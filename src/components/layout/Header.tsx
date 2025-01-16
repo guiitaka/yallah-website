@@ -16,7 +16,9 @@ import {
   Info,
   Lightbulb,
   Headset,
-  ChatCircleText
+  ChatCircleText,
+  Key,
+  House as HouseIcon
 } from '@phosphor-icons/react'
 import ReactFlagsSelect from 'react-flags-select'
 import AnimatedSearch from '../ui/AnimatedSearch'
@@ -145,7 +147,7 @@ export default function Header({ userType }: HeaderProps) {
               />
             </Link>
 
-            {/* Auth Buttons */}
+            {/* Profile Selection Buttons */}
             <div className="flex-1 flex items-center justify-end gap-3">
               <ReactFlagsSelect
                 selected={selected}
@@ -156,12 +158,20 @@ export default function Header({ userType }: HeaderProps) {
                 className="!min-w-0 !w-[120px]"
                 selectButtonClassName="!px-2 !py-2 !border-0 !bg-gray-100 !rounded-full"
               />
-              <button className="px-4 py-2 text-gray-600 hover:text-gray-900">
-                Entrar
-              </button>
-              <button className="px-4 py-2 text-white bg-[#8BADA4] rounded-full hover:bg-[#8BADA4]/90">
-                Cadastrar
-              </button>
+              <Link 
+                href="/owner"
+                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <Key className="w-5 h-5" />
+                Sou Proprietário
+              </Link>
+              <Link 
+                href="/tenant"
+                className="flex items-center gap-2 px-4 py-2 text-white bg-[#8BADA4] rounded-full hover:bg-[#8BADA4]/90 transition-colors"
+              >
+                <HouseIcon className="w-5 h-5" />
+                Quero Alugar
+              </Link>
             </div>
           </div>
         </div>
