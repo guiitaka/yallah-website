@@ -1,0 +1,22 @@
+Ferramentas e Bibliotecas Específicas
+	•	Framer Motion: Para animações.
+	•	React Intersection Observer: Para animações baseadas em scroll.
+	•	next/image: Para otimização de imagens.
+	•	Tailwind CSS Typography Plugin: Para melhorar a estilização de texto.
+
+    Estratégias para Destacar a Identidade Visual da Yallah
+	1.	Logotipo Animado: Adicione uma animação no logotipo do camelo ao carregar a página.
+	2.	Cores: Use transições dinâmicas com a paleta da marca em botões e links interativos.
+	3.	Ícones Customizados: Desenvolva ícones temáticos que remetam à cultura e hospitalidade associadas à marca.
+
+    Otimização e Experiência do Usuário
+	•	Imagens: Use formatos modernos como WebP.
+	•	Pré-carregamento: Pré-carregue fontes e recursos críticos para melhorar o carregamento inicial.
+	•	Navegação: Implemente navegação por SPA (Single Page Application) para transições rápidas.
+	•	Acessibilidade: Siga as diretrizes WCAG para tornar o site acessível.
+
+    Dicas para Replicar Animações e Usabilidade
+	1.	Referências: Utilize ferramentas como Lottie para animações específicas.
+    2.  Componentização: Desenvolva componentes reutilizáveis para elementos animados.
+
+    

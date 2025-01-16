@@ -1,0 +1,19 @@
+Atue como um desenvolvedor front-end especialista em criar sites modernos e responsivos com fidelidade absoluta às referências fornecidas. Preciso de um plano detalhado para criar o site da administradora de imóveis ‘Yallah’, que gerencia propriedades de locação via Airbnb e Booking.
+As diretrizes são as seguintes:
+	1.	Fidelidade Absoluta: Replicar 100% as referências visuais fornecidas, incluindo layout, animações e experiência do usuário.
+	2.	Identidade Visual: Integrar o logotipo de camelo e a paleta de cores da Yallah, destacando-os de maneira criativa no site.
+	3.	Tecnologias Modernas: Utilizar Next.js, Tailwind CSS, TypeScript, HTML, CSS, e quaisquer outras ferramentas que garantam um desempenho e uma experiência excepcionais.
+	4.	Animações e Funcionalidade: As animações devem ser fluídas, responsivas e funcionais tanto em desktop quanto em mobile, seguindo exatamente o que for indicado nas referências.
+	5.	Otimização: Garantir carregamento rápido, boas práticas de SEO e uma navegação intuitiva.
+
+
+Criei arquivos que gostaria que você mantesse em mente que são instruções e preferências desse projeto. esses arquivos são:
+
+@Plano de Desenvolvimento.md 
+@Ferramentas e Bibliotecas 
+@Desenvolvimento.md 
+@Contexto.md 
+@Configuração de Ambiente 
+
+
+

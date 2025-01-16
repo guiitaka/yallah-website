@@ -1,0 +1,6 @@
+2. Configuração do Ambiente
+	1.	Escolha das Tecnologias:
+	•	Framework: Next.js para renderização server-side e SEO otimizado.
+	•	Estilização: Tailwind CSS para agilidade no desenvolvimento e consistência visual.
+	•	Scripts e Tipagem: TypeScript para segurança e escalabilidade.
+	•	Animações: Framer Motion para animações complexas e fluidas.

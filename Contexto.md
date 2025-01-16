@@ -1,0 +1,3 @@
+Contexto:
+
+Você está criando um site estiloso, moderno e responsivo para a administradora de imóveis Yallah, especializada em locações via Airbnb e Booking. O site deve replicar fielmente (100%) as referências visuais e funcionais fornecidas, tanto no layout quanto nas animações e na experiência do usuário. A identidade visual da Yallah, incluindo o logotipo de camelo e a paleta de cores, deve ser integrada de maneira criativa e destacada. O site será desenvolvido com Next.js, Tailwind CSS, TypeScript, HTML, CSS, e outras tecnologias necessárias.
