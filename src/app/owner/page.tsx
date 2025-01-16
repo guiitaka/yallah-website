@@ -10,8 +10,8 @@ import Footer from '@/components/layout/Footer'
 export default function OwnerPage() {
   return (
     <main className="pt-[180px]">
-      <Header />
-      <Banner />
+      <Header userType="owner" />
+      <Banner userType="owner" />
       <Promotions />
       <AboutUs />
       <BestEvents />

@@ -10,8 +10,8 @@ import Footer from '@/components/layout/Footer'
 export default function TenantPage() {
   return (
     <main className="pt-[180px]">
-      <Header />
-      <Banner />
+      <Header userType="tenant" />
+      <Banner userType="tenant" />
       <Promotions />
       <AboutUs />
       <BestEvents />
