@@ -109,10 +109,10 @@ export default function Header({ userType }: HeaderProps) {
     }`}>
       {/* Top Header */}
       <div className="w-full border-b">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="flex items-center justify-between py-2">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-3 items-center">
             {/* Social Media */}
-            <div className="flex-1 flex items-center gap-4">
+            <div className="flex items-center gap-4">
               <Link 
                 href="https://instagram.com" 
                 target="_blank"
@@ -137,41 +137,45 @@ export default function Header({ userType }: HeaderProps) {
             </div>
 
             {/* Logo */}
-            <Link href="/" className="w-[280px] h-[100px] relative">
-              <Image
-                src="/logo-yallah-nobg.png"
-                alt="Yallah"
-                fill
-                style={{ objectFit: 'contain' }}
-                priority
-              />
-            </Link>
+            <div className="flex justify-center">
+              <Link href="/" className="w-[280px] h-[100px] relative">
+                <Image
+                  src="/logo-yallah-nobg.png"
+                  alt="Yallah"
+                  fill
+                  style={{ objectFit: 'contain' }}
+                  priority
+                />
+              </Link>
+            </div>
 
             {/* Profile Selection Buttons */}
-            <div className="flex-1 flex items-center justify-end gap-3">
-              <ReactFlagsSelect
-                selected={selected}
-                onSelect={onSelectFlag}
-                countries={["BR", "US", "ES"]}
-                customLabels={{ BR: "PT", US: "EN", ES: "ES" }}
-                placeholder="Selecione o idioma"
-                className="!min-w-0 !w-[120px]"
-                selectButtonClassName="!px-2 !py-2 !border-0 !bg-gray-100 !rounded-full"
-              />
-              <Link 
-                href="/owner"
-                className="flex items-center justify-center min-w-[140px] gap-1.5 px-4 py-2.5 text-white bg-[#3E5A54] hover:bg-[#2D4640] rounded-full transition-colors text-sm font-medium"
-              >
-                <Key className="w-4 h-4" />
-                Sou Proprietário
-              </Link>
-              <Link 
-                href="/tenant"
-                className="flex items-center justify-center min-w-[140px] gap-1.5 px-4 py-2.5 text-white bg-[#8BADA4] hover:bg-[#7A9C93] rounded-full transition-colors text-sm font-medium"
-              >
-                <HouseIcon className="w-4 h-4" />
-                Quero Alugar
-              </Link>
+            <div className="flex items-center justify-end">
+              <div className="flex items-center gap-4">
+                <ReactFlagsSelect
+                  selected={selected}
+                  onSelect={onSelectFlag}
+                  countries={["BR", "US", "ES"]}
+                  customLabels={{ BR: "PT", US: "EN", ES: "ES" }}
+                  placeholder="Selecione o idioma"
+                  className="!min-w-0 !w-[100px]"
+                  selectButtonClassName="!px-3 !py-2.5 !border-0 !bg-gray-100 !rounded-full !text-sm"
+                />
+                <Link 
+                  href="/owner"
+                  className="h-10 flex items-center justify-center w-[140px] gap-2 px-4 text-white bg-[#3E5A54] hover:bg-[#2D4640] rounded-full transition-colors text-sm font-medium whitespace-nowrap"
+                >
+                  <Key className="w-4 h-4 flex-shrink-0" />
+                  <span>Sou Proprietário</span>
+                </Link>
+                <Link 
+                  href="/tenant"
+                  className="h-10 flex items-center justify-center w-[120px] gap-2 px-4 text-white bg-[#8BADA4] hover:bg-[#7A9C93] rounded-full transition-colors text-sm font-medium whitespace-nowrap"
+                >
+                  <HouseIcon className="w-4 h-4 flex-shrink-0" />
+                  <span>Quero Alugar</span>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -179,7 +183,7 @@ export default function Header({ userType }: HeaderProps) {
 
       {/* Category Navigation */}
       <div className="w-full bg-gray-50">
-        <div className="max-w-[1200px] mx-auto px-6">
+        <div className="container mx-auto px-6">
           <div className="flex items-center justify-center py-4">
             {/* Search Bar - Only show for tenants */}
             {userType === 'tenant' && (
