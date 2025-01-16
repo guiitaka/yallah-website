@@ -4,36 +4,32 @@ import React, { useEffect, useRef } from 'react'
 import Image from 'next/image'
 
 export default function AboutUs() {
-  const sectionRef = useRef<HTMLDivElement>(null)
-
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             entry.target.classList.add('is-visible')
-            observer.unobserve(entry.target) // Para a animação acontecer apenas uma vez
+            observer.unobserve(entry.target)
           }
         })
       },
       {
-        threshold: 0.3 // Dispara quando 30% da seção estiver visível
+        threshold: 0.2,
+        rootMargin: '0px 0px -10% 0px' // Ativa um pouco antes do elemento entrar na tela
       }
     )
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
-    }
+    // Observa todos os elementos com animações
+    document.querySelectorAll('.animate-fadeIn, .animate-slideUp, .animate-scaleUp').forEach((el) => {
+      observer.observe(el)
+    })
 
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current)
-      }
-    }
+    return () => observer.disconnect()
   }, [])
 
   return (
-    <div className="w-full px-6 py-32 relative overflow-hidden" ref={sectionRef}>
+    <div className="w-full px-6 py-32 relative overflow-hidden">
       {/* Background Text */}
       <div className="absolute top-0 right-0 text-[200px] font-bold text-gray-50 select-none pointer-events-none leading-none -translate-y-8">
         YALLAH
@@ -51,56 +47,99 @@ export default function AboutUs() {
         {/* Cards Grid */}
         <div className="grid grid-cols-12 gap-6">
           {/* First Row */}
-          <div className="col-span-5 col-start-1 animate-scaleUp opacity-0">
-            <div className="relative aspect-[4/3] rounded-[32px] overflow-hidden">
-              <Image
-                src="/card1.jpg"
-                alt="Yallah Imóveis"
-                fill
-                className="object-cover"
-              />
+          <div className="col-span-6 col-start-1">
+            <div className="animate-scaleUp opacity-0">
+              <div className="relative aspect-square rounded-[32px] overflow-hidden">
+                <Image
+                  src="/card1.jpg"
+                  alt="Yallah Imóveis"
+                  fill
+                  className="object-cover"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="col-span-4 col-start-6 bg-white rounded-[32px] p-12 shadow-lg animate-fadeIn opacity-0 delay-300">
-            <p className="text-gray-600 text-lg leading-relaxed">
-              Na Yallah, acreditamos que cada imóvel tem o potencial de ser mais do que paredes e teto – é um espaço para criar memórias e viver experiências únicas. Nossa missão é simplificar a gestão de imóveis, conectando proprietários a locatários que valorizam conforto, praticidade e um lugar especial para chamar de lar, mesmo que por pouco tempo.
-            </p>
-          </div>
-
-          <div className="col-span-3 col-start-10 animate-scaleUp opacity-0 delay-150">
-            <div className="relative aspect-square rounded-[32px] overflow-hidden">
-              <Image
-                src="/card2.jpg"
-                alt="Interior Yallah"
-                fill
-                className="object-cover"
-              />
+          <div className="col-span-6 col-start-7">
+            <div className="animate-fadeIn opacity-0">
+              <div className="bg-white rounded-[32px] p-12 shadow-lg">
+                <p className="text-gray-600 text-lg leading-relaxed">
+                  Na Yallah, acreditamos que cada imóvel tem o potencial de ser mais do que paredes e teto – é um espaço para criar memórias e viver experiências únicas. Nossa missão é simplificar a gestão de imóveis, conectando proprietários a locatários que valorizam conforto, praticidade e um lugar especial para chamar de lar, mesmo que por pouco tempo.
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Second Row */}
-          <div className="col-span-4 col-start-2 bg-white rounded-[32px] p-12 shadow-lg mt-6 animate-fadeIn opacity-0 delay-450">
-            <p className="text-gray-600 text-lg leading-relaxed">
-              Com anos de experiência no mercado imobiliário, nossa equipe é especializada em transformar propriedades em ativos rentáveis. Trabalhamos com dedicação para oferecer aos proprietários uma gestão sem preocupações e aos locatários uma estadia impecável, marcada pela excelência e personalização.
-            </p>
-          </div>
-
-          <div className="col-span-3 col-start-6 mt-6 animate-scaleUp opacity-0 delay-300">
-            <div className="relative aspect-[3/4] rounded-[32px] overflow-hidden">
-              <Image
-                src="/card3.jpg"
-                alt="Equipe Yallah"
-                fill
-                className="object-cover"
-              />
+          <div className="col-span-6 col-start-1">
+            <div className="animate-fadeIn opacity-0">
+              <div className="bg-white rounded-[32px] p-12 shadow-lg mt-6">
+                <p className="text-gray-600 text-lg leading-relaxed">
+                  Com anos de experiência no mercado imobiliário, nossa equipe é especializada em transformar propriedades em ativos rentáveis. Trabalhamos com dedicação para oferecer aos proprietários uma gestão sem preocupações e aos locatários uma estadia impecável, marcada pela excelência e personalização.
+                </p>
+              </div>
             </div>
           </div>
 
-          <div className="col-span-4 col-start-9 bg-white rounded-[32px] p-12 shadow-lg mt-6 animate-fadeIn opacity-0 delay-600">
-            <p className="text-gray-600 text-lg leading-relaxed">
-              Nosso compromisso vai além da locação de imóveis. Oferecemos serviços completos de gestão, incluindo limpeza, organização e atendimento ao cliente. Assim, proporcionamos tranquilidade aos proprietários e garantimos uma experiência memorável aos hóspedes que confiam na Yallah para encontrar o espaço perfeito em São Paulo.
-            </p>
+          <div className="col-span-6 col-start-7">
+            <div className="animate-scaleUp opacity-0">
+              <div className="relative aspect-square rounded-[32px] overflow-hidden mt-6">
+                <Image
+                  src="/card2.jpg"
+                  alt="Interior Yallah"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Third Row */}
+          <div className="col-span-6 col-start-1">
+            <div className="animate-scaleUp opacity-0">
+              <div className="relative aspect-square rounded-[32px] overflow-hidden mt-6">
+                <Image
+                  src="/card3.jpg"
+                  alt="Equipe Yallah"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="col-span-6 col-start-7">
+            <div className="animate-fadeIn opacity-0">
+              <div className="bg-white rounded-[32px] p-12 shadow-lg mt-6">
+                <p className="text-gray-600 text-lg leading-relaxed">
+                  Nosso compromisso vai além da locação de imóveis. Oferecemos serviços completos de gestão, incluindo limpeza, organização e atendimento ao cliente. Assim, proporcionamos tranquilidade aos proprietários e garantimos uma experiência memorável aos hóspedes que confiam na Yallah para encontrar o espaço perfeito em São Paulo.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Fourth Row */}
+          <div className="col-span-6 col-start-1">
+            <div className="animate-fadeIn opacity-0">
+              <div className="bg-white rounded-[32px] p-12 shadow-lg mt-6">
+                <p className="text-gray-600 text-lg leading-relaxed">
+                  Nossa plataforma digital intuitiva e equipe dedicada trabalham em conjunto para garantir uma experiência sem complicações. Desde o primeiro contato até o final da estadia, estamos presentes para assegurar que tanto proprietários quanto locatários tenham suas expectativas superadas, construindo relacionamentos duradouros baseados em confiança e excelência.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-span-6 col-start-7">
+            <div className="animate-scaleUp opacity-0">
+              <div className="relative aspect-square rounded-[32px] overflow-hidden mt-6">
+                <Image
+                  src="/card4.jpg"
+                  alt="Experiência Yallah"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -154,24 +193,11 @@ export default function AboutUs() {
 
         .is-visible .animate-fadeIn,
         .is-visible .animate-slideUp,
-        .is-visible .animate-scaleUp {
+        .is-visible .animate-scaleUp,
+        .animate-fadeIn.is-visible,
+        .animate-slideUp.is-visible,
+        .animate-scaleUp.is-visible {
           animation-play-state: running;
-        }
-
-        .delay-150 {
-          animation-delay: 150ms;
-        }
-
-        .delay-300 {
-          animation-delay: 300ms;
-        }
-
-        .delay-450 {
-          animation-delay: 450ms;
-        }
-
-        .delay-600 {
-          animation-delay: 600ms;
         }
       `}</style>
     </div>
