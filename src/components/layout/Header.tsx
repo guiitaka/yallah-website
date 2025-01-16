@@ -160,16 +160,16 @@ export default function Header({ userType }: HeaderProps) {
               />
               <Link 
                 href="/owner"
-                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-white bg-[#3E5A54] hover:bg-[#2D4640] rounded-full transition-colors text-sm font-medium"
               >
-                <Key className="w-5 h-5" />
+                <Key className="w-4 h-4" />
                 Sou Proprietário
               </Link>
               <Link 
                 href="/tenant"
-                className="flex items-center gap-2 px-4 py-2 text-white bg-[#8BADA4] rounded-full hover:bg-[#8BADA4]/90 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-white bg-[#8BADA4] hover:bg-[#7A9C93] rounded-full transition-colors text-sm font-medium"
               >
-                <HouseIcon className="w-5 h-5" />
+                <HouseIcon className="w-4 h-4" />
                 Quero Alugar
               </Link>
             </div>
