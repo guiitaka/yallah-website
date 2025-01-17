@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { 
@@ -18,7 +18,18 @@ import {
   Headset,
   ChatCircleText,
   Key,
-  House as HouseIcon
+  House as HouseIcon,
+  Tree,
+  Mountains,
+  Binoculars,
+  Buildings as BuildingsIcon,
+  Umbrella,
+  SwimmingPool,
+  Bed,
+  Train,
+  SquaresFour,
+  Warehouse,
+  Desktop
 } from '@phosphor-icons/react'
 import ReactFlagsSelect from 'react-flags-select'
 import AnimatedSearch from '../ui/AnimatedSearch'
@@ -30,6 +41,7 @@ type HeaderProps = {
 export default function Header({ userType }: HeaderProps) {
   const [selected, setSelected] = useState('BR')
   const [isScrolled, setIsScrolled] = useState(false)
+  const navRef = useRef<HTMLDivElement>(null)
 
   const onSelectFlag = (code: string) => {
     setSelected(code)
@@ -74,32 +86,48 @@ export default function Header({ userType }: HeaderProps) {
     }
 
     return (
-      <nav className="flex items-center justify-center gap-4">
-        <button className="flex items-center gap-2 px-4 py-2 bg-[#8BADA4] text-white rounded-full">
+      <>
+        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full whitespace-nowrap">
+          <BuildingsIcon size={20} />
+          Apartamentos
+        </button>
+        <button className="flex items-center gap-2 px-4 py-2 bg-[#8BADA4] text-white rounded-full whitespace-nowrap">
           <House weight="fill" size={20} />
-          Imóveis
+          Chalés
         </button>
-        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full">
-          <Star size={20} />
-          Destaques
+        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full whitespace-nowrap">
+          <SquaresFour size={20} />
+          Kitnets
         </button>
-        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full">
-          <Buildings size={20} />
-          Lançamentos
+        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full whitespace-nowrap">
+          <Warehouse size={20} />
+          Lofts
         </button>
-        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full">
+        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full whitespace-nowrap">
           <MapPin size={20} />
-          Localização
+          Perto do centro
         </button>
-        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full">
-          <Calculator size={20} />
-          Financiamento
+        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full whitespace-nowrap">
+          <SwimmingPool size={20} />
+          Piscinas incríveis
         </button>
-        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full">
-          <Calendar size={20} />
-          Agendar
+        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full whitespace-nowrap">
+          <Bed size={20} />
+          Pousadas
         </button>
-      </nav>
+        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full whitespace-nowrap">
+          <Train size={20} />
+          Próximos à estações
+        </button>
+        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full whitespace-nowrap">
+          <Desktop size={20} />
+          Studios
+        </button>
+        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full whitespace-nowrap">
+          <Binoculars size={20} />
+          Vistas incríveis
+        </button>
+      </>
     )
   }
 
@@ -108,7 +136,7 @@ export default function Header({ userType }: HeaderProps) {
       isScrolled ? 'shadow-sm' : ''
     }`}>
       {/* Top Header */}
-      <div className="w-full border-b">
+      <div className="w-full border-b md:block hidden">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-3 items-center">
             {/* Social Media */}
@@ -181,21 +209,68 @@ export default function Header({ userType }: HeaderProps) {
         </div>
       </div>
 
-      {/* Category Navigation */}
-      <div className="w-full bg-gray-50">
-        <div className="container mx-auto px-6">
-          <div className="flex items-center justify-center py-4">
-            {/* Search Bar - Only show for tenants */}
-            {userType === 'tenant' && (
-              <div className="w-[300px]">
-                <AnimatedSearch />
-              </div>
-            )}
-
-            {renderNavigation()}
+      {/* Mobile Header */}
+      <div className="md:hidden w-full border-b bg-white">
+        <div className="container mx-auto px-4 py-2">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="w-[140px] h-[50px] relative">
+              <Image
+                src="/logo-yallah-nobg.png"
+                alt="Yallah"
+                fill
+                style={{ objectFit: 'contain' }}
+                priority
+              />
+            </Link>
+            <div className="flex items-center gap-2">
+              <ReactFlagsSelect
+                selected={selected}
+                onSelect={onSelectFlag}
+                countries={["BR", "US", "ES"]}
+                customLabels={{ BR: "PT", US: "EN", ES: "ES" }}
+                placeholder="Idioma"
+                className="!min-w-0 !w-[80px]"
+                selectButtonClassName="!px-2 !py-1.5 !border-0 !bg-gray-100 !rounded-full !text-sm"
+              />
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Category Navigation */}
+      <div className="w-full bg-gray-50 md:block hidden">
+        <div className="container mx-auto px-6">
+          {userType === 'owner' ? (
+            <div className="py-4">
+              {renderNavigation()}
+            </div>
+          ) : (
+            <div className="flex items-center gap-6 py-4">
+              {/* Search Bar - Only show for tenants */}
+              <div className="w-[300px] flex-shrink-0">
+                <AnimatedSearch />
+              </div>
+
+              {/* Navigation Container */}
+              <div className="flex-1 overflow-x-auto">
+                <div className="flex items-center gap-6 py-2">
+                  {renderNavigation()}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <style jsx global>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   )
 } 
