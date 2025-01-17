@@ -10,8 +10,8 @@ type BannerProps = {
 
 export default function Banner({ userType }: BannerProps) {
   return (
-    <div className="px-4 md:px-6 pt-4 md:pt-10">
-      <div className="relative w-full h-[600px] md:h-[600px] overflow-hidden rounded-3xl">
+    <div className="px-4 md:px-6 pt-0 md:pt-10">
+      <div className="relative w-full h-[650px] md:h-[600px] overflow-hidden rounded-3xl">
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
@@ -24,7 +24,7 @@ export default function Banner({ userType }: BannerProps) {
           <div className="absolute inset-0 bg-black/60 md:bg-black/40" />
         </div>
 
-        <div className="relative h-full mx-auto flex items-start md:items-center pt-8 md:pt-0">
+        <div className="relative h-full mx-auto flex flex-col md:flex-row md:items-center pt-8 md:pt-0">
           <div className="w-full max-w-[1200px] mx-auto px-4 md:px-6">
             <div className="flex flex-col md:flex-row md:gap-20">
               {/* Left Content */}
@@ -45,7 +45,7 @@ export default function Banner({ userType }: BannerProps) {
 
               {userType === 'owner' ? (
                 /* Benefits Card for Owners */
-                <div className="mt-8 md:mt-0 w-full md:w-[400px] bg-white/95 md:bg-white rounded-2xl p-6 md:p-6 shadow-lg">
+                <div className="mt-6 md:mt-0 w-full md:w-[400px] bg-white/95 md:bg-white rounded-2xl p-6 md:p-6 shadow-lg">
                   <div className="flex items-center gap-2 mb-4 md:mb-6">
                     <Buildings className="w-6 h-6" />
                     <h2 className="text-xl font-semibold">Por que anunciar na Yallah?</h2>
@@ -93,7 +93,7 @@ export default function Banner({ userType }: BannerProps) {
                 </div>
               ) : (
                 /* Search Form for Tenants */
-                <div className="mt-8 md:mt-0 w-full md:w-[400px] bg-white/95 md:bg-white rounded-2xl p-6 md:p-6 shadow-lg">
+                <div className="mt-6 md:mt-0 w-full md:w-[400px] bg-white/95 md:bg-white rounded-2xl p-6 md:p-6 shadow-lg">
                   <div className="flex items-center gap-2 mb-4">
                     <Buildings className="w-6 h-6" />
                     <h2 className="text-xl font-semibold">Encontrar Imóveis</h2>
