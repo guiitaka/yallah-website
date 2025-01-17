@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import ClientLayout from '@/components/layout/ClientLayout'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -20,22 +21,5 @@ export default function RootLayout({
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
-  )
-}
-
-'use client'
-
-import MobileNavigation from '@/components/layout/MobileNavigation'
-import { usePathname } from 'next/navigation'
-
-function ClientLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
-  const isHomePage = pathname === '/'
-
-  return (
-    <div className={!isHomePage ? 'pb-16 md:pb-0' : ''}>
-      {children}
-      {!isHomePage && <MobileNavigation />}
-    </div>
   )
 } 
