@@ -10,7 +10,7 @@ type BannerProps = {
 
 export default function Banner({ userType }: BannerProps) {
   return (
-    <div className="px-6 pt-4 md:pt-10">
+    <div className="px-4 md:px-6 pt-4 md:pt-10">
       <div className="relative w-full h-[500px] md:h-[600px] overflow-hidden rounded-3xl">
         {/* Background Image */}
         <div className="absolute inset-0">
@@ -24,128 +24,130 @@ export default function Banner({ userType }: BannerProps) {
           <div className="absolute inset-0 bg-black/40" />
         </div>
 
-        <div className="relative h-full mx-auto px-4 md:px-6 flex items-center">
-          <div className="flex flex-col md:flex-row md:gap-20 w-full max-w-[1200px]">
-            {/* Left Content */}
-            <div className="text-white mb-6 md:mb-0 md:max-w-[600px]">
-              <h1 className="text-4xl md:text-[64px] font-normal leading-tight mb-4 md:mb-8">
-                Transforme seu imóvel em renda garantida:
-              </h1>
-              <p className="text-lg md:text-2xl opacity-100 mb-6 md:mb-10 font-light">
-                Deixe a Yallah cuidar de tudo para você.
-              </p>
-              {userType === 'tenant' && (
-                <button className="flex items-center justify-center w-full md:w-auto gap-2 px-6 md:px-8 py-3 md:py-4 bg-[#8BADA4] text-white rounded-full hover:bg-[#8BADA4]/90 text-base md:text-lg">
-                  <Buildings className="w-5 h-5" />
-                  Encontrar Imóvel
-                </button>
+        <div className="relative h-full mx-auto flex items-center">
+          <div className="w-full max-w-[1200px] mx-auto px-4 md:px-6">
+            <div className="flex flex-col md:flex-row md:gap-20">
+              {/* Left Content */}
+              <div className="md:max-w-[600px] text-white">
+                <h1 className="text-4xl md:text-[64px] font-normal leading-tight mb-4 md:mb-8">
+                  Transforme seu imóvel em renda garantida:
+                </h1>
+                <p className="text-lg md:text-2xl opacity-100 mb-6 md:mb-10 font-light">
+                  Deixe a Yallah cuidar de tudo para você.
+                </p>
+                {userType === 'tenant' && (
+                  <button className="w-full md:w-auto flex items-center justify-center md:justify-start gap-2 px-6 md:px-8 py-3 md:py-4 bg-[#8BADA4] text-white rounded-full hover:bg-[#8BADA4]/90 text-base md:text-lg">
+                    <Buildings className="w-5 h-5" />
+                    Encontrar Imóvel
+                  </button>
+                )}
+              </div>
+
+              {userType === 'owner' ? (
+                /* Benefits Card for Owners */
+                <div className="mt-6 md:mt-0 w-full md:w-[400px] bg-white rounded-2xl p-4 md:p-6 shadow-lg">
+                  <div className="flex items-center gap-2 mb-4 md:mb-6">
+                    <Buildings className="w-6 h-6" />
+                    <h2 className="text-xl font-semibold">Por que anunciar na Yallah?</h2>
+                  </div>
+
+                  <div className="space-y-4 md:space-y-6">
+                    {/* Benefit 1 */}
+                    <div className="flex items-start gap-4">
+                      <div className="p-2 bg-[#8BADA4]/10 rounded-lg">
+                        <ShieldCheck className="w-6 h-6 text-[#8BADA4]" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium mb-1">Aluguel Garantido</h3>
+                        <p className="text-sm text-gray-600">Receba seu aluguel em dia, independente do inquilino</p>
+                      </div>
+                    </div>
+
+                    {/* Benefit 2 */}
+                    <div className="flex items-start gap-4">
+                      <div className="p-2 bg-[#8BADA4]/10 rounded-lg">
+                        <Money className="w-6 h-6 text-[#8BADA4]" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium mb-1">Valorização do Imóvel</h3>
+                        <p className="text-sm text-gray-600">Manutenção preventiva e gestão profissional</p>
+                      </div>
+                    </div>
+
+                    {/* Benefit 3 */}
+                    <div className="flex items-start gap-4">
+                      <div className="p-2 bg-[#8BADA4]/10 rounded-lg">
+                        <ChartLineUp className="w-6 h-6 text-[#8BADA4]" />
+                      </div>
+                      <div>
+                        <h3 className="font-medium mb-1">Gestão Completa</h3>
+                        <p className="text-sm text-gray-600">Cuidamos de tudo: desde o anúncio até a gestão do inquilino</p>
+                      </div>
+                    </div>
+
+                    <button className="w-full flex items-center justify-center gap-2 py-4 bg-[#8BADA4] text-white rounded-lg hover:bg-[#8BADA4]/90 text-lg">
+                      <Buildings className="w-5 h-5" />
+                      Anunciar Imóvel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* Search Form for Tenants */
+                <div className="mt-6 md:mt-0 w-full md:w-[400px] bg-white rounded-2xl p-4 md:p-6 shadow-lg">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Buildings className="w-6 h-6" />
+                    <h2 className="text-xl font-semibold">Encontrar Imóveis</h2>
+                  </div>
+
+                  <div className="space-y-4">
+                    {/* Location */}
+                    <div>
+                      <label className="text-sm text-gray-600 mb-1 block">Cidade ou Região</label>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Digite a localização"
+                          className="w-full p-3 bg-gray-50 rounded-lg pl-10"
+                        />
+                        <MapPin className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                      </div>
+                    </div>
+
+                    {/* Type */}
+                    <div>
+                      <label className="text-sm text-gray-600 mb-1 block">Tipo de Imóvel</label>
+                      <select className="w-full p-3 bg-gray-50 rounded-lg appearance-none">
+                        <option>Apartamento</option>
+                        <option>Casa</option>
+                        <option>Comercial</option>
+                        <option>Terreno</option>
+                      </select>
+                    </div>
+
+                    {/* Price Range */}
+                    <div>
+                      <label className="text-sm text-gray-600 mb-1 block">Faixa de Preço</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Mínimo"
+                          className="w-1/2 p-3 bg-gray-50 rounded-lg"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Máximo"
+                          className="w-1/2 p-3 bg-gray-50 rounded-lg"
+                        />
+                      </div>
+                    </div>
+
+                    <button className="w-full py-3 bg-[#8BADA4] text-white rounded-lg hover:bg-[#8BADA4]/90 mt-2">
+                      Buscar Imóvel
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
-
-            {userType === 'owner' ? (
-              /* Benefits Card for Owners */
-              <div className="w-full md:w-[400px] bg-white rounded-2xl p-4 md:p-6 shadow-lg">
-                <div className="flex items-center gap-2 mb-4 md:mb-6">
-                  <Buildings className="w-6 h-6" />
-                  <h2 className="text-lg md:text-xl font-semibold">Por que anunciar na Yallah?</h2>
-                </div>
-
-                <div className="space-y-4 md:space-y-6">
-                  {/* Benefit 1 */}
-                  <div className="flex items-start gap-3 md:gap-4">
-                    <div className="p-2 bg-[#8BADA4]/10 rounded-lg flex-shrink-0">
-                      <ShieldCheck className="w-5 h-5 md:w-6 md:h-6 text-[#8BADA4]" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium mb-1">Aluguel Garantido</h3>
-                      <p className="text-sm text-gray-600">Receba seu aluguel em dia, independente do inquilino</p>
-                    </div>
-                  </div>
-
-                  {/* Benefit 2 */}
-                  <div className="flex items-start gap-3 md:gap-4">
-                    <div className="p-2 bg-[#8BADA4]/10 rounded-lg flex-shrink-0">
-                      <Money className="w-5 h-5 md:w-6 md:h-6 text-[#8BADA4]" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium mb-1">Valorização do Imóvel</h3>
-                      <p className="text-sm text-gray-600">Manutenção preventiva e gestão profissional</p>
-                    </div>
-                  </div>
-
-                  {/* Benefit 3 */}
-                  <div className="flex items-start gap-3 md:gap-4">
-                    <div className="p-2 bg-[#8BADA4]/10 rounded-lg flex-shrink-0">
-                      <ChartLineUp className="w-5 h-5 md:w-6 md:h-6 text-[#8BADA4]" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium mb-1">Gestão Completa</h3>
-                      <p className="text-sm text-gray-600">Cuidamos de tudo: desde o anúncio até a gestão do inquilino</p>
-                    </div>
-                  </div>
-
-                  <button className="flex items-center justify-center gap-2 w-full py-3 md:py-4 bg-[#8BADA4] text-white rounded-lg hover:bg-[#8BADA4]/90 text-base md:text-lg">
-                    <Buildings className="w-5 h-5" />
-                    Anunciar Imóvel
-                  </button>
-                </div>
-              </div>
-            ) : (
-              /* Search Form for Tenants */
-              <div className="w-full md:w-[400px] bg-white rounded-2xl p-4 md:p-6 shadow-lg">
-                <div className="flex items-center gap-2 mb-4">
-                  <Buildings className="w-6 h-6" />
-                  <h2 className="text-lg md:text-xl font-semibold">Encontrar Imóveis</h2>
-                </div>
-
-                <div className="space-y-3 md:space-y-4">
-                  {/* Location */}
-                  <div>
-                    <label className="text-sm text-gray-600 mb-1 block">Cidade ou Região</label>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        placeholder="Digite a localização"
-                        className="w-full p-3 bg-gray-50 rounded-lg pl-10"
-                      />
-                      <MapPin className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                    </div>
-                  </div>
-
-                  {/* Type */}
-                  <div>
-                    <label className="text-sm text-gray-600 mb-1 block">Tipo de Imóvel</label>
-                    <select className="w-full p-3 bg-gray-50 rounded-lg appearance-none">
-                      <option>Apartamento</option>
-                      <option>Casa</option>
-                      <option>Comercial</option>
-                      <option>Terreno</option>
-                    </select>
-                  </div>
-
-                  {/* Price Range */}
-                  <div>
-                    <label className="text-sm text-gray-600 mb-1 block">Faixa de Preço</label>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        placeholder="Mínimo"
-                        className="w-1/2 p-3 bg-gray-50 rounded-lg"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Máximo"
-                        className="w-1/2 p-3 bg-gray-50 rounded-lg"
-                      />
-                    </div>
-                  </div>
-
-                  <button className="w-full py-3 bg-[#8BADA4] text-white rounded-lg hover:bg-[#8BADA4]/90 mt-2">
-                    Buscar Imóvel
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
