@@ -10,7 +10,7 @@ type BannerProps = {
 
 export default function Banner({ userType }: BannerProps) {
   return (
-    <div className="px-4 md:px-6 pt-2 md:pt-10">
+    <div className="px-4 md:px-6 pt-4 md:pt-10">
       <div className="relative w-full h-[750px] md:h-[600px] overflow-hidden rounded-3xl">
         {/* Background Image */}
         <div className="absolute inset-0">
