@@ -4,14 +4,10 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Buildings, House } from '@phosphor-icons/react'
-import MobileSearch from '@/components/ui/MobileSearch'
 
 export default function Home() {
   return (
     <main className="min-h-screen">
-      {/* Mobile Search */}
-      <MobileSearch />
-
       <div className="h-[calc(100vh-80px)] md:h-screen w-full flex flex-col md:flex-row relative">
         {/* Left Side - Property Owner */}
         <Link 
