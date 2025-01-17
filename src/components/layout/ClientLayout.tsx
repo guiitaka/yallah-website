@@ -1,16 +1,25 @@
 'use client'
 
-import MobileNavigation from '@/components/layout/MobileNavigation'
 import { usePathname } from 'next/navigation'
+import Header from '@/components/layout/Header'
+import MobileNavigation from '@/components/layout/MobileNavigation'
 
-export default function ClientLayout({ children }: { children: React.ReactNode }) {
+type ClientLayoutProps = {
+  children: React.ReactNode
+}
+
+export default function ClientLayout({ children }: ClientLayoutProps) {
   const pathname = usePathname()
-  const isHomePage = pathname === '/'
+  const isHome = pathname === '/'
+  const userType = pathname.startsWith('/owner') ? 'owner' : 'tenant'
 
   return (
-    <div className={!isHomePage ? 'pb-16 md:pb-0' : ''}>
-      {children}
-      {!isHomePage && <MobileNavigation />}
-    </div>
+    <>
+      {!isHome && <Header userType={userType} />}
+      <main className="min-h-screen pb-20 md:pb-0">
+        {children}
+      </main>
+      {!isHome && <MobileNavigation userType={userType} />}
+    </>
   )
 } 
