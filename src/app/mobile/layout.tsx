@@ -20,6 +20,38 @@ export const metadata: Metadata = {
     capable: true,
     statusBarStyle: 'default',
     title: 'Yallah',
+    startupImage: [
+      {
+        url: '/splash/apple-splash-2048-2732.jpg',
+        media: '(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)',
+      },
+      {
+        url: '/splash/apple-splash-1668-2388.jpg',
+        media: '(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)',
+      },
+      {
+        url: '/splash/apple-splash-1536-2048.jpg',
+        media: '(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)',
+      },
+      {
+        url: '/splash/apple-splash-1125-2436.jpg',
+        media: '(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)',
+      },
+      {
+        url: '/splash/apple-splash-1242-2688.jpg',
+        media: '(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)',
+      },
+    ],
+  },
+  icons: {
+    icon: [
+      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/icons/AppIcons/Assets.xcassets/AppIcon.appiconset/180.png', sizes: '180x180', type: 'image/png' },
+      { url: '/icons/AppIcons/Assets.xcassets/AppIcon.appiconset/120.png', sizes: '120x120', type: 'image/png' },
+    ],
   },
 };
 
@@ -30,6 +62,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/AppIcons/Assets.xcassets/AppIcon.appiconset/180.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+      </head>
       <body className={`${inter.className} antialiased`}>
         {children}
       </body>

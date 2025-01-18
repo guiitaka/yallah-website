@@ -2,17 +2,18 @@
 
 import React from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Home, Search, User, Calendar } from 'lucide-react';
+import { Home, Search, User, Heart, MessageCircle } from 'lucide-react';
 
 const MobileLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
 
   const navigationItems = [
-    { icon: Home, label: 'Home', path: '/mobile' },
-    { icon: Search, label: 'Search', path: '/mobile/search' },
-    { icon: Calendar, label: 'Events', path: '/mobile/events' },
-    { icon: User, label: 'Profile', path: '/mobile/profile' },
+    { icon: Home, label: 'Início', path: '/mobile' },
+    { icon: Search, label: 'Buscar', path: '/mobile/search' },
+    { icon: Heart, label: 'Favoritos', path: '/mobile/favorites' },
+    { icon: MessageCircle, label: 'Chat', path: '/mobile/chat' },
+    { icon: User, label: 'Perfil', path: '/mobile/profile' },
   ];
 
   return (
@@ -33,9 +34,9 @@ const MobileLayout = ({ children }: { children: React.ReactNode }) => {
                 key={item.path}
                 onClick={() => router.push(item.path)}
                 className={`flex flex-col items-center justify-center w-16 h-16 space-y-1
-                  ${isActive ? 'text-blue-500' : 'text-gray-500'}`}
+                  ${isActive ? 'text-[#8BADA4]' : 'text-gray-500'}`}
               >
-                <Icon className={`w-6 h-6 ${isActive ? 'fill-current' : ''}`} />
+                <Icon className={`w-6 h-6 ${isActive ? 'stroke-[#8BADA4]' : 'stroke-current'}`} />
                 <span className="text-xs font-medium">{item.label}</span>
               </button>
             );
