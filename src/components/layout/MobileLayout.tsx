@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Home, Building, Info, Phone, User } from 'lucide-react';
+import { Home, Building, Info, User, Phone } from 'lucide-react';
+import Image from 'next/image';
 
 const MobileLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
@@ -18,14 +19,33 @@ const MobileLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 bg-white px-4 py-4 flex items-center justify-center border-b z-10">
+        <div className="w-[120px] h-[40px]">
+          <Image
+            src="/logo-yallah-nobg.png"
+            alt="Yallah"
+            width={120}
+            height={40}
+            priority
+            style={{ objectFit: 'contain' }}
+          />
+        </div>
+        <div className="absolute right-4">
+          <button className="text-sm font-medium px-3 py-1 bg-gray-100 rounded-full">
+            PT
+          </button>
+        </div>
+      </header>
+
       {/* Main Content */}
-      <main className="flex-1 pb-16">
+      <main className="flex-1 pt-[68px] pb-20">
         {children}
       </main>
 
-      {/* Bottom Navigation Bar - Apple Style */}
+      {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
-        <div className="flex justify-around items-center h-16 px-4 max-w-md mx-auto">
+        <div className="flex justify-around items-center h-20 px-4 max-w-md mx-auto">
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.path;

@@ -2,32 +2,12 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { ChevronRight, Star, Home, MapPin, Crown, Calendar } from 'lucide-react';
 import MobileLayout from '@/components/layout/MobileLayout';
 
 export default function MobileHomePage() {
   return (
     <MobileLayout>
       <div className="flex flex-col min-h-screen bg-gray-50">
-        {/* Header Section */}
-        <header className="bg-white px-4 py-4 flex items-center justify-center border-b relative">
-          <div className="w-[120px] h-[40px] relative">
-            <Image
-              src="/logo-yallah-nobg.png"
-              alt="Yallah"
-              width={120}
-              height={40}
-              className="object-contain"
-              priority
-            />
-          </div>
-          <div className="absolute right-4">
-            <button className="text-sm font-medium px-3 py-1 bg-gray-100 rounded-full">
-              PT
-            </button>
-          </div>
-        </header>
-
         {/* Banner Section */}
         <section className="relative w-full h-[300px]">
           <Image
@@ -35,8 +15,8 @@ export default function MobileHomePage() {
             alt="Banner"
             width={800}
             height={600}
-            className="object-cover w-full h-full"
             priority
+            style={{ objectFit: 'cover', width: '100%', height: '100%' }}
           />
           <div className="absolute inset-0 bg-black/60" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6 text-center">
@@ -63,11 +43,12 @@ export default function MobileHomePage() {
               <div key={service.title} className="bg-gray-50 p-4 rounded-xl relative overflow-hidden">
                 <div className="relative aspect-square rounded-xl overflow-hidden mb-3">
                   <video
-                    className="w-full h-full object-cover"
+                    className="w-full h-full"
                     autoPlay
                     loop
                     muted
                     playsInline
+                    style={{ objectFit: 'cover' }}
                   >
                     <source src={service.video} type="video/webm" />
                   </video>
@@ -92,9 +73,9 @@ export default function MobileHomePage() {
               <Image
                 src="/card1.jpg"
                 alt="Yallah Imóveis"
-                width={600}
-                height={400}
-                className="object-cover w-full h-full"
+                width={800}
+                height={450}
+                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
               />
             </div>
             <div className="bg-gray-50 p-4 rounded-xl">
@@ -106,15 +87,15 @@ export default function MobileHomePage() {
               <Image
                 src="/card2.jpg"
                 alt="Interior Yallah"
-                width={600}
-                height={400}
-                className="object-cover w-full h-full"
+                width={800}
+                height={450}
+                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
               />
             </div>
           </div>
         </section>
 
-        {/* Best Events / Featured Properties */}
+        {/* Featured Properties */}
         <section className="px-4 py-8 bg-white mt-2">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-medium">Imóveis em Destaque</h2>
@@ -140,9 +121,9 @@ export default function MobileHomePage() {
                   <Image
                     src={property.image}
                     alt={property.title}
-                    width={600}
-                    height={400}
-                    className="object-cover w-full h-full"
+                    width={800}
+                    height={450}
+                    style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                   />
                 </div>
                 <div className="p-4">
@@ -161,7 +142,7 @@ export default function MobileHomePage() {
         </section>
 
         {/* Contact Form */}
-        <section className="px-4 py-8 bg-white mt-2 mb-16">
+        <section className="px-4 py-8 bg-white mt-2">
           <h2 className="text-xl font-medium mb-6">Entre em Contato</h2>
           <form className="space-y-4">
             <div>
