@@ -2,18 +2,18 @@
 
 import React from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Home, Search, User, Heart, MessageCircle } from 'lucide-react';
+import { Home, Building, Info, Phone, User } from 'lucide-react';
 
 const MobileLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
 
   const navigationItems = [
-    { icon: Home, label: 'Início', path: '/mobile' },
-    { icon: Search, label: 'Buscar', path: '/mobile/search' },
-    { icon: Heart, label: 'Favoritos', path: '/mobile/favorites' },
-    { icon: MessageCircle, label: 'Chat', path: '/mobile/chat' },
-    { icon: User, label: 'Perfil', path: '/mobile/profile' },
+    { icon: Home, label: 'A Yallah', path: '/mobile' },
+    { icon: Building, label: 'Como Funciona', path: '/mobile/como-funciona' },
+    { icon: Info, label: 'Método', path: '/mobile/metodo' },
+    { icon: User, label: 'Proprietário', path: '/mobile/proprietario' },
+    { icon: Phone, label: 'Contato', path: '/mobile/contato' },
   ];
 
   return (
