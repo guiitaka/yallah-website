@@ -3,11 +3,11 @@
 import Link from 'next/link'
 import { House, Info, Lightbulb, Headset, Key } from '@phosphor-icons/react'
 
-interface MobileNavigationProps {
+type MobileNavigationProps = {
   userType: 'owner' | 'tenant'
 }
 
-const MobileNavigation = ({ userType }: MobileNavigationProps) => {
+export default function MobileNavigation({ userType }: MobileNavigationProps) {
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 md:hidden">
       <div className="container mx-auto px-4">
@@ -64,6 +64,4 @@ const MobileNavigation = ({ userType }: MobileNavigationProps) => {
       </div>
     </div>
   )
-}
-
-export default MobileNavigation 
+} 

@@ -1,8 +1,7 @@
 import Header from '@/components/layout/Header'
 import Banner from '@/components/home/Banner'
-import AboutUs from '@/components/home/AboutUs'
-import AboutUsMobile from '@/components/home/AboutUsMobile'
 import Promotions from '@/components/home/Promotions'
+import AboutUs from '@/components/home/AboutUs'
 import BestEvents from '@/components/home/BestEvents'
 import ContactForm from '@/components/home/ContactForm'
 import FAQ from '@/components/home/FAQ'
@@ -14,9 +13,8 @@ export default function OwnerPage() {
       <Header userType="owner" />
       <div className="space-y-12 md:space-y-20">
         <Banner userType="owner" />
-        <AboutUs />
-        <AboutUsMobile />
         <Promotions />
+        <AboutUs />
         <BestEvents />
         <ContactForm />
         <FAQ />
