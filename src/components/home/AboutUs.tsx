@@ -28,18 +28,20 @@ export default function AboutUs() {
   }, [])
 
   return (
-    <div className="w-full px-4 md:px-6 py-16 md:py-32 relative overflow-hidden">
+    <div className="w-full px-4 md:px-6 py-10 md:py-32 relative overflow-hidden">
       {/* Background Text */}
-      <div className="absolute top-0 right-0 text-[60px] md:text-[200px] font-bold text-gray-50 select-none pointer-events-none leading-none -translate-y-8">
+      <div className="absolute top-0 right-0 text-[40px] md:text-[200px] font-bold text-gray-50 select-none pointer-events-none leading-none -translate-y-8">
         YALLAH
       </div>
 
       <div className="max-w-[1200px] mx-auto relative">
         {/* Header */}
-        <div className="mb-8 md:mb-20">
-          <h2 className="text-lg md:text-2xl text-gray-500 mb-2 md:mb-4 animate-fadeIn opacity-0">Seu imóvel,</h2>
-          <h3 className="text-lg md:text-2xl text-gray-500 mb-3 md:mb-4 animate-fadeIn opacity-0">nossa expertise</h3>
-          <h1 className="text-2xl md:text-[56px] leading-[1.3] md:leading-[1.1] font-light max-w-[1000px] animate-slideUp opacity-0">
+        <div className="mb-6 md:mb-20">
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-2 mb-4 md:mb-6">
+            <h2 className="text-base md:text-2xl text-gray-500">Seu imóvel,</h2>
+            <h3 className="text-base md:text-2xl text-gray-500">nossa expertise</h3>
+          </div>
+          <h1 className="text-xl md:text-[56px] leading-snug md:leading-[1.1] font-light max-w-[1000px] animate-slideUp opacity-0">
             Cuidamos do seu imóvel como se fosse nosso
           </h1>
         </div>
@@ -49,7 +51,7 @@ export default function AboutUs() {
           {/* First Row */}
           <div className="md:col-span-6 md:col-start-1">
             <div className="animate-scaleUp opacity-0">
-              <div className="relative h-[200px] md:aspect-square rounded-[20px] md:rounded-[32px] overflow-hidden">
+              <div className="relative h-[160px] md:aspect-square rounded-xl md:rounded-[32px] overflow-hidden">
                 <Image
                   src="/card1.jpg"
                   alt="Yallah Imóveis"
@@ -62,9 +64,9 @@ export default function AboutUs() {
 
           <div className="md:col-span-6 md:col-start-7">
             <div className="animate-fadeIn opacity-0">
-              <div className="bg-white rounded-[20px] md:rounded-[32px] p-4 md:p-12 shadow-lg">
+              <div className="bg-white rounded-xl md:rounded-[32px] p-4 md:p-12 shadow-lg">
                 <p className="text-sm md:text-lg text-gray-600 leading-relaxed">
-                  Na Yallah, acreditamos que cada imóvel tem o potencial de ser mais do que paredes e teto – é um espaço para criar memórias e viver experiências únicas. Nossa missão é simplificar a gestão de imóveis, conectando proprietários a locatários que valorizam conforto, praticidade e um lugar especial para chamar de lar, mesmo que por pouco tempo.
+                  Na Yallah, acreditamos que cada imóvel tem o potencial de ser mais do que paredes e teto – é um espaço para criar memórias e viver experiências únicas. Nossa missão é simplificar a gestão de imóveis, conectando proprietários a locatários que valorizam conforto, praticidade e um lugar especial para chamar de lar.
                 </p>
               </div>
             </div>
@@ -73,9 +75,9 @@ export default function AboutUs() {
           {/* Second Row */}
           <div className="md:col-span-6 md:col-start-1">
             <div className="animate-fadeIn opacity-0">
-              <div className="bg-white rounded-[20px] md:rounded-[32px] p-4 md:p-12 shadow-lg mt-4 md:mt-6">
+              <div className="bg-white rounded-xl md:rounded-[32px] p-4 md:p-12 shadow-lg mt-4 md:mt-6">
                 <p className="text-sm md:text-lg text-gray-600 leading-relaxed">
-                  Com anos de experiência no mercado imobiliário, nossa equipe é especializada em transformar propriedades em ativos rentáveis. Trabalhamos com dedicação para oferecer aos proprietários uma gestão sem preocupações e aos locatários uma estadia impecável, marcada pela excelência e personalização.
+                  Com anos de experiência no mercado imobiliário, nossa equipe é especializada em transformar propriedades em ativos rentáveis. Trabalhamos com dedicação para oferecer aos proprietários uma gestão sem preocupações e aos locatários uma estadia impecável.
                 </p>
               </div>
             </div>
@@ -83,7 +85,7 @@ export default function AboutUs() {
 
           <div className="md:col-span-6 md:col-start-7">
             <div className="animate-scaleUp opacity-0">
-              <div className="relative h-[200px] md:aspect-square rounded-[20px] md:rounded-[32px] overflow-hidden mt-4 md:mt-6">
+              <div className="relative h-[160px] md:aspect-square rounded-xl md:rounded-[32px] overflow-hidden mt-4 md:mt-6">
                 <Image
                   src="/card2.jpg"
                   alt="Interior Yallah"
@@ -97,7 +99,7 @@ export default function AboutUs() {
           {/* Third Row */}
           <div className="md:col-span-6 md:col-start-1">
             <div className="animate-scaleUp opacity-0">
-              <div className="relative h-[200px] md:aspect-square rounded-[20px] md:rounded-[32px] overflow-hidden mt-4 md:mt-6">
+              <div className="relative h-[160px] md:aspect-square rounded-xl md:rounded-[32px] overflow-hidden mt-4 md:mt-6">
                 <Image
                   src="/card3.jpg"
                   alt="Equipe Yallah"
@@ -110,9 +112,9 @@ export default function AboutUs() {
 
           <div className="md:col-span-6 md:col-start-7">
             <div className="animate-fadeIn opacity-0">
-              <div className="bg-white rounded-[20px] md:rounded-[32px] p-4 md:p-12 shadow-lg mt-4 md:mt-6">
+              <div className="bg-white rounded-xl md:rounded-[32px] p-4 md:p-12 shadow-lg mt-4 md:mt-6">
                 <p className="text-sm md:text-lg text-gray-600 leading-relaxed">
-                  Nosso compromisso vai além da locação de imóveis. Oferecemos serviços completos de gestão, incluindo limpeza, organização e atendimento ao cliente. Assim, proporcionamos tranquilidade aos proprietários e garantimos uma experiência memorável aos hóspedes que confiam na Yallah para encontrar o espaço perfeito em São Paulo.
+                  Nosso compromisso vai além da locação de imóveis. Oferecemos serviços completos de gestão, incluindo limpeza, organização e atendimento ao cliente. Assim, proporcionamos tranquilidade aos proprietários e garantimos uma experiência memorável aos hóspedes.
                 </p>
               </div>
             </div>
@@ -121,9 +123,9 @@ export default function AboutUs() {
           {/* Fourth Row */}
           <div className="md:col-span-6 md:col-start-1">
             <div className="animate-fadeIn opacity-0">
-              <div className="bg-white rounded-[20px] md:rounded-[32px] p-4 md:p-12 shadow-lg mt-4 md:mt-6">
+              <div className="bg-white rounded-xl md:rounded-[32px] p-4 md:p-12 shadow-lg mt-4 md:mt-6">
                 <p className="text-sm md:text-lg text-gray-600 leading-relaxed">
-                  Nossa plataforma digital intuitiva e equipe dedicada trabalham em conjunto para garantir uma experiência sem complicações. Desde o primeiro contato até o final da estadia, estamos presentes para assegurar que tanto proprietários quanto locatários tenham suas expectativas superadas, construindo relacionamentos duradouros baseados em confiança e excelência.
+                  Nossa plataforma digital intuitiva e equipe dedicada trabalham em conjunto para garantir uma experiência sem complicações. Desde o primeiro contato até o final da estadia, estamos presentes para assegurar que tanto proprietários quanto locatários tenham suas expectativas superadas.
                 </p>
               </div>
             </div>
@@ -131,7 +133,7 @@ export default function AboutUs() {
 
           <div className="md:col-span-6 md:col-start-7">
             <div className="animate-scaleUp opacity-0">
-              <div className="relative h-[200px] md:aspect-square rounded-[20px] md:rounded-[32px] overflow-hidden mt-4 md:mt-6">
+              <div className="relative h-[160px] md:aspect-square rounded-xl md:rounded-[32px] overflow-hidden mt-4 md:mt-6">
                 <Image
                   src="/card4.jpg"
                   alt="Experiência Yallah"

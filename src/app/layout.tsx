@@ -1,14 +1,8 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
+import { Inter } from 'next/font/google'
 import ClientLayout from '@/components/layout/ClientLayout'
 
 const inter = Inter({ subsets: ['latin'] })
-
-export const metadata: Metadata = {
-  title: 'Yallah Brasil',
-  description: 'Gestão profissional de imóveis para locação',
-}
 
 export default function RootLayout({
   children,

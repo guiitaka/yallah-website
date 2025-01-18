@@ -213,7 +213,10 @@ export default function Header({ userType }: HeaderProps) {
       <div className="md:hidden w-full border-b bg-white">
         <div className="container mx-auto px-4 py-2">
           <div className="flex items-center justify-between">
-            <Link href="/" className="w-[140px] h-[50px] relative">
+            {/* Empty div to help with centering */}
+            <div className="w-[80px]" />
+
+            <Link href="/" className="w-[160px] h-[60px] relative">
               <Image
                 src="/logo-yallah-nobg.png"
                 alt="Yallah"
@@ -222,17 +225,16 @@ export default function Header({ userType }: HeaderProps) {
                 priority
               />
             </Link>
-            <div className="flex items-center gap-2">
-              <ReactFlagsSelect
-                selected={selected}
-                onSelect={onSelectFlag}
-                countries={["BR", "US", "ES"]}
-                customLabels={{ BR: "PT", US: "EN", ES: "ES" }}
-                placeholder="Idioma"
-                className="!min-w-0 !w-[80px]"
-                selectButtonClassName="!px-2 !py-1.5 !border-0 !bg-gray-100 !rounded-full !text-sm"
-              />
-            </div>
+
+            <ReactFlagsSelect
+              selected={selected}
+              onSelect={onSelectFlag}
+              countries={["BR", "US", "ES"]}
+              customLabels={{ BR: "PT", US: "EN", ES: "ES" }}
+              placeholder="Idioma"
+              className="!min-w-0 !w-[80px]"
+              selectButtonClassName="!px-2 !py-1.5 !border-0 !bg-gray-100 !rounded-full !text-sm"
+            />
           </div>
         </div>
       </div>
