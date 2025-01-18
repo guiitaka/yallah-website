@@ -28,20 +28,20 @@ export default function AboutUs() {
   }, [])
 
   return (
-    <div className="w-full px-4 md:px-6 py-10 md:py-32 relative overflow-hidden">
+    <div className="w-full px-4 md:px-6 py-10 md:py-32 relative overflow-hidden hidden md:block">
       {/* Background Text */}
-      <div className="absolute top-0 right-0 text-[40px] md:text-[200px] font-bold text-gray-50 select-none pointer-events-none leading-none -translate-y-8">
+      <div className="absolute top-0 right-0 text-[200px] font-bold text-gray-50 select-none pointer-events-none leading-none -translate-y-8">
         YALLAH
       </div>
 
       <div className="max-w-[1200px] mx-auto relative">
         {/* Header */}
-        <div className="mb-6 md:mb-20">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-2 mb-4 md:mb-6">
-            <h2 className="text-base md:text-2xl text-gray-500">Seu imóvel,</h2>
-            <h3 className="text-base md:text-2xl text-gray-500">nossa expertise</h3>
+        <div className="mb-20">
+          <div className="flex flex-row items-center gap-2 mb-6">
+            <h2 className="text-2xl text-gray-500">Seu imóvel,</h2>
+            <h3 className="text-2xl text-gray-500">nossa expertise</h3>
           </div>
-          <h1 className="text-xl md:text-[56px] leading-snug md:leading-[1.1] font-light max-w-[1000px] animate-slideUp opacity-0">
+          <h1 className="text-[56px] leading-[1.1] font-light max-w-[1000px] animate-slideUp opacity-0">
             Cuidamos do seu imóvel como se fosse nosso
           </h1>
         </div>
