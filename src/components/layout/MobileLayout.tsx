@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Home, Search, User, Calendar } from 'lucide-react';
@@ -7,10 +9,10 @@ const MobileLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
 
   const navigationItems = [
-    { icon: Home, label: 'Home', path: '/' },
-    { icon: Search, label: 'Search', path: '/search' },
-    { icon: Calendar, label: 'Events', path: '/events' },
-    { icon: User, label: 'Profile', path: '/profile' },
+    { icon: Home, label: 'Home', path: '/mobile' },
+    { icon: Search, label: 'Search', path: '/mobile/search' },
+    { icon: Calendar, label: 'Events', path: '/mobile/events' },
+    { icon: User, label: 'Profile', path: '/mobile/profile' },
   ];
 
   return (
