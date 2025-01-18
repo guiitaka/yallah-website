@@ -1,100 +1,69 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { 
-  House, 
-  MagnifyingGlass, 
-  Heart, 
-  ChatCircleText,
-  User,
-  Info,
-  Lightbulb,
-  Headset,
-  Calculator,
-  Buildings,
-} from '@phosphor-icons/react'
+import { House, Info, Lightbulb, Headset, Key } from '@phosphor-icons/react'
 
-export default function MobileNavigation() {
-  const pathname = usePathname()
-  const isOwner = pathname.startsWith('/owner')
+interface MobileNavigationProps {
+  userType: 'owner' | 'tenant'
+}
 
-  const ownerNavigation = [
-    {
-      href: '/owner',
-      icon: <House size={24} weight={pathname === '/owner' ? 'fill' : 'regular'} />,
-      label: 'A Yallah'
-    },
-    {
-      href: '/owner/como-funciona',
-      icon: <Info size={24} />,
-      label: 'Como Funciona'
-    },
-    {
-      href: '/owner/nosso-metodo',
-      icon: <Lightbulb size={24} />,
-      label: 'Método'
-    },
-    {
-      href: '/owner/suporte',
-      icon: <Headset size={24} />,
-      label: 'Suporte'
-    },
-    {
-      href: '/owner/fale-conosco',
-      icon: <ChatCircleText size={24} />,
-      label: 'Contato'
-    }
-  ]
-
-  const tenantNavigation = [
-    {
-      href: '/tenant',
-      icon: <House size={24} weight={pathname === '/tenant' ? 'fill' : 'regular'} />,
-      label: 'Explorar'
-    },
-    {
-      href: '/tenant/favoritos',
-      icon: <Heart size={24} />,
-      label: 'Favoritos'
-    },
-    {
-      href: '/tenant/reservas',
-      icon: <Buildings size={24} />,
-      label: 'Reservas'
-    },
-    {
-      href: '/tenant/mensagens',
-      icon: <ChatCircleText size={24} />,
-      label: 'Mensagens'
-    },
-    {
-      href: '/tenant/perfil',
-      icon: <User size={24} />,
-      label: 'Perfil'
-    }
-  ]
-
-  const navigation = isOwner ? ownerNavigation : tenantNavigation
-
+const MobileNavigation = ({ userType }: MobileNavigationProps) => {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t md:hidden z-50">
-      <div className="flex items-center justify-around py-2">
-        {navigation.map((item) => (
-          <Link 
-            key={item.href}
-            href={item.href} 
-            className={`flex flex-col items-center gap-1 ${
-              pathname === item.href 
-                ? 'text-[#8BADA4]' 
-                : 'text-gray-500 hover:text-[#8BADA4]'
-            }`}
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 md:hidden">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between py-3">
+          <Link
+            href="/"
+            className="flex flex-col items-center gap-1"
           >
-            {item.icon}
-            <span className="text-xs">{item.label}</span>
+            <House weight="light" className="w-6 h-6 text-gray-600" />
+            <span className="text-xs text-gray-600">A Yallah</span>
           </Link>
-        ))}
+
+          <Link
+            href="/como-funciona"
+            className="flex flex-col items-center gap-1"
+          >
+            <Info weight="light" className="w-6 h-6 text-gray-600" />
+            <span className="text-xs text-gray-600">Como Funciona</span>
+          </Link>
+
+          <Link
+            href="/metodo"
+            className="flex flex-col items-center gap-1"
+          >
+            <Lightbulb weight="light" className="w-6 h-6 text-gray-600" />
+            <span className="text-xs text-gray-600">Método</span>
+          </Link>
+
+          <Link
+            href={userType === 'owner' ? '/tenant' : '/owner'}
+            className="flex flex-col items-center gap-1"
+          >
+            {userType === 'owner' ? (
+              <>
+                <House weight="light" className="w-6 h-6 text-gray-600" />
+                <span className="text-xs text-gray-600">Alugar</span>
+              </>
+            ) : (
+              <>
+                <Key weight="light" className="w-6 h-6 text-gray-600" />
+                <span className="text-xs text-gray-600">Proprietário</span>
+              </>
+            )}
+          </Link>
+
+          <Link
+            href="/contato"
+            className="flex flex-col items-center gap-1"
+          >
+            <Headset weight="light" className="w-6 h-6 text-gray-600" />
+            <span className="text-xs text-gray-600">Contato</span>
+          </Link>
+        </div>
       </div>
-    </nav>
+    </div>
   )
-} 
+}
+
+export default MobileNavigation 
