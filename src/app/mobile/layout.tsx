@@ -1,5 +1,6 @@
 import { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
+import SplashScreen from '@/components/mobile/SplashScreen';
 import '@/styles/globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -14,7 +15,7 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: 'Yallah Mobile',
-  description: 'Find and book the best events near you',
+  description: 'Especialistas em administração de imóveis para Airbnb e Booking',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -61,7 +62,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <head>
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/AppIcons/Assets.xcassets/AppIcon.appiconset/180.png" />
         <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
@@ -70,6 +71,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body className={`${inter.className} antialiased`}>
+        <SplashScreen />
         {children}
       </body>
     </html>
