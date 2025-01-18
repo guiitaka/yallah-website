@@ -11,7 +11,7 @@ type ClientLayoutProps = {
 export default function ClientLayout({ children }: ClientLayoutProps) {
   const pathname = usePathname()
   const isHome = pathname === '/'
-  const userType = pathname.startsWith('/owner') ? 'owner' as const : 'tenant' as const
+  const userType = pathname.startsWith('/owner') ? 'owner' : 'tenant'
 
   return (
     <>
