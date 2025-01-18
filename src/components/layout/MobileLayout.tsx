@@ -23,12 +23,12 @@ const MobileLayout = ({ children }: { children: React.ReactNode }) => {
       <header className="fixed top-0 left-0 right-0 bg-white px-4 py-4 flex items-center justify-center border-b z-10">
         <div className="w-[120px] h-[40px]">
           <Image
-            src="/logo-yallah-nobg.png"
+            src={'/logo-yallah-nobg.png'}
             alt="Yallah"
             width={120}
             height={40}
             priority
-            style={{ objectFit: 'contain' }}
+            unoptimized
           />
         </div>
         <div className="absolute right-4">

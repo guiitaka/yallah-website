@@ -11,12 +11,13 @@ export default function MobileHomePage() {
         {/* Banner Section */}
         <section className="relative w-full h-[300px]">
           <Image
-            src="/owner-bg.jpg"
+            src={'/owner-bg.jpg'}
             alt="Banner"
             width={800}
             height={600}
             priority
-            style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+            unoptimized
+            className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black/60" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6 text-center">
@@ -43,12 +44,11 @@ export default function MobileHomePage() {
               <div key={service.title} className="bg-gray-50 p-4 rounded-xl relative overflow-hidden">
                 <div className="relative aspect-square rounded-xl overflow-hidden mb-3">
                   <video
-                    className="w-full h-full"
+                    className="w-full h-full object-cover"
                     autoPlay
                     loop
                     muted
                     playsInline
-                    style={{ objectFit: 'cover' }}
                   >
                     <source src={service.video} type="video/webm" />
                   </video>
@@ -71,11 +71,12 @@ export default function MobileHomePage() {
           <div className="grid grid-cols-1 gap-4">
             <div className="relative aspect-video rounded-xl overflow-hidden">
               <Image
-                src="/card1.jpg"
+                src={'/card1.jpg'}
                 alt="Yallah Imóveis"
                 width={800}
                 height={450}
-                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                unoptimized
+                className="w-full h-full object-cover"
               />
             </div>
             <div className="bg-gray-50 p-4 rounded-xl">
@@ -85,11 +86,12 @@ export default function MobileHomePage() {
             </div>
             <div className="relative aspect-video rounded-xl overflow-hidden">
               <Image
-                src="/card2.jpg"
+                src={'/card2.jpg'}
                 alt="Interior Yallah"
                 width={800}
                 height={450}
-                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                unoptimized
+                className="w-full h-full object-cover"
               />
             </div>
           </div>
@@ -123,7 +125,8 @@ export default function MobileHomePage() {
                     alt={property.title}
                     width={800}
                     height={450}
-                    style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                    unoptimized
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <div className="p-4">

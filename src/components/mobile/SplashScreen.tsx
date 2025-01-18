@@ -20,12 +20,13 @@ export default function SplashScreen() {
     <div className="fixed inset-0 bg-white z-50 flex items-center justify-center">
       <div className="w-[200px] h-[200px]">
         <Image
-          src="/logo-yallah-nobg.png"
+          src={'/logo-yallah-nobg.png'}
           alt="Yallah"
           width={200}
           height={200}
           priority
-          style={{ objectFit: 'contain', width: '100%', height: '100%' }}
+          unoptimized
+          className="w-full h-full object-contain"
         />
       </div>
     </div>
