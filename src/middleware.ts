@@ -7,13 +7,21 @@ export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const isMobilePath = url.pathname.startsWith('/mobile');
 
-  // If mobile device and not already on mobile path, redirect to mobile version
+  // Verifica se é uma requisição de asset estático
+  const isStaticAsset = /\.(jpg|jpeg|png|gif|svg|webm|mp4|webp|css|js|ico|json)$/i.test(url.pathname);
+  
+  // Se for asset estático ou estiver na pasta public, não redireciona
+  if (isStaticAsset || url.pathname.startsWith('/videos/') || url.pathname.startsWith('/icons/')) {
+    return NextResponse.next();
+  }
+
+  // Se for dispositivo mobile e não estiver em um caminho mobile, redireciona para versão mobile
   if (isMobile && !isMobilePath && !url.pathname.startsWith('/_next')) {
     url.pathname = `/mobile${url.pathname}`;
     return NextResponse.redirect(url);
   }
 
-  // If desktop device and on mobile path, redirect to desktop version
+  // Se for desktop e estiver em um caminho mobile, redireciona para versão desktop
   if (!isMobile && isMobilePath) {
     url.pathname = url.pathname.replace('/mobile', '');
     return NextResponse.redirect(url);
