@@ -43,7 +43,9 @@ export default function Header({ userType }: HeaderProps) {
   const router = useRouter()
   const [selected, setSelected] = useState('BR')
   const [isScrolled, setIsScrolled] = useState(false)
-  const [isTransitioning, setIsTransitioning] = useState(false)
+  const [phase, setPhase] = useState<'idle' | 'fadeIn' | 'fadeOut'>('idle')
+  const [isFlipping, setIsFlipping] = useState(false)
+  const [targetUserType, setTargetUserType] = useState<'owner' | 'tenant'>(userType)
   const navRef = useRef<HTMLDivElement>(null)
 
   const onSelectFlag = (code: string) => {
@@ -61,10 +63,91 @@ export default function Header({ userType }: HeaderProps) {
   }, [])
 
   const handleNavigation = (path: string) => {
-    setIsTransitioning(true)
+    const newUserType = path.includes('owner') ? 'owner' : 'tenant'
+    setTargetUserType(newUserType)
+    
+    // Primeira fase: fade in para verde
+    setPhase('fadeIn')
+    
+    // Após a tela ficar verde, inicia a animação do ícone
     setTimeout(() => {
-      router.push(path)
-    }, 300) // Tempo da animação
+      setIsFlipping(true)
+      
+      // Após a animação do ícone, navega e inicia o fade out
+      setTimeout(() => {
+        setIsFlipping(false)
+        router.push(path)
+        setPhase('fadeOut')
+        
+        // Resetar o estado após a animação completa
+        setTimeout(() => {
+          setPhase('idle')
+        }, 1500)
+      }, 2000) // Aumentado para 2s para combinar com a animação de rotação
+    }, 1500)
+  }
+
+  const renderTransitionIcon = () => {
+    const iconSize = 120
+    const FromIcon = userType === 'owner' ? Key : HouseIcon
+    const ToIcon = targetUserType === 'owner' ? Key : HouseIcon
+    
+    // Texto correspondente à versão que está sendo carregada
+    const transitionText = targetUserType === 'owner' 
+      ? 'Maximize o retorno do seu imóvel'
+      : 'Encontre o lugar perfeito para sua estadia'
+    
+    return (
+      <div className="flex flex-col items-center gap-6">
+        <div className="relative w-[120px] h-[120px]">
+          {/* Container com flip */}
+          <div 
+            className={`
+              absolute inset-0 transition-all duration-[2000ms] transform
+              ${isFlipping ? 'animate-flip-y' : ''}
+            `}
+            style={{
+              transformStyle: 'preserve-3d',
+              transformOrigin: 'center center'
+            }}
+          >
+            {/* Primeiro ícone */}
+            <div 
+              className={`
+                absolute inset-0 transition-all duration-[1000ms] backface-hidden
+                ${isFlipping ? 'opacity-0' : 'opacity-100'}
+              `}
+            >
+              <FromIcon size={iconSize} weight="fill" className="text-white drop-shadow-lg" />
+            </div>
+
+            {/* Segundo ícone */}
+            <div 
+              className={`
+                absolute inset-0 transition-all duration-[1000ms] backface-hidden rotate-y-180
+                ${isFlipping ? 'opacity-100' : 'opacity-0'}
+              `}
+            >
+              <ToIcon size={iconSize} weight="fill" className="text-white drop-shadow-lg" />
+            </div>
+          </div>
+        </div>
+
+        {/* Texto com reticências animadas */}
+        <div 
+          className={`
+            text-white text-[40px] font-montserrat font-extrabold text-center transition-all duration-1000 tracking-tight
+            ${isFlipping ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}
+          `}
+          style={{
+            textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}
+        >
+          {transitionText}
+          <span className="animate-ellipsis">...</span>
+        </div>
+      </div>
+    )
   }
 
   const renderNavigation = () => {
@@ -166,25 +249,29 @@ export default function Header({ userType }: HeaderProps) {
 
   return (
     <>
-      {isTransitioning && (
+      {/* Overlay de transição com duas fases */}
+      <div 
+        className={`fixed inset-0 z-[9999] transition-all transform duration-[1500ms] ease-in-out
+          ${phase === 'idle' ? 'opacity-0 scale-110 pointer-events-none' : ''}
+          ${phase === 'fadeIn' ? 'opacity-100 scale-100 bg-[#8BADA4]' : ''}
+          ${phase === 'fadeOut' ? 'opacity-0 scale-90 bg-[#8BADA4]' : ''}
+        `}
+      >
         <div 
-          className="fixed inset-0 bg-white z-[9999]"
-          style={{
-            animation: 'fadeIn 0.3s ease-in-out forwards'
-          }}
+          className={`absolute inset-0 transition-opacity duration-[1500ms] ${
+            phase === 'fadeIn' ? 'opacity-100' : 'opacity-0'
+          }`}
         >
-          <style jsx>{`
-            @keyframes fadeIn {
-              from {
-                opacity: 0;
-              }
-              to {
-                opacity: 1;
-              }
-            }
-          `}</style>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#8BADA4]/20 to-[#8BADA4]/40" />
+          
+          {/* Ícone central com animação */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="perspective">
+              {renderTransitionIcon()}
+            </div>
+          </div>
         </div>
-      )}
+      </div>
       <div className={`w-full bg-white fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled ? 'shadow-sm' : ''
       }`}>
@@ -311,6 +398,43 @@ export default function Header({ userType }: HeaderProps) {
           }
           .scrollbar-hide::-webkit-scrollbar {
             display: none;
+          }
+          .perspective {
+            perspective: 1000px;
+          }
+          
+          .backface-hidden {
+            backface-visibility: hidden;
+          }
+
+          .rotate-y-180 {
+            transform: rotateY(180deg);
+          }
+          
+          @keyframes flip-y {
+            0% {
+              transform: rotateY(0deg);
+            }
+            100% {
+              transform: rotateY(1080deg);
+            }
+          }
+
+          .animate-flip-y {
+            animation: flip-y 2s linear infinite;
+          }
+
+          @keyframes ellipsis {
+            0% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+            100% { content: ''; }
+          }
+
+          .animate-ellipsis::after {
+            content: '';
+            animation: ellipsis 2s steps(4) infinite;
           }
         `}</style>
       </div>
