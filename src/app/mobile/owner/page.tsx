@@ -8,13 +8,45 @@ export default function MobileOwnerPage() {
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   useEffect(() => {
-    videoRefs.current.forEach((videoRef) => {
-      if (videoRef) {
-        videoRef.play().catch((error) => {
-          console.error('Error playing video:', error);
-        });
+    const playVideos = () => {
+      videoRefs.current.forEach((videoRef) => {
+        if (videoRef) {
+          // Ensure video is muted first
+          videoRef.muted = true;
+          
+          // Play the video
+          const playPromise = videoRef.play();
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                // Video started playing successfully
+              })
+              .catch(error => {
+                console.error("Error attempting to play video:", error);
+                // Try playing again with a user interaction
+                document.addEventListener('touchstart', () => {
+                  videoRef.play();
+                }, { once: true });
+              });
+          }
+        }
+      });
+    };
+
+    // Initial play attempt
+    playVideos();
+
+    // Add event listener for visibility changes
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        playVideos();
       }
     });
+
+    // Cleanup
+    return () => {
+      document.removeEventListener('visibilitychange', playVideos);
+    };
   }, []);
 
   return (
