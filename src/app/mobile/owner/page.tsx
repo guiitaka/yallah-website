@@ -35,10 +35,38 @@ export default function MobileOwnerPage() {
           </p>
           <div className="grid grid-cols-2 gap-4">
             {[
-              { title: 'Gestão Completa', description: 'Administração total do seu imóvel', video: '/videos/administracao.webm' },
-              { title: 'Limpeza', description: 'Serviço profissional de limpeza', video: '/videos/imovel-impecavel.webm' },
-              { title: 'Manutenção', description: 'Manutenção preventiva e corretiva', video: '/videos/anuncios.webm' },
-              { title: 'Atendimento 24h', description: 'Suporte aos hóspedes 24 horas', video: '/videos/complicacoes.webm' }
+              { 
+                title: 'Gestão Completa', 
+                description: 'Administração total do seu imóvel', 
+                video: {
+                  webm: '/videos/administracao.webm',
+                  mp4: '/videos/administracao.mp4'
+                }
+              },
+              { 
+                title: 'Limpeza', 
+                description: 'Serviço profissional de limpeza', 
+                video: {
+                  webm: '/videos/imovel-impecavel.webm',
+                  mp4: '/videos/imovel-impecavel.mp4'
+                }
+              },
+              { 
+                title: 'Manutenção', 
+                description: 'Manutenção preventiva e corretiva', 
+                video: {
+                  webm: '/videos/anuncios.webm',
+                  mp4: '/videos/anuncios.mp4'
+                }
+              },
+              { 
+                title: 'Atendimento 24h', 
+                description: 'Suporte aos hóspedes 24 horas', 
+                video: {
+                  webm: '/videos/complicacoes.webm',
+                  mp4: '/videos/complicacoes.mp4'
+                }
+              }
             ].map((service) => (
               <div key={service.title} className="bg-gray-50 p-4 rounded-xl relative overflow-hidden">
                 <div className="relative aspect-square rounded-xl overflow-hidden mb-3">
@@ -48,8 +76,11 @@ export default function MobileOwnerPage() {
                     loop
                     muted
                     playsInline
+                    preload="auto"
+                    webkit-playsinline="true"
                   >
-                    <source src={service.video} type="video/webm" />
+                    <source src={service.video.webm} type="video/webm" />
+                    <source src={service.video.mp4} type="video/mp4" />
                   </video>
                 </div>
                 <h3 className="font-medium mb-1">{service.title}</h3>
