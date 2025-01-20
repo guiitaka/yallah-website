@@ -1,10 +1,22 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import MobileLayout from '@/components/layout/MobileLayout';
 
 export default function MobileOwnerPage() {
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+
+  useEffect(() => {
+    videoRefs.current.forEach((videoRef) => {
+      if (videoRef) {
+        videoRef.play().catch((error) => {
+          console.error('Error playing video:', error);
+        });
+      }
+    });
+  }, []);
+
   return (
     <MobileLayout>
       <div className="flex flex-col min-h-screen bg-gray-50">
@@ -41,7 +53,8 @@ export default function MobileOwnerPage() {
                 video: {
                   webm: '/videos/administracao.webm',
                   mp4: '/videos/administracao.mp4'
-                }
+                },
+                poster: '/images/administracao.jpeg'
               },
               { 
                 title: 'Limpeza', 
@@ -49,7 +62,8 @@ export default function MobileOwnerPage() {
                 video: {
                   webm: '/videos/imovel-impecavel.webm',
                   mp4: '/videos/imovel-impecavel.mp4'
-                }
+                },
+                poster: '/images/imovel-impecavel.jpeg'
               },
               { 
                 title: 'Manutenção', 
@@ -57,7 +71,8 @@ export default function MobileOwnerPage() {
                 video: {
                   webm: '/videos/anuncios.webm',
                   mp4: '/videos/anuncios.mp4'
-                }
+                },
+                poster: '/images/anuncios.jpeg'
               },
               { 
                 title: 'Atendimento 24h', 
@@ -65,22 +80,34 @@ export default function MobileOwnerPage() {
                 video: {
                   webm: '/videos/complicacoes.webm',
                   mp4: '/videos/complicacoes.mp4'
-                }
+                },
+                poster: '/images/complicacoes.jpeg'
               }
-            ].map((service) => (
+            ].map((service, index) => (
               <div key={service.title} className="bg-gray-50 p-4 rounded-xl relative overflow-hidden">
                 <div className="relative aspect-square rounded-xl overflow-hidden mb-3">
                   <video
+                    ref={(el) => {
+                      if (el) videoRefs.current[index] = el;
+                    }}
                     className="w-full h-full object-cover"
                     autoPlay
                     loop
                     muted
                     playsInline
-                    preload="auto"
-                    webkit-playsinline="true"
+                    preload="metadata"
+                    poster={service.poster}
+                    onError={(e) => console.error(`Error loading video for ${service.title}:`, e)}
                   >
-                    <source src={service.video.webm} type="video/webm" />
                     <source src={service.video.mp4} type="video/mp4" />
+                    <source src={service.video.webm} type="video/webm" />
+                    <Image
+                      src={service.poster}
+                      alt={service.title}
+                      width={400}
+                      height={400}
+                      className="w-full h-full object-cover"
+                    />
                   </video>
                 </div>
                 <h3 className="font-medium mb-1">{service.title}</h3>
