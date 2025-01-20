@@ -1,54 +1,11 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import MobileLayout from '@/components/layout/MobileLayout';
+import AutoplayVideo from '@/components/AutoplayVideo';
 
 export default function MobileOwnerPage() {
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
-
-  useEffect(() => {
-    const playVideos = () => {
-      videoRefs.current.forEach((videoRef) => {
-        if (videoRef) {
-          // Ensure video is muted first
-          videoRef.muted = true;
-          
-          // Play the video
-          const playPromise = videoRef.play();
-          if (playPromise !== undefined) {
-            playPromise
-              .then(() => {
-                // Video started playing successfully
-              })
-              .catch(error => {
-                console.error("Error attempting to play video:", error);
-                // Try playing again with a user interaction
-                document.addEventListener('touchstart', () => {
-                  videoRef.play();
-                }, { once: true });
-              });
-          }
-        }
-      });
-    };
-
-    // Initial play attempt
-    playVideos();
-
-    // Add event listener for visibility changes
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') {
-        playVideos();
-      }
-    });
-
-    // Cleanup
-    return () => {
-      document.removeEventListener('visibilitychange', playVideos);
-    };
-  }, []);
-
   return (
     <MobileLayout>
       <div className="flex flex-col min-h-screen bg-gray-50">
@@ -115,32 +72,13 @@ export default function MobileOwnerPage() {
                 },
                 poster: '/images/complicacoes.jpeg'
               }
-            ].map((service, index) => (
+            ].map((service) => (
               <div key={service.title} className="bg-gray-50 p-4 rounded-xl relative overflow-hidden">
                 <div className="relative aspect-square rounded-xl overflow-hidden mb-3">
-                  <video
-                    ref={(el) => {
-                      if (el) videoRefs.current[index] = el;
-                    }}
-                    className="w-full h-full object-cover"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    preload="metadata"
+                  <AutoplayVideo
+                    videoSrc={service.video}
                     poster={service.poster}
-                    onError={(e) => console.error(`Error loading video for ${service.title}:`, e)}
-                  >
-                    <source src={service.video.mp4} type="video/mp4" />
-                    <source src={service.video.webm} type="video/webm" />
-                    <Image
-                      src={service.poster}
-                      alt={service.title}
-                      width={400}
-                      height={400}
-                      className="w-full h-full object-cover"
-                    />
-                  </video>
+                  />
                 </div>
                 <h3 className="font-medium mb-1">{service.title}</h3>
                 <p className="text-sm text-gray-500">{service.description}</p>
