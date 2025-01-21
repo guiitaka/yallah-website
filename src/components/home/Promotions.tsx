@@ -12,7 +12,6 @@ interface ServiceCard {
     mp4: string
     webm: string
   }
-  poster: string
 }
 
 const services: ServiceCard[] = [
@@ -22,8 +21,7 @@ const services: ServiceCard[] = [
     videoSrc: {
       mp4: '/videos/administracao.mp4',
       webm: '/videos/administracao.webm'
-    },
-    poster: '/images/posters/administracao.jpg'
+    }
   },
   {
     title: 'Imóvel sempre Impecável',
@@ -31,8 +29,7 @@ const services: ServiceCard[] = [
     videoSrc: {
       mp4: '/videos/imovel-impecavel.mp4',
       webm: '/videos/imovel-impecavel.webm'
-    },
-    poster: '/images/posters/imovel-impecavel.jpg'
+    }
   },
   {
     title: 'Anúncios Estratégicos',
@@ -40,8 +37,7 @@ const services: ServiceCard[] = [
     videoSrc: {
       mp4: '/videos/anuncios.mp4',
       webm: '/videos/anuncios.webm'
-    },
-    poster: '/images/posters/anuncios.jpg'
+    }
   },
   {
     title: 'Sem Complicações',
@@ -49,8 +45,7 @@ const services: ServiceCard[] = [
     videoSrc: {
       mp4: '/videos/complicacoes.mp4',
       webm: '/videos/complicacoes.webm'
-    },
-    poster: '/images/posters/complicacoes.jpg'
+    }
   }
 ]
 
@@ -91,7 +86,7 @@ export default function Promotions() {
               <div className="relative aspect-square rounded-[32px] overflow-hidden bg-gray-100">
                 <AutoplayVideo
                   videoSrc={service.videoSrc}
-                  poster={service.poster}
+                  poster=""
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/10" />
               </div>

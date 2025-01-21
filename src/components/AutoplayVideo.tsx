@@ -5,10 +5,9 @@ interface AutoplayVideoProps {
     mp4: string;
     webm: string;
   };
-  poster: string;
 }
 
-export default function AutoplayVideo({ videoSrc, poster }: AutoplayVideoProps) {
+export default function AutoplayVideo({ videoSrc }: AutoplayVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -42,7 +41,6 @@ export default function AutoplayVideo({ videoSrc, poster }: AutoplayVideoProps) 
         muted
         loop
         playsInline
-        poster={poster}
         preload="auto"
         controls={false}
         data-playsinline="true"
