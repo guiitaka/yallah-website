@@ -2,7 +2,23 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { House, Info, Lightbulb, Headset, Key, CaretUp } from '@phosphor-icons/react'
+import {
+  House,
+  Info,
+  Lightbulb,
+  Headset,
+  Key,
+  CaretUp,
+  Buildings,
+  Tree,
+  Bed,
+  SketchLogo,
+  MapPin,
+  Waves,
+  Train,
+  Desktop,
+  Mountains
+} from '@phosphor-icons/react'
 import { useState } from 'react'
 
 type MobileNavigationProps = {
@@ -10,16 +26,16 @@ type MobileNavigationProps = {
 }
 
 const categories = [
-  'Apartamentos',
-  'Chalés',
-  'Kitnets',
-  'Lofts',
-  'Perto do centro',
-  'Piscinas Incríveis',
-  'Pousadas',
-  'Próximos à estações',
-  'Studios',
-  'Vistas Incríveis'
+  { name: 'Apartamentos', icon: Buildings },
+  { name: 'Chalés', icon: Tree },
+  { name: 'Kitnets', icon: Bed },
+  { name: 'Lofts', icon: SketchLogo },
+  { name: 'Perto do centro', icon: MapPin },
+  { name: 'Piscinas Incríveis', icon: Waves },
+  { name: 'Pousadas', icon: House },
+  { name: 'Próximos à estações', icon: Train },
+  { name: 'Studios', icon: Desktop },
+  { name: 'Vistas Incríveis', icon: Mountains }
 ]
 
 export default function MobileNavigation({ userType }: MobileNavigationProps) {
@@ -149,16 +165,17 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
         <div className="fixed bottom-[80px] left-0 right-0 bg-white border-t border-gray-100 shadow-lg transition-all duration-300 ease-in-out max-h-[60vh] overflow-y-auto">
           <div className="container mx-auto px-4 py-4">
             <div className="grid grid-cols-2 gap-4">
-              {categories.map((category) => (
+              {categories.map(({ name, icon: Icon }) => (
                 <button
-                  key={category}
-                  className="text-left py-3 px-4 rounded-lg bg-gray-50 hover:bg-gray-100 text-sm text-gray-700"
+                  key={name}
+                  className="flex items-center gap-3 py-3 px-4 rounded-lg bg-gray-50 hover:bg-gray-100 text-sm text-gray-700"
                   onClick={() => {
                     setIsCategoryOpen(false)
                     // Aqui você pode adicionar a lógica de navegação para a categoria
                   }}
                 >
-                  {category}
+                  <Icon className="w-5 h-5 text-[#8BADA4]" />
+                  {name}
                 </button>
               ))}
             </div>
