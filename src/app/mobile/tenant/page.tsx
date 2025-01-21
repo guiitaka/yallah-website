@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import MobileLayout from '@/components/layout/MobileLayout';
+import PopularDestinations from '@/components/home/PopularDestinations';
 
 export default function MobileTenantPage() {
   return (
@@ -26,6 +27,9 @@ export default function MobileTenantPage() {
             </p>
           </div>
         </section>
+
+        {/* Popular Destinations */}
+        <PopularDestinations />
 
         {/* Featured Properties */}
         <section className="px-4 py-8 bg-white">
