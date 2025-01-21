@@ -34,16 +34,16 @@ function FAQItem({ question, answer }: FAQItem) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <div className="border-b border-gray-200 py-6">
+    <div className="border-b border-gray-200 py-4 md:py-6">
       <button
         className="flex justify-between items-center w-full text-left"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className="text-xl">{question}</span>
-        <span className="text-2xl">{isOpen ? '−' : '+'}</span>
+        <span className="text-lg md:text-xl pr-4">{question}</span>
+        <span className="text-xl md:text-2xl flex-shrink-0">{isOpen ? '−' : '+'}</span>
       </button>
       {isOpen && (
-        <p className="mt-4 text-gray-600 leading-relaxed">
+        <p className="mt-3 md:mt-4 text-gray-600 text-base md:text-lg leading-relaxed">
           {answer}
         </p>
       )}
@@ -53,19 +53,19 @@ function FAQItem({ question, answer }: FAQItem) {
 
 export default function FAQ() {
   return (
-    <div className="w-full px-6 py-20">
+    <div className="w-full px-4 md:px-6 py-12 md:py-20">
       <div className="max-w-[1200px] mx-auto">
-        <div className="grid grid-cols-12 gap-20">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-20">
           {/* Left Side */}
-          <div className="col-span-4">
-            <h2 className="text-5xl font-light">Perguntas Frequentes</h2>
-            <p className="mt-6 text-gray-600">
+          <div className="col-span-1 md:col-span-4">
+            <h2 className="text-3xl md:text-5xl font-light">Perguntas Frequentes</h2>
+            <p className="mt-4 md:mt-6 text-gray-600 text-base md:text-lg">
               Tire suas dúvidas sobre como a Yallah pode transformar seu imóvel em uma fonte de renda sem preocupações ou encontrar o lugar perfeito para sua estadia em São Paulo.
             </p>
           </div>
 
           {/* Right Side - FAQ Items */}
-          <div className="col-span-8">
+          <div className="col-span-1 md:col-span-8">
             {faqItems.map((item, index) => (
               <FAQItem key={index} {...item} />
             ))}
