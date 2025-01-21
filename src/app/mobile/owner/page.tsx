@@ -98,7 +98,11 @@ export default function MobileOwnerPage() {
 
         {/* Promotions Section */}
         <section className="px-4 py-8 bg-white">
-          <h2 className="text-xl font-medium mb-4">Seu imóvel, nossa expertise</h2>
+          <h2 className="text-xl text-gray-500 mb-3">Seu imóvel, nossa expertise</h2>
+          <h1 className="text-[32px] leading-[1.2] font-light mb-4">
+            Cuidamos do seu imóvel<br />
+            como se fosse nosso
+          </h1>
           <p className="text-gray-600 mb-6">
             A Yallah oferece gestão completa para seu imóvel: Desde a administração da locação até a manutenção e limpeza.
           </p>
@@ -148,7 +152,7 @@ export default function MobileOwnerPage() {
                     poster={service.poster}
                   />
                 </div>
-                <h3 className="font-medium mb-1">{service.title}</h3>
+                <h3 className="font-medium mb-1 text-center">{service.title}</h3>
                 <p className="text-sm text-gray-500">{service.description}</p>
               </div>
             ))}
