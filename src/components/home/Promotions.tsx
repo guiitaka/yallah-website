@@ -3,33 +3,54 @@
 import React from 'react'
 import Image from 'next/image'
 import { ArrowUpRight } from '@phosphor-icons/react'
+import AutoplayVideo from '../AutoplayVideo'
 
 interface ServiceCard {
   title: string
   description: string
-  videoSrc: string
+  videoSrc: {
+    mp4: string
+    webm: string
+  }
+  poster: string
 }
 
 const services: ServiceCard[] = [
   {
     title: 'Administração Completa',
     description: 'Cuidamos da gestão, locação e manutenção do seu imóvel, garantindo tranquilidade e rentabilidade máxima.',
-    videoSrc: '/videos/administracao.webm'
+    videoSrc: {
+      mp4: '/videos/administracao.mp4',
+      webm: '/videos/administracao.webm'
+    },
+    poster: '/images/posters/administracao.jpg'
   },
   {
     title: 'Imóvel sempre Impecável',
     description: 'Realizamos limpeza e preparação profissional para encantar os hóspedes e valorizar seu patrimônio.',
-    videoSrc: '/videos/imovel-impecavel.webm'
+    videoSrc: {
+      mp4: '/videos/imovel-impecavel.mp4',
+      webm: '/videos/imovel-impecavel.webm'
+    },
+    poster: '/images/posters/imovel-impecavel.jpg'
   },
   {
     title: 'Anúncios Estratégicos',
     description: 'Destacamos seu imóvel nas melhores plataformas para atrair viajantes e profissionais de alto padrão.',
-    videoSrc: '/videos/anuncios.webm'
+    videoSrc: {
+      mp4: '/videos/anuncios.mp4',
+      webm: '/videos/anuncios.webm'
+    },
+    poster: '/images/posters/anuncios.jpg'
   },
   {
     title: 'Sem Complicações',
     description: 'Você aproveita os rendimentos enquanto a Yallah resolve tudo, do check-in ao check-out.',
-    videoSrc: '/videos/complicacoes.webm'
+    videoSrc: {
+      mp4: '/videos/complicacoes.mp4',
+      webm: '/videos/complicacoes.webm'
+    },
+    poster: '/images/posters/complicacoes.jpg'
   }
 ]
 
@@ -63,21 +84,15 @@ export default function Promotions() {
         </div>
 
         {/* Cards Grid */}
-        <div className="grid grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {services.map((service, index) => (
             <div key={index} className="bg-white rounded-[32px] overflow-hidden shadow-sm hover:shadow-md transition-shadow">
               {/* Video Container */}
               <div className="relative aspect-square rounded-[32px] overflow-hidden bg-gray-100">
-                <video
-                  className="w-full h-full object-cover"
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                >
-                  <source src={service.videoSrc} type="video/webm" />
-                  <p>Seu navegador não suporta vídeos HTML5.</p>
-                </video>
+                <AutoplayVideo
+                  videoSrc={service.videoSrc}
+                  poster={service.poster}
+                />
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/10" />
               </div>
 
