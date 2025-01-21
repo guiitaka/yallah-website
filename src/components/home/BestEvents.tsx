@@ -8,7 +8,7 @@ export default function BestEvents() {
   return (
     <div className="w-full px-6 pt-40 pb-32 relative overflow-hidden">
       {/* Background Text */}
-      <div className="absolute top-0 left-0 text-[200px] font-bold text-gray-50 select-none pointer-events-none leading-none -translate-y-[35px]">
+      <div className="absolute top-0 left-0 text-[60px] md:text-[200px] font-bold text-gray-50 select-none pointer-events-none leading-none translate-y-2 md:-translate-y-[35px]">
         YALLAH
       </div>
 
