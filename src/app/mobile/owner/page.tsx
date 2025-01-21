@@ -4,6 +4,10 @@ import React from 'react';
 import Image from 'next/image';
 import MobileLayout from '@/components/layout/MobileLayout';
 import AutoplayVideo from '@/components/AutoplayVideo';
+import AboutUs from '@/components/home/AboutUs';
+import BestEvents from '@/components/home/BestEvents';
+import ContactForm from '@/components/home/ContactForm';
+import FAQ from '@/components/home/FAQ';
 
 export default function MobileOwnerPage() {
   return (
@@ -86,6 +90,26 @@ export default function MobileOwnerPage() {
             ))}
           </div>
         </section>
+
+        {/* About Us Section */}
+        <div className="bg-white">
+          <AboutUs />
+        </div>
+
+        {/* Best Events Section */}
+        <div className="bg-white">
+          <BestEvents />
+        </div>
+
+        {/* Contact Form Section */}
+        <div className="bg-white">
+          <ContactForm />
+        </div>
+
+        {/* FAQ Section */}
+        <div className="bg-white">
+          <FAQ />
+        </div>
       </div>
     </MobileLayout>
   );
