@@ -4,11 +4,15 @@ import React from 'react';
 import Image from 'next/image';
 import MobileLayout from '@/components/layout/MobileLayout';
 import PopularDestinations from '@/components/home/PopularDestinations';
+import HeroSearch from '@/components/home/HeroSearch';
 
 export default function MobileTenantPage() {
   return (
     <MobileLayout>
       <div className="flex flex-col min-h-screen bg-gray-50">
+        {/* Hero Search */}
+        <HeroSearch userType="tenant" />
+
         {/* Banner Section */}
         <section className="relative w-full h-[300px]">
           <Image
