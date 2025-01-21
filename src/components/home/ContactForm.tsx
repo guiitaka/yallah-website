@@ -4,28 +4,28 @@ import React from 'react'
 
 export default function ContactForm() {
   return (
-    <div className="w-full px-6 py-32 bg-gradient-to-br from-[#8BADA4] to-[#405A53]">
+    <div className="w-full px-4 md:px-6 py-16 md:py-32 bg-gradient-to-br from-[#8BADA4] to-[#405A53]">
       <div className="max-w-[1200px] mx-auto">
-        <div className="grid grid-cols-2 gap-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-20">
           {/* Left side - Form */}
-          <div className="col-span-1 bg-white rounded-[32px] p-12 shadow-xl">
-            <h2 className="text-4xl font-light text-[#405A53] mb-2">Entre em Contato</h2>
-            <p className="text-gray-500 mb-8">24/7 Estamos aqui para ajudar você</p>
+          <div className="col-span-1 bg-white rounded-[20px] md:rounded-[32px] p-6 md:p-12 shadow-xl">
+            <h2 className="text-3xl md:text-4xl font-light text-[#405A53] mb-2">Entre em Contato</h2>
+            <p className="text-gray-500 mb-6 md:mb-8">24/7 Estamos aqui para ajudar você</p>
             
-            <form className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
+            <form className="space-y-4 md:space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="relative">
                   <input
                     type="text"
                     placeholder="Nome"
-                    className="w-full px-6 py-4 bg-gray-50 rounded-2xl border border-gray-100 focus:outline-none focus:border-[#8BADA4] focus:ring-2 focus:ring-[#8BADA4]/20 transition-all"
+                    className="w-full px-4 md:px-6 py-3 md:py-4 bg-gray-50 rounded-xl md:rounded-2xl border border-gray-100 focus:outline-none focus:border-[#8BADA4] focus:ring-2 focus:ring-[#8BADA4]/20 transition-all"
                   />
                 </div>
                 <div className="relative">
                   <input
                     type="text"
                     placeholder="Sobrenome"
-                    className="w-full px-6 py-4 bg-gray-50 rounded-2xl border border-gray-100 focus:outline-none focus:border-[#8BADA4] focus:ring-2 focus:ring-[#8BADA4]/20 transition-all"
+                    className="w-full px-4 md:px-6 py-3 md:py-4 bg-gray-50 rounded-xl md:rounded-2xl border border-gray-100 focus:outline-none focus:border-[#8BADA4] focus:ring-2 focus:ring-[#8BADA4]/20 transition-all"
                   />
                 </div>
               </div>
@@ -34,7 +34,7 @@ export default function ContactForm() {
                 <input
                   type="email"
                   placeholder="Email"
-                  className="w-full px-6 py-4 bg-gray-50 rounded-2xl border border-gray-100 focus:outline-none focus:border-[#8BADA4] focus:ring-2 focus:ring-[#8BADA4]/20 transition-all"
+                  className="w-full px-4 md:px-6 py-3 md:py-4 bg-gray-50 rounded-xl md:rounded-2xl border border-gray-100 focus:outline-none focus:border-[#8BADA4] focus:ring-2 focus:ring-[#8BADA4]/20 transition-all"
                 />
               </div>
 
@@ -42,7 +42,7 @@ export default function ContactForm() {
                 <input
                   type="tel"
                   placeholder="Telefone"
-                  className="w-full px-6 py-4 bg-gray-50 rounded-2xl border border-gray-100 focus:outline-none focus:border-[#8BADA4] focus:ring-2 focus:ring-[#8BADA4]/20 transition-all"
+                  className="w-full px-4 md:px-6 py-3 md:py-4 bg-gray-50 rounded-xl md:rounded-2xl border border-gray-100 focus:outline-none focus:border-[#8BADA4] focus:ring-2 focus:ring-[#8BADA4]/20 transition-all"
                 />
               </div>
 
@@ -50,13 +50,13 @@ export default function ContactForm() {
                 <textarea
                   placeholder="Descreva sua necessidade"
                   rows={4}
-                  className="w-full px-6 py-4 bg-gray-50 rounded-2xl border border-gray-100 focus:outline-none focus:border-[#8BADA4] focus:ring-2 focus:ring-[#8BADA4]/20 transition-all resize-none"
+                  className="w-full px-4 md:px-6 py-3 md:py-4 bg-gray-50 rounded-xl md:rounded-2xl border border-gray-100 focus:outline-none focus:border-[#8BADA4] focus:ring-2 focus:ring-[#8BADA4]/20 transition-all resize-none"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-4 bg-[#8BADA4] text-white rounded-2xl hover:bg-[#8BADA4]/90 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full py-3 md:py-4 bg-[#8BADA4] text-white rounded-xl md:rounded-2xl hover:bg-[#8BADA4]/90 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
               >
                 Enviar Mensagem
               </button>
@@ -64,13 +64,13 @@ export default function ContactForm() {
           </div>
 
           {/* Right side - Decorative content */}
-          <div className="col-span-1 flex flex-col justify-center">
+          <div className="col-span-1 flex flex-col justify-center text-center md:text-left">
             <div className="space-y-4">
-              <h1 className="text-[48pt] font-black text-white text-center font-raleway leading-tight">
+              <h1 className="text-[36px] md:text-[48pt] font-black text-white font-raleway leading-tight">
                 Vamos conversar<br />
                 <span className="whitespace-nowrap">sobre seu imóvel?</span>
               </h1>
-              <p className="text-white/80 text-xl mt-8">
+              <p className="text-white/80 text-lg md:text-xl mt-4 md:mt-8">
                 Nossa equipe está pronta para te ajudar a maximizar o potencial do seu imóvel.
               </p>
             </div>
