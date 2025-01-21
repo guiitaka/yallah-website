@@ -153,7 +153,7 @@ export default function MobileOwnerPage() {
                   />
                 </div>
                 <h3 className="font-medium mb-1 text-center">{service.title}</h3>
-                <p className="text-sm text-gray-500">{service.description}</p>
+                <p className="text-sm text-gray-500 text-center">{service.description}</p>
               </div>
             ))}
           </div>
