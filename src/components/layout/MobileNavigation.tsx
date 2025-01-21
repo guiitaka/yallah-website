@@ -2,18 +2,32 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { House, Info, Lightbulb, Headset, Key } from '@phosphor-icons/react'
+import { House, Info, Lightbulb, Headset, Key, CaretUp } from '@phosphor-icons/react'
 import { useState } from 'react'
 
 type MobileNavigationProps = {
   userType: 'owner' | 'tenant'
 }
 
+const categories = [
+  'Apartamentos',
+  'Chalés',
+  'Kitnets',
+  'Lofts',
+  'Perto do centro',
+  'Piscinas Incríveis',
+  'Pousadas',
+  'Próximos à estações',
+  'Studios',
+  'Vistas Incríveis'
+]
+
 export default function MobileNavigation({ userType }: MobileNavigationProps) {
   const router = useRouter()
   const [phase, setPhase] = useState<'idle' | 'fadeIn' | 'fadeOut'>('idle')
   const [isFlipping, setIsFlipping] = useState(false)
   const [targetUserType, setTargetUserType] = useState<'owner' | 'tenant'>(userType)
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false)
 
   const handleUserTypeChange = () => {
     const newUserType = userType === 'owner' ? 'tenant' : 'owner'
@@ -130,6 +144,28 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
         </div>
       </div>
 
+      {/* Categories Dropdown */}
+      {userType === 'tenant' && isCategoryOpen && (
+        <div className="fixed bottom-[80px] left-0 right-0 bg-white border-t border-gray-100 shadow-lg transition-all duration-300 ease-in-out max-h-[60vh] overflow-y-auto">
+          <div className="container mx-auto px-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  className="text-left py-3 px-4 rounded-lg bg-gray-50 hover:bg-gray-100 text-sm text-gray-700"
+                  onClick={() => {
+                    setIsCategoryOpen(false)
+                    // Aqui você pode adicionar a lógica de navegação para a categoria
+                  }}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Menu de navegação mobile */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 md:hidden">
         <div className="container mx-auto px-4">
@@ -142,13 +178,28 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
               <span className="text-[10px] text-gray-600">A Yallah</span>
             </Link>
 
-            <Link
-              href="/mobile/como-funciona"
-              className="flex flex-col items-center gap-1"
-            >
-              <Info weight="light" className="w-6 h-6 text-gray-600" />
-              <span className="text-[10px] text-gray-600">Como Funciona</span>
-            </Link>
+            {userType === 'tenant' ? (
+              <button
+                onClick={() => setIsCategoryOpen(!isCategoryOpen)}
+                className="flex flex-col items-center gap-1"
+              >
+                <CaretUp
+                  weight="light"
+                  className={`w-6 h-6 text-gray-600 transition-transform duration-300 ${
+                    isCategoryOpen ? 'rotate-180' : ''
+                  }`}
+                />
+                <span className="text-[10px] text-gray-600">Categorias</span>
+              </button>
+            ) : (
+              <Link
+                href="/mobile/como-funciona"
+                className="flex flex-col items-center gap-1"
+              >
+                <Info weight="light" className="w-6 h-6 text-gray-600" />
+                <span className="text-[10px] text-gray-600">Como Funciona</span>
+              </Link>
+            )}
 
             <Link
               href="/mobile/metodo"
