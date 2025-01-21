@@ -105,8 +105,8 @@ export default function MobileOwnerPage() {
           <div className="grid grid-cols-2 gap-4">
             {[
               { 
-                title: 'Gestão Completa', 
-                description: 'Administração total do seu imóvel', 
+                title: 'Administração Completa', 
+                description: 'Cuidamos da gestão, locação e manutenção do seu imóvel, garantindo tranquilidade e rentabilidade máxima.', 
                 video: {
                   webm: '/videos/administracao.webm',
                   mp4: '/videos/administracao.mp4'
@@ -114,8 +114,8 @@ export default function MobileOwnerPage() {
                 poster: '/administracao.jpeg'
               },
               { 
-                title: 'Limpeza', 
-                description: 'Serviço profissional de limpeza', 
+                title: 'Imóvel sempre Impecável', 
+                description: 'Realizamos limpeza e preparação profissional para encantar os hóspedes e valorizar seu patrimônio.', 
                 video: {
                   webm: '/videos/imovel-impecavel.webm',
                   mp4: '/videos/imovel-impecavel.mp4'
@@ -123,8 +123,8 @@ export default function MobileOwnerPage() {
                 poster: '/imovel-impecavel.jpeg'
               },
               { 
-                title: 'Manutenção', 
-                description: 'Manutenção preventiva e corretiva', 
+                title: 'Anúncios Estratégicos', 
+                description: 'Destacamos seu imóvel nas melhores plataformas para atrair viajantes e profissionais de alto padrão.', 
                 video: {
                   webm: '/videos/anuncios.webm',
                   mp4: '/videos/anuncios.mp4'
@@ -132,8 +132,8 @@ export default function MobileOwnerPage() {
                 poster: '/anuncios.jpeg'
               },
               { 
-                title: 'Atendimento 24h', 
-                description: 'Suporte aos hóspedes 24 horas', 
+                title: 'Sem Complicações', 
+                description: 'Você aproveita os rendimentos enquanto a Yallah resolve tudo, do check-in ao check-out.', 
                 video: {
                   webm: '/videos/complicacoes.webm',
                   mp4: '/videos/complicacoes.mp4'
