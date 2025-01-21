@@ -131,12 +131,12 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
       </div>
 
       {/* Menu de navegação mobile */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 md:hidden">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 md:hidden pb-[env(safe-area-inset-bottom,20px)]">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between py-3">
+          <div className="flex items-center justify-between py-4">
             <Link
               href="/mobile/a-yallah"
-              className="flex flex-col items-center gap-1"
+              className="flex flex-col items-center gap-1.5"
             >
               <House weight="light" className="w-6 h-6 text-gray-600" />
               <span className="text-xs text-gray-600">A Yallah</span>
@@ -144,7 +144,7 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
 
             <Link
               href="/mobile/como-funciona"
-              className="flex flex-col items-center gap-1"
+              className="flex flex-col items-center gap-1.5"
             >
               <Info weight="light" className="w-6 h-6 text-gray-600" />
               <span className="text-xs text-gray-600">Como Funciona</span>
@@ -152,7 +152,7 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
 
             <Link
               href="/mobile/metodo"
-              className="flex flex-col items-center gap-1"
+              className="flex flex-col items-center gap-1.5"
             >
               <Lightbulb weight="light" className="w-6 h-6 text-gray-600" />
               <span className="text-xs text-gray-600">Método</span>
@@ -160,7 +160,7 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
 
             <button
               onClick={handleUserTypeChange}
-              className="flex flex-col items-center gap-1"
+              className="flex flex-col items-center gap-1.5"
             >
               {userType === 'owner' ? (
                 <>
@@ -177,7 +177,7 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
 
             <Link
               href="/mobile/contato"
-              className="flex flex-col items-center gap-1"
+              className="flex flex-col items-center gap-1.5"
             >
               <Headset weight="light" className="w-6 h-6 text-gray-600" />
               <span className="text-xs text-gray-600">Contato</span>
