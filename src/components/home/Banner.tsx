@@ -15,7 +15,7 @@ export default function Banner({ userType }: BannerProps) {
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
-            src="/banner.jpg"
+            src={userType === 'tenant' ? "/banner-locatario.JPG" : "/banner.jpg"}
             alt="Banner"
             fill
             className="object-cover"
@@ -30,10 +30,14 @@ export default function Banner({ userType }: BannerProps) {
               {/* Left Content */}
               <div className="w-full md:max-w-[600px] text-white flex flex-col items-center text-center pt-6 md:pt-20 flex-none">
                 <h1 className="text-[40px] md:text-[64px] font-normal leading-[1.1] md:leading-tight mb-4 md:mb-8 max-w-[800px]">
-                  Transforme seu imóvel em renda garantida:
+                  {userType === 'tenant' 
+                    ? "Encontre o imóvel perfeito para alugar"
+                    : "Transforme seu imóvel em renda garantida:"}
                 </h1>
                 <p className="text-xl md:text-2xl opacity-100 mb-6 md:mb-10 font-light max-w-[600px]">
-                  Deixe a Yallah cuidar de tudo para você.
+                  {userType === 'tenant'
+                    ? "Alugue com segurança e tranquilidade através da Yallah"
+                    : "Deixe a Yallah cuidar de tudo para você."}
                 </p>
                 {userType === 'tenant' && (
                   <button className="w-full md:w-auto flex items-center justify-center gap-2 px-6 md:px-8 py-4 md:py-4 bg-[#8BADA4] text-white rounded-full hover:bg-[#8BADA4]/90 text-lg">
