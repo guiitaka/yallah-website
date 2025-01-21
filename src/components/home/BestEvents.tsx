@@ -15,12 +15,13 @@ export default function BestEvents() {
       <div className="max-w-[1200px] mx-auto relative">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start mb-12">
+          <h2 className="text-xl md:text-2xl text-gray-500 mb-4 md:mb-0">Seu imóvel, nossa expertise</h2>
           <h1 className="text-[32px] md:text-[56px] leading-[1.2] md:leading-[1.1] font-light mb-4 md:mb-0">
-            Deixe que nós<br />
-            gerenciamos seu imóvel
+            Cuidamos do seu imóvel<br />
+            como se fosse nosso
           </h1>
           <p className="text-gray-500 text-base md:text-lg max-w-full md:max-w-[400px]">
-            Aproveite a experiência de um imóvel com a melhor gestão do mercado.
+            A Yallah oferece gestão completa para seu imóvel: Desde a administração da locação até a manutenção e limpeza. Transformamos apartamentos, lofts e estúdios em fontes de renda, cuidando de cada detalhe para você.
           </p>
         </div>
 
@@ -44,7 +45,7 @@ export default function BestEvents() {
               Desde a locação, limpeza, e contato com os hóspedes, nós cuidamos de tudo!
             </p>
             <button className="flex items-center gap-2 bg-white text-black px-6 md:px-8 py-2.5 md:py-3 rounded-full hover:bg-white/90 transition-colors text-base md:text-lg">
-              Procurar Imóveis
+              Ver Todos
               <ArrowRight className="w-4 h-4 md:w-5 md:h-5" weight="bold" />
             </button>
           </div>
