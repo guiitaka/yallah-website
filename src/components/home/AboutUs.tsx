@@ -30,7 +30,7 @@ export default function AboutUs() {
   return (
     <div className="w-full px-4 md:px-6 py-16 md:py-32 relative overflow-hidden">
       {/* Background Text */}
-      <div className="absolute top-0 right-0 text-[60px] md:text-[200px] font-bold text-gray-50 select-none pointer-events-none leading-none -translate-y-4 md:-translate-y-8">
+      <div className="absolute top-0 right-0 text-[60px] md:text-[200px] font-bold text-gray-50 select-none pointer-events-none leading-none -translate-y-2 md:-translate-y-8">
         YALLAH
       </div>
 
