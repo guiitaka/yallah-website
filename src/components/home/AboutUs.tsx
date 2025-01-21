@@ -46,8 +46,8 @@ export default function AboutUs() {
         {/* Cards Grid */}
         <div className="flex flex-col md:grid md:grid-cols-12 gap-4 md:gap-6">
           {/* First Row */}
-          <div className="order-1 md:col-span-6 md:col-start-1 h-full">
-            <div className="animate-scaleUp opacity-0 h-full">
+          <div className="order-1 md:col-span-6 md:col-start-1">
+            <div className="animate-scaleUp opacity-0">
               <div className="relative aspect-square rounded-[20px] md:rounded-[32px] overflow-hidden">
                 <Image
                   src="/card1.jpg"
@@ -59,9 +59,9 @@ export default function AboutUs() {
             </div>
           </div>
 
-          <div className="order-2 md:col-span-6 md:col-start-7 h-full">
-            <div className="animate-fadeIn opacity-0 h-full">
-              <div className="bg-white rounded-[20px] md:rounded-[32px] p-6 md:p-12 shadow-lg h-full flex flex-col justify-center">
+          <div className="order-2 md:col-span-6 md:col-start-7">
+            <div className="animate-fadeIn opacity-0">
+              <div className="bg-white rounded-[20px] md:rounded-[32px] p-6 md:p-12 shadow-lg aspect-square flex items-center">
                 <p className="text-base md:text-lg text-gray-600 leading-relaxed">
                   Na Yallah, acreditamos que cada imóvel tem o potencial de ser mais do que paredes e teto – é um espaço para criar memórias e viver experiências únicas. Nossa missão é simplificar a gestão de imóveis, conectando proprietários a locatários que valorizam conforto, praticidade e um lugar especial para chamar de lar, mesmo que por pouco tempo.
                 </p>
@@ -70,8 +70,8 @@ export default function AboutUs() {
           </div>
 
           {/* Second Row */}
-          <div className="order-3 md:col-span-6 md:col-start-7 h-full">
-            <div className="animate-scaleUp opacity-0 h-full">
+          <div className="order-3 md:col-span-6 md:col-start-7">
+            <div className="animate-scaleUp opacity-0">
               <div className="relative aspect-square rounded-[20px] md:rounded-[32px] overflow-hidden mt-4 md:mt-6">
                 <Image
                   src="/card2.jpg"
@@ -83,9 +83,9 @@ export default function AboutUs() {
             </div>
           </div>
 
-          <div className="order-4 md:col-span-6 md:col-start-1 h-full">
-            <div className="animate-fadeIn opacity-0 h-full">
-              <div className="bg-white rounded-[20px] md:rounded-[32px] p-6 md:p-12 shadow-lg mt-4 md:mt-6 h-full flex flex-col justify-center">
+          <div className="order-4 md:col-span-6 md:col-start-1">
+            <div className="animate-fadeIn opacity-0">
+              <div className="bg-white rounded-[20px] md:rounded-[32px] p-6 md:p-12 shadow-lg mt-4 md:mt-6 aspect-square flex items-center">
                 <p className="text-base md:text-lg text-gray-600 leading-relaxed">
                   Com anos de experiência no mercado imobiliário, nossa equipe é especializada em transformar propriedades em ativos rentáveis. Trabalhamos com dedicação para oferecer aos proprietários uma gestão sem preocupações e aos locatários uma estadia impecável, marcada pela excelência e personalização.
                 </p>
@@ -94,8 +94,8 @@ export default function AboutUs() {
           </div>
 
           {/* Third Row */}
-          <div className="order-5 md:col-span-6 md:col-start-1 h-full">
-            <div className="animate-scaleUp opacity-0 h-full">
+          <div className="order-5 md:col-span-6 md:col-start-1">
+            <div className="animate-scaleUp opacity-0">
               <div className="relative aspect-square rounded-[20px] md:rounded-[32px] overflow-hidden mt-4 md:mt-6">
                 <Image
                   src="/card3.jpg"
@@ -107,9 +107,9 @@ export default function AboutUs() {
             </div>
           </div>
 
-          <div className="order-6 md:col-span-6 md:col-start-7 h-full">
-            <div className="animate-fadeIn opacity-0 h-full">
-              <div className="bg-white rounded-[20px] md:rounded-[32px] p-6 md:p-12 shadow-lg mt-4 md:mt-6 h-full flex flex-col justify-center">
+          <div className="order-6 md:col-span-6 md:col-start-7">
+            <div className="animate-fadeIn opacity-0">
+              <div className="bg-white rounded-[20px] md:rounded-[32px] p-6 md:p-12 shadow-lg mt-4 md:mt-6 aspect-square flex items-center">
                 <p className="text-base md:text-lg text-gray-600 leading-relaxed">
                   Nosso compromisso vai além da locação de imóveis. Oferecemos serviços completos de gestão, incluindo limpeza, organização e atendimento ao cliente. Assim, proporcionamos tranquilidade aos proprietários e garantimos uma experiência memorável aos hóspedes que confiam na Yallah para encontrar o espaço perfeito em São Paulo.
                 </p>
@@ -118,8 +118,8 @@ export default function AboutUs() {
           </div>
 
           {/* Fourth Row */}
-          <div className="order-7 md:col-span-6 md:col-start-7 h-full">
-            <div className="animate-scaleUp opacity-0 h-full">
+          <div className="order-7 md:col-span-6 md:col-start-7">
+            <div className="animate-scaleUp opacity-0">
               <div className="relative aspect-square rounded-[20px] md:rounded-[32px] overflow-hidden mt-4 md:mt-6">
                 <Image
                   src="/card4.jpg"
@@ -131,9 +131,9 @@ export default function AboutUs() {
             </div>
           </div>
 
-          <div className="order-8 md:col-span-6 md:col-start-1 h-full">
-            <div className="animate-fadeIn opacity-0 h-full">
-              <div className="bg-white rounded-[20px] md:rounded-[32px] p-6 md:p-12 shadow-lg mt-4 md:mt-6 h-full flex flex-col justify-center">
+          <div className="order-8 md:col-span-6 md:col-start-1">
+            <div className="animate-fadeIn opacity-0">
+              <div className="bg-white rounded-[20px] md:rounded-[32px] p-6 md:p-12 shadow-lg mt-4 md:mt-6 aspect-square flex items-center">
                 <p className="text-base md:text-lg text-gray-600 leading-relaxed">
                   Nossa plataforma digital intuitiva e equipe dedicada trabalham em conjunto para garantir uma experiência sem complicações. Desde o primeiro contato até o final da estadia, estamos presentes para assegurar que tanto proprietários quanto locatários tenham suas expectativas superadas, construindo relacionamentos duradouros baseados em confiança e excelência.
                 </p>
