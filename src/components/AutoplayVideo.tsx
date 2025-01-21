@@ -57,16 +57,12 @@ export default function AutoplayVideo({ videoSrc }: AutoplayVideoProps) {
       <video
         ref={videoRef}
         className="w-full h-full object-cover"
+        playsInline
         autoPlay
         muted
         loop
-        playsInline
         preload="metadata"
         controls={false}
-        webkit-playsinline="true"
-        x5-playsinline="true"
-        x5-video-player-type="h5"
-        x5-video-player-fullscreen="true"
       >
         <source src={videoSrc.mp4} type="video/mp4" />
         <source src={videoSrc.webm} type="video/webm" />
