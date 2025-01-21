@@ -10,6 +10,43 @@ import ContactForm from '@/components/home/ContactForm';
 import FAQ from '@/components/home/FAQ';
 import { Buildings, ShieldCheck, Money, ChartLineUp } from '@phosphor-icons/react';
 
+const GITHUB_VIDEO_BASE_URL = 'https://user-images.githubusercontent.com/YOUR_USER_ID/YOUR_REPO'
+
+const services = [
+  { 
+    title: 'Administração Completa', 
+    description: 'Cuidamos da gestão, locação e manutenção do seu imóvel, garantindo tranquilidade e rentabilidade máxima.', 
+    video: {
+      webm: `${GITHUB_VIDEO_BASE_URL}/administracao.webm`,
+      mp4: `${GITHUB_VIDEO_BASE_URL}/administracao.mp4`
+    }
+  },
+  { 
+    title: 'Imóvel sempre Impecável', 
+    description: 'Realizamos limpeza e preparação profissional para encantar os hóspedes e valorizar seu patrimônio.', 
+    video: {
+      webm: `${GITHUB_VIDEO_BASE_URL}/imovel-impecavel.webm`,
+      mp4: `${GITHUB_VIDEO_BASE_URL}/imovel-impecavel.mp4`
+    }
+  },
+  { 
+    title: 'Anúncios Estratégicos', 
+    description: 'Destacamos seu imóvel nas melhores plataformas para atrair viajantes e profissionais de alto padrão.', 
+    video: {
+      webm: `${GITHUB_VIDEO_BASE_URL}/anuncios.webm`,
+      mp4: `${GITHUB_VIDEO_BASE_URL}/anuncios.mp4`
+    }
+  },
+  { 
+    title: 'Sem Complicações', 
+    description: 'Você aproveita os rendimentos enquanto a Yallah resolve tudo, do check-in ao check-out.', 
+    video: {
+      webm: `${GITHUB_VIDEO_BASE_URL}/complicacoes.webm`,
+      mp4: `${GITHUB_VIDEO_BASE_URL}/complicacoes.mp4`
+    }
+  }
+]
+
 export default function MobileOwnerPage() {
   return (
     <MobileLayout>
@@ -107,40 +144,7 @@ export default function MobileOwnerPage() {
             A Yallah oferece gestão completa para seu imóvel: Desde a administração da locação até a manutenção e limpeza.
           </p>
           <div className="grid grid-cols-2 gap-4">
-            {[
-              { 
-                title: 'Administração Completa', 
-                description: 'Cuidamos da gestão, locação e manutenção do seu imóvel, garantindo tranquilidade e rentabilidade máxima.', 
-                video: {
-                  webm: '/videos/administracao.webm',
-                  mp4: '/videos/administracao.mp4'
-                }
-              },
-              { 
-                title: 'Imóvel sempre Impecável', 
-                description: 'Realizamos limpeza e preparação profissional para encantar os hóspedes e valorizar seu patrimônio.', 
-                video: {
-                  webm: '/videos/imovel-impecavel.webm',
-                  mp4: '/videos/imovel-impecavel.mp4'
-                }
-              },
-              { 
-                title: 'Anúncios Estratégicos', 
-                description: 'Destacamos seu imóvel nas melhores plataformas para atrair viajantes e profissionais de alto padrão.', 
-                video: {
-                  webm: '/videos/anuncios.webm',
-                  mp4: '/videos/anuncios.mp4'
-                }
-              },
-              { 
-                title: 'Sem Complicações', 
-                description: 'Você aproveita os rendimentos enquanto a Yallah resolve tudo, do check-in ao check-out.', 
-                video: {
-                  webm: '/videos/complicacoes.webm',
-                  mp4: '/videos/complicacoes.mp4'
-                }
-              }
-            ].map((service) => (
+            {services.map((service) => (
               <div key={service.title} className="bg-gray-50 p-4 rounded-xl relative overflow-hidden">
                 <div className="relative aspect-square rounded-xl overflow-hidden mb-3">
                   <AutoplayVideo

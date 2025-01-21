@@ -14,37 +14,40 @@ interface ServiceCard {
   }
 }
 
+// Base URL para os vídeos no GitHub
+const GITHUB_VIDEO_BASE_URL = 'https://user-images.githubusercontent.com/YOUR_USER_ID/YOUR_REPO'
+
 const services: ServiceCard[] = [
   {
     title: 'Administração Completa',
     description: 'Cuidamos da gestão, locação e manutenção do seu imóvel, garantindo tranquilidade e rentabilidade máxima.',
     videoSrc: {
-      mp4: '/videos/administracao.mp4',
-      webm: '/videos/administracao.webm'
+      mp4: `${GITHUB_VIDEO_BASE_URL}/administracao.mp4`,
+      webm: `${GITHUB_VIDEO_BASE_URL}/administracao.webm`
     }
   },
   {
     title: 'Imóvel sempre Impecável',
     description: 'Realizamos limpeza e preparação profissional para encantar os hóspedes e valorizar seu patrimônio.',
     videoSrc: {
-      mp4: '/videos/imovel-impecavel.mp4',
-      webm: '/videos/imovel-impecavel.webm'
+      mp4: `${GITHUB_VIDEO_BASE_URL}/imovel-impecavel.mp4`,
+      webm: `${GITHUB_VIDEO_BASE_URL}/imovel-impecavel.webm`
     }
   },
   {
     title: 'Anúncios Estratégicos',
     description: 'Destacamos seu imóvel nas melhores plataformas para atrair viajantes e profissionais de alto padrão.',
     videoSrc: {
-      mp4: '/videos/anuncios.mp4',
-      webm: '/videos/anuncios.webm'
+      mp4: `${GITHUB_VIDEO_BASE_URL}/anuncios.mp4`,
+      webm: `${GITHUB_VIDEO_BASE_URL}/anuncios.webm`
     }
   },
   {
     title: 'Sem Complicações',
     description: 'Você aproveita os rendimentos enquanto a Yallah resolve tudo, do check-in ao check-out.',
     videoSrc: {
-      mp4: '/videos/complicacoes.mp4',
-      webm: '/videos/complicacoes.webm'
+      mp4: `${GITHUB_VIDEO_BASE_URL}/complicacoes.mp4`,
+      webm: `${GITHUB_VIDEO_BASE_URL}/complicacoes.webm`
     }
   }
 ]
