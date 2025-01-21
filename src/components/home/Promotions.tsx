@@ -86,7 +86,6 @@ export default function Promotions() {
               <div className="relative aspect-square rounded-[32px] overflow-hidden bg-gray-100">
                 <AutoplayVideo
                   videoSrc={service.videoSrc}
-                  poster=""
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/10" />
               </div>

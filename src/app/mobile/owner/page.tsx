@@ -114,8 +114,7 @@ export default function MobileOwnerPage() {
                 video: {
                   webm: '/videos/administracao.webm',
                   mp4: '/videos/administracao.mp4'
-                },
-                poster: '/administracao.jpeg'
+                }
               },
               { 
                 title: 'Imóvel sempre Impecável', 
@@ -123,8 +122,7 @@ export default function MobileOwnerPage() {
                 video: {
                   webm: '/videos/imovel-impecavel.webm',
                   mp4: '/videos/imovel-impecavel.mp4'
-                },
-                poster: '/imovel-impecavel.jpeg'
+                }
               },
               { 
                 title: 'Anúncios Estratégicos', 
@@ -132,8 +130,7 @@ export default function MobileOwnerPage() {
                 video: {
                   webm: '/videos/anuncios.webm',
                   mp4: '/videos/anuncios.mp4'
-                },
-                poster: '/anuncios.jpeg'
+                }
               },
               { 
                 title: 'Sem Complicações', 
@@ -141,15 +138,13 @@ export default function MobileOwnerPage() {
                 video: {
                   webm: '/videos/complicacoes.webm',
                   mp4: '/videos/complicacoes.mp4'
-                },
-                poster: '/complicacoes.jpeg'
+                }
               }
             ].map((service) => (
               <div key={service.title} className="bg-gray-50 p-4 rounded-xl relative overflow-hidden">
                 <div className="relative aspect-square rounded-xl overflow-hidden mb-3">
                   <AutoplayVideo
                     videoSrc={service.video}
-                    poster={service.poster}
                   />
                 </div>
                 <h3 className="font-medium mb-1 text-center">{service.title}</h3>
