@@ -93,7 +93,8 @@ export default function Banner({ userType }: BannerProps) {
                       Encontre o imóvel perfeito para alugar
                     </h1>
                     <p className="text-xl md:text-2xl opacity-100 mb-6 md:mb-10 font-light max-w-[600px]">
-                      Alugue com segurança e tranquilidade através da Yallah
+                      Alugue com segurança e tranquilidade<br />
+                      através da Yallah
                     </p>
                   </div>
                 </>
