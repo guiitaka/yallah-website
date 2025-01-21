@@ -133,7 +133,7 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
       {/* Menu de navegação mobile */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 md:hidden">
         <div className="container mx-auto px-4">
-          <div className="flex items-start justify-between pt-4 h-[72px] mb-[env(safe-area-inset-bottom,20px)]">
+          <div className="flex items-start justify-between pt-2 h-[80px] mb-[env(safe-area-inset-bottom,24px)]">
             <Link
               href="/mobile/a-yallah"
               className="flex flex-col items-center gap-1"
