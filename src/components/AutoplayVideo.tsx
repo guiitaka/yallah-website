@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import Image from 'next/image';
 
 interface AutoplayVideoProps {
@@ -11,29 +11,36 @@ interface AutoplayVideoProps {
 
 export default function AutoplayVideo({ videoSrc, poster }: AutoplayVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
+    // Reset video state
+    video.pause();
+    video.currentTime = 0;
+    
     // Ensure video is muted before attempting to play
-    // According to Apple's docs: "A <video> element can use the play() method to automatically 
-    // play without user gestures only when it contains no audio tracks or has its muted property set to true"
     video.muted = true;
-
-    // Load only metadata initially to improve performance
+    video.defaultMuted = true;
+    
+    // Load only metadata initially
     video.preload = 'metadata';
 
-    // According to Apple's docs, playback will pause if:
-    // 1. The video element gains an audio track
-    // 2. Becomes unmuted without user interaction
-    // 3. Video is no longer onscreen
+    const handleCanPlay = () => {
+      setIsLoading(false);
+      playVideo();
+    };
+
     const playVideo = () => {
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((error) => {
-          console.error("Error attempting to play video:", error);
-        });
+      if (video.paused) {
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.error("Error attempting to play video:", error);
+          });
+        }
       }
     };
 
@@ -41,28 +48,44 @@ export default function AutoplayVideo({ videoSrc, poster }: AutoplayVideoProps) 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
+          if (entry.isIntersecting && !isLoading) {
             playVideo();
           } else {
             video.pause();
           }
         });
       },
-      { threshold: 0.1 } // Start playing when at least 10% of the video is visible
+      { threshold: 0.1 }
     );
 
+    // Add event listeners
+    video.addEventListener('canplay', handleCanPlay);
     observer.observe(video);
 
+    // Cleanup
     return () => {
+      video.removeEventListener('canplay', handleCanPlay);
       observer.disconnect();
     };
-  }, []);
+  }, [isLoading]);
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full bg-gray-100 rounded-xl overflow-hidden">
+      {isLoading && (
+        <div className="w-full h-full flex items-center justify-center">
+          <Image
+            src={poster}
+            alt="Video Thumbnail"
+            width={400}
+            height={400}
+            className="w-full h-full object-cover"
+            priority
+          />
+        </div>
+      )}
       <video
         ref={videoRef}
-        className="w-full h-full object-cover rounded-xl"
+        className={`w-full h-full object-cover ${isLoading ? 'hidden' : ''}`}
         autoPlay
         muted
         loop
@@ -73,13 +96,6 @@ export default function AutoplayVideo({ videoSrc, poster }: AutoplayVideoProps) 
       >
         <source src={videoSrc.mp4} type="video/mp4" />
         <source src={videoSrc.webm} type="video/webm" />
-        <Image
-          src={poster}
-          alt="Video Thumbnail"
-          width={400}
-          height={400}
-          className="w-full h-full object-cover rounded-xl"
-        />
       </video>
     </div>
   );

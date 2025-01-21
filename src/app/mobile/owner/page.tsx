@@ -43,7 +43,7 @@ export default function MobileOwnerPage() {
                   webm: '/videos/administracao.webm',
                   mp4: '/videos/administracao.mp4'
                 },
-                poster: '/images/administracao.jpeg'
+                poster: '/administracao.jpeg'
               },
               { 
                 title: 'Limpeza', 
@@ -52,7 +52,7 @@ export default function MobileOwnerPage() {
                   webm: '/videos/imovel-impecavel.webm',
                   mp4: '/videos/imovel-impecavel.mp4'
                 },
-                poster: '/images/imovel-impecavel.jpeg'
+                poster: '/imovel-impecavel.jpeg'
               },
               { 
                 title: 'Manutenção', 
@@ -61,7 +61,7 @@ export default function MobileOwnerPage() {
                   webm: '/videos/anuncios.webm',
                   mp4: '/videos/anuncios.mp4'
                 },
-                poster: '/images/anuncios.jpeg'
+                poster: '/anuncios.jpeg'
               },
               { 
                 title: 'Atendimento 24h', 
@@ -70,7 +70,7 @@ export default function MobileOwnerPage() {
                   webm: '/videos/complicacoes.webm',
                   mp4: '/videos/complicacoes.mp4'
                 },
-                poster: '/images/complicacoes.jpeg'
+                poster: '/complicacoes.jpeg'
               }
             ].map((service) => (
               <div key={service.title} className="bg-gray-50 p-4 rounded-xl relative overflow-hidden">
