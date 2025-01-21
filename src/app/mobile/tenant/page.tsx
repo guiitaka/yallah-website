@@ -11,7 +11,7 @@ export default function MobileTenantPage() {
         {/* Banner Section */}
         <section className="relative w-full h-[300px]">
           <Image
-            src={'/tenant-bg.jpg'}
+            src="/banner-locatario.JPG"
             alt="Banner"
             width={800}
             height={600}
@@ -20,9 +20,9 @@ export default function MobileTenantPage() {
           />
           <div className="absolute inset-0 bg-black/60" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6 text-center">
-            <h1 className="text-3xl font-medium mb-4">Encontre seu lugar</h1>
+            <h1 className="text-3xl font-medium mb-4">Encontre o imóvel perfeito para alugar</h1>
             <p className="text-lg">
-              Os melhores imóveis para sua estadia
+              Alugue com segurança e tranquilidade através da Yallah
             </p>
           </div>
         </section>
