@@ -44,9 +44,9 @@ export default function AboutUs() {
         </div>
 
         {/* Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6">
+        <div className="flex flex-col md:grid md:grid-cols-12 gap-4 md:gap-6">
           {/* First Row */}
-          <div className="md:col-span-6 md:col-start-1">
+          <div className="order-1 md:col-span-6 md:col-start-1">
             <div className="animate-scaleUp opacity-0">
               <div className="relative aspect-square rounded-[20px] md:rounded-[32px] overflow-hidden">
                 <Image
@@ -59,7 +59,7 @@ export default function AboutUs() {
             </div>
           </div>
 
-          <div className="md:col-span-6 md:col-start-7">
+          <div className="order-2 md:col-span-6 md:col-start-7">
             <div className="animate-fadeIn opacity-0">
               <div className="bg-white rounded-[20px] md:rounded-[32px] p-6 md:p-12 shadow-lg">
                 <p className="text-base md:text-lg text-gray-600 leading-relaxed">
@@ -70,17 +70,7 @@ export default function AboutUs() {
           </div>
 
           {/* Second Row */}
-          <div className="md:col-span-6 md:col-start-1">
-            <div className="animate-fadeIn opacity-0">
-              <div className="bg-white rounded-[20px] md:rounded-[32px] p-6 md:p-12 shadow-lg mt-4 md:mt-6">
-                <p className="text-base md:text-lg text-gray-600 leading-relaxed">
-                  Com anos de experiência no mercado imobiliário, nossa equipe é especializada em transformar propriedades em ativos rentáveis. Trabalhamos com dedicação para oferecer aos proprietários uma gestão sem preocupações e aos locatários uma estadia impecável, marcada pela excelência e personalização.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="md:col-span-6 md:col-start-7">
+          <div className="order-3 md:col-span-6 md:col-start-7">
             <div className="animate-scaleUp opacity-0">
               <div className="relative aspect-square rounded-[20px] md:rounded-[32px] overflow-hidden mt-4 md:mt-6">
                 <Image
@@ -93,8 +83,18 @@ export default function AboutUs() {
             </div>
           </div>
 
+          <div className="order-4 md:col-span-6 md:col-start-1">
+            <div className="animate-fadeIn opacity-0">
+              <div className="bg-white rounded-[20px] md:rounded-[32px] p-6 md:p-12 shadow-lg mt-4 md:mt-6">
+                <p className="text-base md:text-lg text-gray-600 leading-relaxed">
+                  Com anos de experiência no mercado imobiliário, nossa equipe é especializada em transformar propriedades em ativos rentáveis. Trabalhamos com dedicação para oferecer aos proprietários uma gestão sem preocupações e aos locatários uma estadia impecável, marcada pela excelência e personalização.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Third Row */}
-          <div className="md:col-span-6 md:col-start-1">
+          <div className="order-5 md:col-span-6 md:col-start-1">
             <div className="animate-scaleUp opacity-0">
               <div className="relative aspect-square rounded-[20px] md:rounded-[32px] overflow-hidden mt-4 md:mt-6">
                 <Image
@@ -107,7 +107,7 @@ export default function AboutUs() {
             </div>
           </div>
 
-          <div className="md:col-span-6 md:col-start-7">
+          <div className="order-6 md:col-span-6 md:col-start-7">
             <div className="animate-fadeIn opacity-0">
               <div className="bg-white rounded-[20px] md:rounded-[32px] p-6 md:p-12 shadow-lg mt-4 md:mt-6">
                 <p className="text-base md:text-lg text-gray-600 leading-relaxed">
@@ -118,17 +118,7 @@ export default function AboutUs() {
           </div>
 
           {/* Fourth Row */}
-          <div className="md:col-span-6 md:col-start-1">
-            <div className="animate-fadeIn opacity-0">
-              <div className="bg-white rounded-[20px] md:rounded-[32px] p-6 md:p-12 shadow-lg mt-4 md:mt-6">
-                <p className="text-base md:text-lg text-gray-600 leading-relaxed">
-                  Nossa plataforma digital intuitiva e equipe dedicada trabalham em conjunto para garantir uma experiência sem complicações. Desde o primeiro contato até o final da estadia, estamos presentes para assegurar que tanto proprietários quanto locatários tenham suas expectativas superadas, construindo relacionamentos duradouros baseados em confiança e excelência.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="md:col-span-6 md:col-start-7">
+          <div className="order-7 md:col-span-6 md:col-start-7">
             <div className="animate-scaleUp opacity-0">
               <div className="relative aspect-square rounded-[20px] md:rounded-[32px] overflow-hidden mt-4 md:mt-6">
                 <Image
@@ -137,6 +127,16 @@ export default function AboutUs() {
                   fill
                   className="object-cover"
                 />
+              </div>
+            </div>
+          </div>
+
+          <div className="order-8 md:col-span-6 md:col-start-1">
+            <div className="animate-fadeIn opacity-0">
+              <div className="bg-white rounded-[20px] md:rounded-[32px] p-6 md:p-12 shadow-lg mt-4 md:mt-6">
+                <p className="text-base md:text-lg text-gray-600 leading-relaxed">
+                  Nossa plataforma digital intuitiva e equipe dedicada trabalham em conjunto para garantir uma experiência sem complicações. Desde o primeiro contato até o final da estadia, estamos presentes para assegurar que tanto proprietários quanto locatários tenham suas expectativas superadas, construindo relacionamentos duradouros baseados em confiança e excelência.
+                </p>
               </div>
             </div>
           </div>
