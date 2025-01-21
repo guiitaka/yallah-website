@@ -17,32 +17,32 @@ const services = [
     title: 'Administração Completa', 
     description: 'Cuidamos da gestão, locação e manutenção do seu imóvel, garantindo tranquilidade e rentabilidade máxima.', 
     video: {
-      webm: `${GITHUB_VIDEO_BASE_URL}/administracao.webm`,
-      mp4: `${GITHUB_VIDEO_BASE_URL}/administracao.mp4`
+      webm: 'https://github.com/guiitaka/yallah-website/raw/refs/heads/main/public/videos/administracao.webm',
+      mp4: 'https://github.com/guiitaka/yallah-website/raw/refs/heads/main/public/videos/administracao.mp4'
     }
   },
   { 
     title: 'Imóvel sempre Impecável', 
     description: 'Realizamos limpeza e preparação profissional para encantar os hóspedes e valorizar seu patrimônio.', 
     video: {
-      webm: `${GITHUB_VIDEO_BASE_URL}/imovel-impecavel.webm`,
-      mp4: `${GITHUB_VIDEO_BASE_URL}/imovel-impecavel.mp4`
+      webm: 'https://github.com/guiitaka/yallah-website/raw/refs/heads/main/public/videos/imovel-impecavel.webm',
+      mp4: 'https://github.com/guiitaka/yallah-website/raw/refs/heads/main/public/videos/imovel-impecavel.mp4'
     }
   },
   { 
     title: 'Anúncios Estratégicos', 
     description: 'Destacamos seu imóvel nas melhores plataformas para atrair viajantes e profissionais de alto padrão.', 
     video: {
-      webm: `${GITHUB_VIDEO_BASE_URL}/anuncios.webm`,
-      mp4: `${GITHUB_VIDEO_BASE_URL}/anuncios.mp4`
+      webm: 'https://github.com/guiitaka/yallah-website/raw/refs/heads/main/public/videos/anuncios.webm',
+      mp4: 'https://github.com/guiitaka/yallah-website/raw/refs/heads/main/public/videos/anuncios.mp4'
     }
   },
   { 
     title: 'Sem Complicações', 
     description: 'Você aproveita os rendimentos enquanto a Yallah resolve tudo, do check-in ao check-out.', 
     video: {
-      webm: `${GITHUB_VIDEO_BASE_URL}/complicacoes.webm`,
-      mp4: `${GITHUB_VIDEO_BASE_URL}/complicacoes.mp4`
+      webm: 'https://github.com/guiitaka/yallah-website/raw/refs/heads/main/public/videos/complicacoes.webm',
+      mp4: 'https://github.com/guiitaka/yallah-website/raw/refs/heads/main/public/videos/complicacoes.mp4'
     }
   }
 ]
