@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 interface AutoplayVideoProps {
   videoSrc: {
@@ -9,26 +9,46 @@ interface AutoplayVideoProps {
 
 export default function AutoplayVideo({ videoSrc }: AutoplayVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    const playVideo = () => {
-      video.play().catch((error) => {
+    // Função para tentar reproduzir o vídeo
+    const attemptPlay = async () => {
+      try {
+        await video.play();
+        setIsPlaying(true);
+        console.log('Video playing successfully');
+      } catch (error) {
         console.log('Autoplay prevented:', error);
-      });
+        setIsPlaying(false);
+      }
     };
 
-    // Tenta reproduzir o vídeo quando estiver carregado
-    video.addEventListener('loadeddata', playVideo);
-    
-    // Tenta reproduzir novamente em interação do usuário
-    document.addEventListener('touchstart', playVideo, { once: true });
+    // Eventos para tentar reproduzir o vídeo
+    const playEvents = ['touchstart', 'click'];
+    const mediaEvents = ['loadeddata', 'loadedmetadata'];
 
+    // Tenta reproduzir quando o vídeo estiver carregado
+    mediaEvents.forEach(event => {
+      video.addEventListener(event, attemptPlay);
+    });
+
+    // Tenta reproduzir em interação do usuário
+    playEvents.forEach(event => {
+      document.addEventListener(event, attemptPlay, { once: true });
+    });
+
+    // Cleanup
     return () => {
-      video.removeEventListener('loadeddata', playVideo);
-      document.removeEventListener('touchstart', playVideo);
+      mediaEvents.forEach(event => {
+        video.removeEventListener(event, attemptPlay);
+      });
+      playEvents.forEach(event => {
+        document.removeEventListener(event, attemptPlay);
+      });
     };
   }, []);
 
@@ -41,11 +61,12 @@ export default function AutoplayVideo({ videoSrc }: AutoplayVideoProps) {
         muted
         loop
         playsInline
-        preload="auto"
+        preload="metadata"
         controls={false}
-        data-playsinline="true"
-        data-webkit-playsinline="true"
-        data-x5-playsinline="true"
+        webkit-playsinline="true"
+        x5-playsinline="true"
+        x5-video-player-type="h5"
+        x5-video-player-fullscreen="true"
       >
         <source src={videoSrc.mp4} type="video/mp4" />
         <source src={videoSrc.webm} type="video/webm" />
