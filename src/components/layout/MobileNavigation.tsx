@@ -133,13 +133,13 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
       {/* Menu de navegação mobile */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 md:hidden">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between py-3 mb-[env(safe-area-inset-bottom,20px)]">
+          <div className="flex items-start justify-between pt-4 h-[72px] mb-[env(safe-area-inset-bottom,20px)]">
             <Link
               href="/mobile/a-yallah"
               className="flex flex-col items-center gap-1"
             >
               <House weight="light" className="w-6 h-6 text-gray-600" />
-              <span className="text-xs text-gray-600">A Yallah</span>
+              <span className="text-[10px] text-gray-600">A Yallah</span>
             </Link>
 
             <Link
@@ -147,7 +147,7 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
               className="flex flex-col items-center gap-1"
             >
               <Info weight="light" className="w-6 h-6 text-gray-600" />
-              <span className="text-xs text-gray-600">Como Funciona</span>
+              <span className="text-[10px] text-gray-600">Como Funciona</span>
             </Link>
 
             <Link
@@ -155,7 +155,7 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
               className="flex flex-col items-center gap-1"
             >
               <Lightbulb weight="light" className="w-6 h-6 text-gray-600" />
-              <span className="text-xs text-gray-600">Método</span>
+              <span className="text-[10px] text-gray-600">Método</span>
             </Link>
 
             <button
@@ -165,12 +165,12 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
               {userType === 'owner' ? (
                 <>
                   <House weight="light" className="w-6 h-6 text-gray-600" />
-                  <span className="text-xs text-gray-600">Alugar</span>
+                  <span className="text-[10px] text-gray-600">Alugar</span>
                 </>
               ) : (
                 <>
                   <Key weight="light" className="w-6 h-6 text-gray-600" />
-                  <span className="text-xs text-gray-600">Proprietário</span>
+                  <span className="text-[10px] text-gray-600">Proprietário</span>
                 </>
               )}
             </button>
@@ -180,7 +180,7 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
               className="flex flex-col items-center gap-1"
             >
               <Headset weight="light" className="w-6 h-6 text-gray-600" />
-              <span className="text-xs text-gray-600">Contato</span>
+              <span className="text-[10px] text-gray-600">Contato</span>
             </Link>
           </div>
         </div>
