@@ -16,13 +16,46 @@ export default function AutoplayVideo({ videoSrc, poster }: AutoplayVideoProps) 
     const video = videoRef.current;
     if (!video) return;
 
+    // Ensure video is muted before attempting to play
+    // According to Apple's docs: "A <video> element can use the play() method to automatically 
+    // play without user gestures only when it contains no audio tracks or has its muted property set to true"
     video.muted = true;
-    video.setAttribute('playsinline', 'true');
-    video.setAttribute('webkit-playsinline', 'true');
 
-    video.play().catch((error) => {
-      console.error("Error playing video:", error);
-    });
+    // Load only metadata initially to improve performance
+    video.preload = 'metadata';
+
+    // According to Apple's docs, playback will pause if:
+    // 1. The video element gains an audio track
+    // 2. Becomes unmuted without user interaction
+    // 3. Video is no longer onscreen
+    const playVideo = () => {
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          console.error("Error attempting to play video:", error);
+        });
+      }
+    };
+
+    // Play video when it becomes visible
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            playVideo();
+          } else {
+            video.pause();
+          }
+        });
+      },
+      { threshold: 0.1 } // Start playing when at least 10% of the video is visible
+    );
+
+    observer.observe(video);
+
+    return () => {
+      observer.disconnect();
+    };
   }, []);
 
   return (
@@ -31,11 +64,12 @@ export default function AutoplayVideo({ videoSrc, poster }: AutoplayVideoProps) 
         ref={videoRef}
         className="w-full h-full object-cover rounded-xl"
         autoPlay
-        loop
         muted
+        loop
         playsInline
-        preload="auto"
+        preload="metadata"
         poster={poster}
+        controls={false}
       >
         <source src={videoSrc.mp4} type="video/mp4" />
         <source src={videoSrc.webm} type="video/webm" />
