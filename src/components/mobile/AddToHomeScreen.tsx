@@ -2,29 +2,7 @@
 
 import { useEffect } from 'react';
 
-// Renomeando as interfaces para evitar conflitos
-interface YallahAddToHomeScreenOptions {
-  appName: string;
-  appNameDisplay?: 'standalone' | 'inline';
-  appIconUrl: string;
-  assetUrl: string;
-  maxModalDisplayCount?: number;
-  displayOptions?: { showMobile: boolean; showDesktop: boolean };
-  allowClose?: boolean;
-}
-
-interface YallahAddToHomeScreenType {
-  show: (locale?: string) => void;
-}
-
-// Declarando apenas o que precisamos na interface Window
-declare global {
-  interface Window {
-    AddToHomeScreen: (options: YallahAddToHomeScreenOptions) => YallahAddToHomeScreenType;
-    AddToHomeScreenInstance: YallahAddToHomeScreenType;
-  }
-}
-
+// Removendo as declarações de tipo pois agora estão no arquivo .d.ts
 export default function AddToHomeScreen() {
   useEffect(() => {
     const initAddToHomeScreen = () => {
