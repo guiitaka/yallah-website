@@ -1,8 +1,6 @@
 import { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import '@/styles/globals.css';
-import AddToHomeScreen from '@/components/mobile/AddToHomeScreen';
-import Script from 'next/script';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -66,19 +64,8 @@ export default function MobileLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
-      <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/gh/philfung/add-to-homescreen@2.97/dist/add-to-homescreen.min.css"
-      />
-      <Script
-        src="https://cdn.jsdelivr.net/gh/philfung/add-to-homescreen@2.97/dist/add-to-homescreen.min.js"
-        strategy="afterInteractive"
-      />
-      <div className={inter.className}>
-        <AddToHomeScreen />
-        {children}
-      </div>
-    </>
+    <div className={inter.className}>
+      {children}
+    </div>
   );
 } 
