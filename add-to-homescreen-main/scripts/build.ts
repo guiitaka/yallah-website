@@ -10,18 +10,34 @@ const sourceMainFilePath = `${__dirname}/../src/main.ts`;
 const sourceIndexFilePath = `${__dirname}/../src/index.ts`;
 const localesFilePath = `${__dirname}/../src/locales`;
 
-function ensureDirectoryExistence(dirName) {
+function ensureDirectoryExistence(dirName: string) {
   if (fs.existsSync(dirName)) {
     return true;
   }
-  fs.mkdirSync(dirName);
+  fs.mkdirSync(dirName, { recursive: true });
 }
 
-function deleteFolder(folderPath) {
+function createFolder(folderPath: string) {
+  try {
+    ensureDirectoryExistence(folderPath);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error('Error creating folder:', error.message);
+    } else {
+      console.error('Unknown error creating folder');
+    }
+  }
+}
+
+function deleteFolder(folderPath: string) {
   try {
     fs.rmSync(folderPath, { recursive: true, force: true });
-  } catch (error) {
-    console.error(`Error deleting folder ${folderPath}: ${error.message}`);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(`Error deleting folder ${folderPath}: ${error.message}`);
+    } else {
+      console.error(`Unknown error deleting folder ${folderPath}`);
+    }
   }
 }
 
