@@ -2,7 +2,8 @@
 
 import { useEffect } from 'react';
 
-interface AddToHomeScreenOptions {
+// Renomeando as interfaces para evitar conflitos
+interface YallahAddToHomeScreenOptions {
   appName: string;
   appNameDisplay?: 'standalone' | 'inline';
   appIconUrl: string;
@@ -12,15 +13,15 @@ interface AddToHomeScreenOptions {
   allowClose?: boolean;
 }
 
-interface AddToHomeScreenType {
+interface YallahAddToHomeScreenType {
   show: (locale?: string) => void;
 }
 
-// Augment the window interface
+// Declarando apenas o que precisamos na interface Window
 declare global {
   interface Window {
-    AddToHomeScreen(options: AddToHomeScreenOptions): AddToHomeScreenType;
-    AddToHomeScreenInstance: AddToHomeScreenType;
+    AddToHomeScreen: (options: YallahAddToHomeScreenOptions) => YallahAddToHomeScreenType;
+    AddToHomeScreenInstance: YallahAddToHomeScreenType;
   }
 }
 
