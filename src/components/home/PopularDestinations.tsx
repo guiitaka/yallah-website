@@ -44,14 +44,35 @@ const destinations = [
 
 export default function PopularDestinations() {
   const [currentIndex, setCurrentIndex] = useState(0)
+  const [touchStart, setTouchStart] = useState(0)
+  const [touchEnd, setTouchEnd] = useState(0)
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.touches[0].clientX)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.touches[0].clientX)
+  }
+
+  const handleTouchEnd = () => {
+    if (touchStart - touchEnd > 75) {
+      // Swipe left
+      nextSlide()
+    }
+    if (touchStart - touchEnd < -75) {
+      // Swipe right
+      prevSlide()
+    }
+  }
 
   const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % Math.max(0, destinations.length - 3))
+    setCurrentIndex((prev) => (prev + 1) % Math.max(0, destinations.length - 1))
   }
 
   const prevSlide = () => {
     setCurrentIndex((prev) => 
-      prev === 0 ? Math.max(0, destinations.length - 4) : prev - 1
+      prev === 0 ? Math.max(0, destinations.length - 2) : prev - 1
     )
   }
 
@@ -71,7 +92,7 @@ export default function PopularDestinations() {
             <button
               onClick={nextSlide}
               className="p-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
-              disabled={currentIndex >= destinations.length - 4}
+              disabled={currentIndex >= destinations.length - 2}
             >
               <CaretRight className="w-5 h-5 text-gray-600" />
             </button>
@@ -80,8 +101,11 @@ export default function PopularDestinations() {
 
         <div className="relative overflow-hidden">
           <div 
-            className="flex gap-6 transition-transform duration-300 ease-in-out"
-            style={{ transform: `translateX(-${currentIndex * (100 / 4)}%)` }}
+            className="flex gap-6 transition-transform duration-300 ease-in-out touch-pan-x"
+            style={{ transform: `translateX(-${currentIndex * (100 / (destinations.length - 1))}%)` }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
             {destinations.map((destination) => (
               <div
@@ -111,40 +135,6 @@ export default function PopularDestinations() {
                         <Star weight="fill" className="w-4 h-4 text-[#8BADA4]" />
                         <span className="text-white">{destination.rating.toFixed(1)}</span>
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Mobile Version */}
-        <div className="md:hidden mt-8">
-          <div className="grid grid-cols-1 gap-4">
-            {destinations.map((destination) => (
-              <div key={destination.id} className="rounded-2xl overflow-hidden bg-white shadow">
-                <div className="relative aspect-[4/3]">
-                  <Image
-                    src={destination.image}
-                    alt={destination.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    {destination.name}
-                  </h3>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                      <span className="text-sm text-gray-500">R$</span>
-                      <span className="text-gray-900 font-medium">{destination.price}</span>
-                      <span className="text-sm text-gray-500">/noite</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Star weight="fill" className="w-4 h-4 text-[#8BADA4]" />
-                      <span className="text-gray-900">{destination.rating.toFixed(1)}</span>
                     </div>
                   </div>
                 </div>

@@ -4,36 +4,14 @@ import React from 'react';
 import Image from 'next/image';
 import MobileLayout from '@/components/layout/MobileLayout';
 import PopularDestinations from '@/components/home/PopularDestinations';
+import MobileBanner from '@/components/home/MobileBanner';
 
 export default function MobileTenantPage() {
   return (
     <MobileLayout>
       <div className="flex flex-col min-h-screen bg-gray-50">
         {/* Banner Section */}
-        <section className="relative w-full h-[300px]">
-          <Image
-            src="/banner-locatario.JPG"
-            alt="Banner"
-            width={800}
-            height={600}
-            priority
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/60" />
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6 text-center">
-            <h1 className="text-3xl font-medium mb-4">
-              Encontre o imóvel{' '}
-              <span className="relative">
-                perfeito
-                <span className="absolute left-0 right-0 bottom-1 h-1 bg-[#8BADA4]"></span>
-              </span>{' '}
-              para alugar
-            </h1>
-            <p className="text-lg">
-              Desfrute de uma experiência única em imóveis selecionados. Relaxe e realize seus sonhos com a Yallah
-            </p>
-          </div>
-        </section>
+        <MobileBanner />
 
         {/* Popular Destinations */}
         <PopularDestinations />
