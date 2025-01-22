@@ -1,103 +1,173 @@
 'use client'
 
-import React from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
-import { MapPin, Calendar, Users, Buildings, ShieldCheck, Money, ChartLineUp } from '@phosphor-icons/react'
+import { MapPin, Calendar as CalendarIcon, Users, Buildings, ShieldCheck, Money, ChartLineUp, MagnifyingGlass, CaretDown, Bed } from '@phosphor-icons/react'
+import Link from 'next/link'
+import DatePicker from 'react-datepicker'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
+import "react-datepicker/dist/react-datepicker.css"
 
 type BannerProps = {
   userType: 'owner' | 'tenant'
 }
 
 export default function Banner({ userType }: BannerProps) {
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null])
+  const [startDate, endDate] = dateRange
+
   return (
     <div className="px-4 md:px-6 pt-10 md:pt-10">
-      <div className="relative w-full h-[750px] md:h-[600px] overflow-hidden rounded-3xl">
-        {/* Background Image */}
+      <div className={`relative w-full ${userType === 'tenant' ? 'h-[900px] md:h-[750px]' : 'h-[700px] md:h-[600px]'} overflow-hidden rounded-3xl`}>
+        {/* Background Video/Image */}
         <div className="absolute inset-0">
-          <Image
-            src={userType === 'tenant' ? "/banner-locatario.JPG" : "/banner.jpg"}
-            alt="Banner"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-black/60 md:bg-black/40" />
+          {userType === 'tenant' ? (
+            <>
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover"
+              >
+                <source src="/banner-locatario.mp4" type="video/mp4" />
+              </video>
+              <div className="absolute inset-0 bg-black/40" />
+            </>
+          ) : (
+            <>
+              <Image
+                src="/banner.jpg"
+                alt="Banner"
+                fill
+                className="object-cover"
+                priority
+              />
+              <div className="absolute inset-0 bg-black/40" />
+            </>
+          )}
         </div>
 
         <div className="relative h-full mx-auto">
-          <div className="w-full max-w-[1200px] mx-auto px-4 md:px-6 h-full">
+          <div className="w-full max-w-[1400px] mx-auto px-4 md:px-6 h-full">
             <div className="h-full flex flex-col md:flex-row md:gap-20">
               {userType === 'tenant' ? (
-                <>
-                  {/* Card Container - Moved to left for tenant */}
-                  <div className="flex-1 flex items-start justify-center pt-6 md:pt-20 order-2 md:order-1">
-                    <div className="w-full md:w-[400px] bg-white/95 md:bg-white rounded-2xl p-6 md:p-6 shadow-lg">
-                      <div className="flex items-center gap-2 mb-4">
-                        <Buildings className="w-6 h-6" />
-                        <h2 className="text-xl font-semibold">Encontrar Imóveis</h2>
-                      </div>
+                <div className="container mx-auto h-full flex items-center justify-center">
+                  <div className="max-w-[800px] w-full text-center">
+                    {/* Content */}
+                    <div className="text-white mb-10">
+                      <h1 className="text-4xl md:text-6xl font-bold mb-6">
+                        Encontre o imóvel{' '}
+                        <span className="relative">
+                          perfeito
+                          <span className="absolute left-0 right-0 bottom-1 h-1 bg-[#8BADA4]"></span>
+                        </span>{' '}
+                        para alugar
+                      </h1>
+                      <p className="text-gray-200 text-lg md:text-xl">
+                        Desfrute de uma experiência única em imóveis selecionados. Relaxe e realize seus sonhos com a Yallah
+                      </p>
+                    </div>
 
-                      <div className="space-y-4">
+                    {/* Search Form */}
+                    <div className="bg-white rounded-2xl shadow-lg relative">
+                      <div className="flex flex-col md:flex-row items-center">
                         {/* Location */}
-                        <div>
-                          <label className="text-sm text-gray-600 mb-1 block">Cidade ou Região</label>
+                        <div className="flex-1 p-4 border-b md:border-b-0 md:border-r border-gray-100">
+                          <label className="text-sm text-gray-500 block mb-1">Para onde você vai?</label>
                           <div className="relative">
-                            <input
-                              type="text"
-                              placeholder="Digite a localização"
-                              className="w-full p-4 md:p-3 bg-gray-50 rounded-lg pl-12 md:pl-10 text-base"
-                            />
-                            <MapPin className="w-5 h-5 absolute left-4 md:left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <select className="w-full appearance-none bg-transparent text-gray-700 text-lg pr-8">
+                              <option value="">Selecione o bairro</option>
+                              <option>Moema</option>
+                              <option>Vila Madalena</option>
+                              <option>Pinheiros</option>
+                              <option>Jardins</option>
+                              <option>Itaim Bibi</option>
+                              <option>Vila Mariana</option>
+                              <option>Brooklin</option>
+                              <option>Perdizes</option>
+                              <option>Higienópolis</option>
+                              <option>Campo Belo</option>
+                            </select>
+                            <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none flex gap-1 items-center text-gray-400">
+                              <Bed className="w-5 h-5" />
+                              <CaretDown className="w-4 h-4" />
+                            </div>
                           </div>
                         </div>
 
-                        {/* Type */}
-                        <div>
-                          <label className="text-sm text-gray-600 mb-1 block">Tipo de Imóvel</label>
-                          <select className="w-full p-4 md:p-3 bg-gray-50 rounded-lg appearance-none text-base">
-                            <option>Apartamento</option>
-                            <option>Casa</option>
-                            <option>Comercial</option>
-                            <option>Terreno</option>
-                          </select>
-                        </div>
-
-                        {/* Price Range */}
-                        <div>
-                          <label className="text-sm text-gray-600 mb-1 block">Faixa de Preço</label>
-                          <div className="flex gap-2">
-                            <input
-                              type="text"
-                              placeholder="Mínimo"
-                              className="w-1/2 p-4 md:p-3 bg-gray-50 rounded-lg text-base"
-                            />
-                            <input
-                              type="text"
-                              placeholder="Máximo"
-                              className="w-1/2 p-4 md:p-3 bg-gray-50 rounded-lg text-base"
+                        {/* Date */}
+                        <div className="flex-1 p-4 border-b md:border-b-0 md:border-r border-gray-100 relative z-50">
+                          <label className="text-sm text-gray-500 block mb-1">Data</label>
+                          <div className="relative">
+                            <DatePicker
+                              selectsRange={true}
+                              startDate={startDate}
+                              endDate={endDate}
+                              onChange={(update) => {
+                                setDateRange(update)
+                              }}
+                              isClearable={true}
+                              placeholderText="dd/mm/yyyy"
+                              dateFormat="dd/MM/yyyy"
+                              locale={ptBR}
+                              className="w-full appearance-none bg-transparent text-gray-700 text-lg pr-8"
+                              calendarClassName="rounded-lg shadow-lg border-0"
+                              showPopperArrow={false}
+                              monthsShown={2}
+                              popperPlacement="bottom-start"
+                              customInput={
+                                <div className="flex items-center justify-between cursor-pointer">
+                                  <input
+                                    type="text"
+                                    value={startDate ? `${format(startDate, 'dd/MM/yyyy')}${endDate ? ` - ${format(endDate, 'dd/MM/yyyy')}` : ''}` : ''}
+                                    placeholder="dd/mm/yyyy"
+                                    className="w-full appearance-none bg-transparent text-gray-700 text-lg cursor-pointer"
+                                    readOnly
+                                  />
+                                  <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none flex gap-1 items-center text-gray-400">
+                                    <div className="w-5 h-5 relative">
+                                      <CalendarIcon weight="regular" className="w-5 h-5 text-gray-400" />
+                                    </div>
+                                    <CaretDown className="w-4 h-4" />
+                                  </div>
+                                </div>
+                              }
                             />
                           </div>
                         </div>
 
-                        <button className="w-full flex items-center justify-center gap-2 py-4 md:py-3 bg-[#8BADA4] text-white rounded-lg hover:bg-[#8BADA4]/90 text-base">
-                          <Buildings className="w-5 h-5" />
-                          Encontrar Imóvel
-                        </button>
+                        {/* Guests */}
+                        <div className="flex-1 p-4 relative">
+                          <label className="text-sm text-gray-500 block mb-1">Quantas pessoas?</label>
+                          <div className="relative">
+                            <select className="w-full appearance-none bg-transparent text-gray-700 text-lg pr-8">
+                              <option value="">Selecione</option>
+                              <option>1 pessoa</option>
+                              <option>2 pessoas</option>
+                              <option>3 pessoas</option>
+                              <option>4 pessoas</option>
+                              <option>5 pessoas</option>
+                              <option>6+ pessoas</option>
+                            </select>
+                            <div className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none flex gap-1 items-center text-gray-400">
+                              <Users className="w-5 h-5" />
+                              <CaretDown className="w-4 h-4" />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Search Button */}
+                        <div className="p-2">
+                          <button className="p-4 bg-[#8BADA4] text-white rounded-full hover:bg-[#8BADA4]/90 transition-colors shadow-lg">
+                            <MagnifyingGlass className="w-6 h-6" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-
-                  {/* Left Content - Moved to right for tenant */}
-                  <div className="w-full md:max-w-[600px] text-white flex flex-col items-center md:items-start text-center md:text-left pt-6 md:pt-20 flex-none order-1 md:order-2">
-                    <h1 className="text-[40px] md:text-[64px] font-normal leading-[1.1] md:leading-tight mb-4 md:mb-8 max-w-[800px]">
-                      Encontre o imóvel perfeito para alugar
-                    </h1>
-                    <p className="text-xl md:text-2xl opacity-100 mb-6 md:mb-10 font-light max-w-[600px]">
-                      Alugue com segurança e tranquilidade<br />
-                      através da Yallah
-                    </p>
-                  </div>
-                </>
+                </div>
               ) : (
                 <>
                   {/* Left Content for owner */}
