@@ -28,7 +28,7 @@ export default function MobileBanner() {
         <div className="absolute inset-0 bg-black/40" />
       </div>
 
-      <div className="relative h-full flex flex-col items-center justify-between py-8 px-4">
+      <div className="relative h-full flex flex-col items-center justify-start py-8 px-4">
         {/* Content */}
         <div className="text-white text-center mt-8">
           <h1 className="text-3xl font-bold mb-4">
@@ -39,20 +39,20 @@ export default function MobileBanner() {
             </span>{' '}
             para alugar
           </h1>
-          <p className="text-gray-200 text-lg">
+          <p className="text-gray-200 text-lg mb-8">
             Desfrute de uma experiência única em imóveis selecionados. Relaxe e realize seus sonhos com a Yallah
           </p>
-        </div>
 
-        {/* Search Button */}
-        {!isSearchOpen && (
-          <button
-            onClick={() => setIsSearchOpen(true)}
-            className="absolute bottom-8 right-8 p-4 bg-[#8BADA4] text-white rounded-full hover:bg-[#8BADA4]/90 transition-all shadow-lg"
-          >
-            <MagnifyingGlass className="w-6 h-6" />
-          </button>
-        )}
+          {/* Search Button */}
+          {!isSearchOpen && (
+            <button
+              onClick={() => setIsSearchOpen(true)}
+              className="p-4 bg-[#8BADA4] text-white rounded-full hover:bg-[#8BADA4]/90 transition-all shadow-lg mx-auto"
+            >
+              <MagnifyingGlass className="w-6 h-6" />
+            </button>
+          )}
+        </div>
 
         {/* Search Form */}
         <div 
