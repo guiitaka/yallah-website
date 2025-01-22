@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { MapPin, Calendar as CalendarIcon, Users, Bed, CaretDown, MagnifyingGlass } from '@phosphor-icons/react'
+import { MapPin, Calendar as CalendarIcon, Users, Bed, CaretDown, MagnifyingGlass, X } from '@phosphor-icons/react'
 import DatePicker from 'react-datepicker'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
@@ -10,6 +10,7 @@ import "react-datepicker/dist/react-datepicker.css"
 export default function MobileBanner() {
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null])
   const [startDate, endDate] = dateRange
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
 
   return (
     <section className="relative w-full h-[600px]">
@@ -43,8 +44,34 @@ export default function MobileBanner() {
           </p>
         </div>
 
+        {/* Search Button */}
+        {!isSearchOpen && (
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="absolute bottom-8 right-8 p-4 bg-[#8BADA4] text-white rounded-full hover:bg-[#8BADA4]/90 transition-all shadow-lg"
+          >
+            <MagnifyingGlass className="w-6 h-6" />
+          </button>
+        )}
+
         {/* Search Form */}
-        <div className="w-full bg-white rounded-2xl shadow-lg">
+        <div 
+          className={`w-full bg-white rounded-2xl shadow-lg transition-all duration-300 ${
+            isSearchOpen 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-8 pointer-events-none'
+          }`}
+        >
+          {/* Close Button */}
+          <div className="flex justify-end p-2">
+            <button
+              onClick={() => setIsSearchOpen(false)}
+              className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
           {/* Location */}
           <div className="p-4 border-b border-gray-100">
             <label className="text-sm text-gray-500 block mb-1">Para onde você vai?</label>
