@@ -16,9 +16,11 @@ interface AddToHomeScreenType {
   show: (locale?: string) => void;
 }
 
+type AddToHomeScreenFunction = (options: AddToHomeScreenOptions) => AddToHomeScreenType;
+
 declare global {
   interface Window {
-    AddToHomeScreen: (options: AddToHomeScreenOptions) => AddToHomeScreenType;
+    AddToHomeScreen: AddToHomeScreenFunction;
     AddToHomeScreenInstance: AddToHomeScreenType;
   }
 }
