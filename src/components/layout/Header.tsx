@@ -18,8 +18,8 @@ import {
   Lightbulb,
   Headset,
   ChatCircleText,
-  Key,
   House as HouseIcon,
+  Key,
   Tree,
   Mountains,
   Binoculars,
@@ -224,29 +224,6 @@ export default function Header({ userType }: HeaderProps) {
     )
   }
 
-  const renderSwitchButton = () => {
-    if (userType === 'owner') {
-      return (
-        <button 
-          onClick={() => handleNavigation('/tenant')}
-          className="flex items-center justify-center w-[160px] gap-2 px-6 py-2 text-white bg-[#8BADA4] hover:bg-[#7A9C93] rounded-full transition-colors text-sm font-medium whitespace-nowrap"
-        >
-          <HouseIcon className="w-4 h-4 flex-shrink-0" />
-          <span>Quero Alugar</span>
-        </button>
-      )
-    }
-    return (
-      <button 
-        onClick={() => handleNavigation('/owner')}
-        className="flex items-center justify-center w-[180px] gap-2 px-6 py-2 text-white bg-[#3E5A54] hover:bg-[#2D4640] rounded-full transition-colors text-sm font-medium whitespace-nowrap"
-      >
-        <Key className="w-4 h-4 flex-shrink-0" />
-        <span>Sou Proprietário</span>
-      </button>
-    )
-  }
-
   return (
     <>
       {/* Overlay de transição com duas fases */}
@@ -329,7 +306,6 @@ export default function Header({ userType }: HeaderProps) {
                     className="!min-w-0 !w-[100px]"
                     selectButtonClassName="!px-3 !py-2.5 !border-0 !bg-gray-100 !rounded-full !text-sm"
                   />
-                  {renderSwitchButton()}
                 </div>
               </div>
             </div>

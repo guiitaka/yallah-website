@@ -3,6 +3,7 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import MobileNavigation from './MobileNavigation';
+import FloatingCoinButton from '../ui/FloatingCoinButton';
 import Image from 'next/image';
 
 const MobileLayout = ({ children }: { children: React.ReactNode }) => {
@@ -10,6 +11,7 @@ const MobileLayout = ({ children }: { children: React.ReactNode }) => {
   
   // Determina o tipo de usuário baseado na URL
   const userType = pathname.includes('/mobile/owner') ? 'owner' : 'tenant';
+  const isHome = pathname === '/mobile';
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -24,11 +26,6 @@ const MobileLayout = ({ children }: { children: React.ReactNode }) => {
             priority
           />
         </div>
-        <div className="absolute right-4">
-          <button className="text-sm font-medium px-3 py-1 bg-gray-100 rounded-full">
-            PT
-          </button>
-        </div>
       </header>
 
       {/* Main Content */}
@@ -38,6 +35,9 @@ const MobileLayout = ({ children }: { children: React.ReactNode }) => {
 
       {/* Bottom Navigation */}
       <MobileNavigation userType={userType} />
+
+      {/* Floating Button */}
+      {!isHome && <FloatingCoinButton />}
     </div>
   );
 };

@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation'
 import Header from '@/components/layout/Header'
 import MobileNavigation from '@/components/layout/MobileNavigation'
+import FloatingCoinButton from '@/components/ui/FloatingCoinButton'
 
 type ClientLayoutProps = {
   children: React.ReactNode
@@ -20,6 +21,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
         {children}
       </main>
       {!isHome && <MobileNavigation userType={userType} />}
+      {!isHome && <FloatingCoinButton />}
     </>
   )
 } 
