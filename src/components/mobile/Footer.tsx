@@ -12,7 +12,7 @@ export default function Footer() {
                 <div className="flex justify-center mb-8">
                     <div className="w-[180px] h-[60px] relative bg-white rounded-lg p-2">
                         <Image
-                            src="/logo-yallah-nobg.png"
+                            src="/logo-yallah-nobg-footer.png"
                             alt="Yallah"
                             fill
                             className="object-contain"
