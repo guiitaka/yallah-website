@@ -4,6 +4,7 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import MobileNavigation from './MobileNavigation';
 import FloatingCoinButton from '../ui/FloatingCoinButton';
+import Footer from '../mobile/Footer';
 import Image from 'next/image';
 
 const MobileLayout = ({ children }: { children: React.ReactNode }) => {
@@ -32,6 +33,9 @@ const MobileLayout = ({ children }: { children: React.ReactNode }) => {
       <main className="flex-1 pt-[84px] pb-20">
         {children}
       </main>
+
+      {/* Footer */}
+      {!isHome && <Footer />}
 
       {/* Bottom Navigation */}
       <MobileNavigation userType={userType} />
