@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 255, 255, 255;
+  --background-end-rgb: 255, 255, 255;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-start-rgb));
+}
+
+/* Esconde a barra de rolagem no Chrome, Safari e Opera */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Esconde a barra de rolagem no IE, Edge e Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE e Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Suporte para notch do iPhone */
+@supports(padding: max(0px)) {
+  .fixed-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 24px);
+  }
+}
+
+/* Animações */
+@keyframes flip-y {
+  0% {
+    transform: rotateY(0deg);
+  }
+  100% {
+    transform: rotateY(1080deg);
+  }
+}
+
+.animate-flip-y {
+  animation: flip-y 2s linear infinite;
+}
+
+@keyframes ellipsis {
+  0% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75% { content: '...'; }
+  100% { content: ''; }
+}
+
+.animate-ellipsis::after {
+  content: '';
+  animation: ellipsis 2s steps(4) infinite;
+}
+
+/* Backface visibility */
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Perspective */
+.perspective {
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+}
+
+/* Rotate Y */
+.rotate-y-180 {
+  transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+} 
