@@ -10,12 +10,12 @@ export default function Footer() {
             <div className="container mx-auto">
                 {/* Logo */}
                 <div className="flex justify-center mb-8">
-                    <div className="w-[180px] h-[60px] relative bg-white rounded-lg p-2">
+                    <div className="w-[180px] h-[60px] relative">
                         <Image
-                            src="/logo-yallah-nobg-footer.png"
+                            src="/logo-yallah-nobg.png"
                             alt="Yallah"
                             fill
-                            className="object-contain"
+                            className="object-contain brightness-0 invert"
                             priority
                         />
                     </div>
