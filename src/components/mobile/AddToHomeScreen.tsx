@@ -2,47 +2,64 @@
 
 import { useEffect } from 'react';
 
-interface AddToHomeScreenOptions {
-  appName: string;
-  appNameDisplay?: 'standalone' | 'inline';
-  appIconUrl: string;
-  assetUrl: string;
-  maxModalDisplayCount?: number;
-  displayOptions?: { showMobile: boolean; showDesktop: boolean };
-  allowClose?: boolean;
-}
+type AddToHomeScreenOptions = {
+  startAutomatically?: boolean;
+  skipFirstVisit?: boolean;
+  minPageViews?: number;
+  daysUntilPrompt?: number;
+  customPrompt?: {
+    title?: string;
+    cancelMsg?: string;
+    installMsg?: string;
+    guidanceCancelMsg?: string;
+    src?: string;
+  };
+};
 
-interface AddToHomeScreenType {
-  show: (locale?: string) => void;
-}
+type AddToHomeScreenType = {
+  isAvailable: () => boolean;
+  start: () => void;
+  reset: () => void;
+};
 
+// Declare the types without redeclaring the Window interface
 declare global {
-  interface Window {
-    AddToHomeScreen: (options: AddToHomeScreenOptions) => AddToHomeScreenType;
-    AddToHomeScreenInstance: AddToHomeScreenType;
-  }
+  var AddToHomeScreen: (options: AddToHomeScreenOptions) => AddToHomeScreenType;
+  var AddToHomeScreenInstance: AddToHomeScreenType;
 }
 
 export default function AddToHomeScreen() {
   useEffect(() => {
-    const initAddToHomeScreen = () => {
-      if (typeof window !== 'undefined' && window.AddToHomeScreen) {
-        window.AddToHomeScreenInstance = window.AddToHomeScreen({
-          appName: 'Yallah',
-          appNameDisplay: 'standalone',
-          appIconUrl: '/apple-touch-icon.png',
-          assetUrl: 'https://cdn.jsdelivr.net/gh/philfung/add-to-homescreen@2.97/dist/assets/img/',
-          maxModalDisplayCount: -1,
-          displayOptions: { showMobile: true, showDesktop: false },
-          allowClose: true,
+    const script = document.createElement('script');
+    script.src = '/add-to-homescreen.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    script.onload = () => {
+      if (typeof window.AddToHomeScreen !== 'undefined') {
+        const a2hs = window.AddToHomeScreen({
+          startAutomatically: true,
+          skipFirstVisit: false,
+          minPageViews: 0,
+          daysUntilPrompt: 0,
+          customPrompt: {
+            title: 'Instale o Yallah',
+            cancelMsg: 'Agora não',
+            installMsg: 'Instalar',
+            guidanceCancelMsg: 'OK',
+            src: '/logo-yallah-nobg.png'
+          }
         });
 
-        window.AddToHomeScreenInstance.show('pt');
+        if (a2hs.isAvailable()) {
+          a2hs.start();
+        }
       }
     };
 
-    // Pequeno delay para garantir que o script foi carregado
-    setTimeout(initAddToHomeScreen, 1000);
+    return () => {
+      document.body.removeChild(script);
+    };
   }, []);
 
   return null;
