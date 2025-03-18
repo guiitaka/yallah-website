@@ -333,7 +333,7 @@ export default function AboutUs() {
         muted
         playsInline
       >
-        <source src="https://github.com/guiitaka/yallah-website/raw/refs/heads/main/public/videos/gerenciamento-imóvel.mp4" type="video/mp4" />
+        <source src="https://github.com/guiitaka/yallah-website/raw/refs/heads/main/public/videos/gerenciamento-imo%CC%81vel.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
 
