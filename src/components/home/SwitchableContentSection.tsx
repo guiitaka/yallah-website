@@ -92,7 +92,7 @@ export default function SwitchableContentSection() {
                 className="absolute top-0 left-0 w-full h-full object-cover"
                 style={{ zIndex: -1 }}
             >
-                <source src="/videos/para-proprietarios.mp4" type="video/mp4" />
+                <source src="https://github.com/guiitaka/yallah-website/raw/refs/heads/main/public/videos/para-proprietarios.mp4" type="video/mp4" />
             </video>
 
             {/* Overlay to ensure text readability */}
