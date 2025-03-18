@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600">
+  <!-- Background elements -->
+  <rect x="0" y="0" width="800" height="600" fill="#f3f8f7" />
+  <path d="M0,500 C200,450 600,550 800,480 L800,600 L0,600 Z" fill="#e5efee" />
+  
+  <!-- Decorative circles -->
+  <circle cx="120" cy="120" r="30" fill="#8BADA4" opacity="0.3" />
+  <circle cx="700" cy="200" r="40" fill="#FFB347" opacity="0.3" />
+  <circle cx="600" cy="400" r="20" fill="#8BADA4" opacity="0.2" />
+  
+  <!-- Park bench -->
+  <g transform="translate(150, 420)">
+    <!-- Bench legs -->
+    <rect x="10" y="20" width="10" height="40" fill="#5D4037" />
+    <rect x="180" y="20" width="10" height="40" fill="#5D4037" />
+    
+    <!-- Bench seat -->
+    <rect x="0" y="20" width="200" height="8" rx="2" fill="#8D6E63" />
+    
+    <!-- Bench back -->
+    <g>
+      <rect x="15" y="-20" width="170" height="8" rx="2" fill="#8D6E63" />
+      <rect x="15" y="0" width="170" height="8" rx="2" fill="#8D6E63" />
+      <rect x="15" y="-40" width="170" height="8" rx="2" fill="#8D6E63" />
+    </g>
+  </g>
+  
+  <!-- Person sitting on bench -->
+  <g transform="translate(180, 400)">
+    <!-- Body -->
+    <rect x="0" y="0" width="30" height="40" rx="10" fill="#81C784" />
+    
+    <!-- Head -->
+    <circle cx="15" cy="-10" r="10" fill="#FFD54F" />
+    
+    <!-- Legs -->
+    <rect x="5" y="40" width="8" height="30" fill="#5D4037" />
+    <rect x="18" y="40" width="8" height="30" fill="#5D4037" />
+    
+    <!-- Arms -->
+    <rect x="-10" y="10" width="20" height="6" rx="3" fill="#FFD54F" transform="rotate(-20)" />
+  </g>
+  
+  <!-- Standing person -->
+  <g transform="translate(500, 380)">
+    <!-- Body -->
+    <rect x="0" y="0" width="30" height="60" rx="10" fill="#4FC3F7" />
+    
+    <!-- Head -->
+    <circle cx="15" cy="-10" r="12" fill="#FFD54F" />
+    
+    <!-- Legs -->
+    <rect x="5" y="60" width="8" height="40" fill="#5D4037" />
+    <rect x="18" y="60" width="8" height="40" fill="#5D4037" />
+    
+    <!-- Arms -->
+    <rect x="-15" y="20" width="25" height="6" rx="3" fill="#FFD54F" transform="rotate(-20)" />
+    <rect x="40" y="5" width="25" height="6" rx="3" fill="#FFD54F" transform="rotate(30)" />
+  </g>
+  
+  <!-- Phone booth -->
+  <g transform="translate(400, 340)">
+    <!-- Booth body -->
+    <rect x="0" y="0" width="60" height="100" fill="#CE4B4B" rx="2" />
+    
+    <!-- Booth top -->
+    <path d="M-5,0 L65,0 L65,-10 C65,-15 60,-15 60,-15 L0,-15 C0,-15 -5,-15 -5,-10 Z" fill="#B71C1C" />
+    
+    <!-- Booth windows -->
+    <rect x="5" y="10" width="50" height="60" fill="#BBDEFB" />
+    
+    <!-- Window dividers -->
+    <rect x="5" y="30" width="50" height="2" fill="#B71C1C" />
+    <rect x="5" y="50" width="50" height="2" fill="#B71C1C" />
+    <rect x="20" y="10" width="2" height="60" fill="#B71C1C" />
+    <rect x="40" y="10" width="2" height="60" fill="#B71C1C" />
+    
+    <!-- Door -->
+    <rect x="5" y="70" width="50" height="25" fill="#B71C1C" />
+    
+    <!-- Telephone label -->
+    <rect x="15" y="76" width="30" height="8" rx="1" fill="#FAFAFA" />
+    <text x="18" y="83" font-family="Arial" font-size="6" font-weight="bold" fill="#000000">TELEPHONE</text>
+  </g>
+  
+  <!-- Small person in distance -->
+  <g transform="translate(300, 350) scale(0.6)">
+    <!-- Body -->
+    <rect x="0" y="0" width="20" height="40" rx="5" fill="#B39DDB" />
+    
+    <!-- Head -->
+    <circle cx="10" cy="-5" r="8" fill="#FFD54F" />
+    
+    <!-- Legs -->
+    <rect x="4" y="40" width="5" height="25" fill="#5D4037" />
+    <rect x="12" y="40" width="5" height="25" fill="#5D4037" />
+  </g>
+  
+  <!-- Trash bin -->
+  <g transform="translate(100, 450)">
+    <rect x="0" y="0" width="20" height="30" fill="#FFC107" />
+    <rect x="-2" y="-5" width="24" height="5" fill="#FFA000" />
+  </g>
+  
+  <!-- Small tree -->
+  <g transform="translate(50, 350)">
+    <rect x="10" y="50" width="10" height="40" fill="#8D6E63" />
+    <circle cx="15" cy="30" r="30" fill="#81C784" />
+  </g>
+  
+  <!-- Bush -->
+  <g transform="translate(460, 430)">
+    <circle cx="0" cy="0" r="15" fill="#81C784" />
+    <circle cx="10" cy="-5" r="12" fill="#81C784" />
+    <circle cx="-10" cy="-3" r="10" fill="#81C784" />
+  </g>
+</svg> 

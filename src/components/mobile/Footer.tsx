@@ -6,7 +6,7 @@ import { InstagramLogo, FacebookLogo, WhatsappLogo } from '@phosphor-icons/react
 
 export default function Footer() {
     return (
-        <footer className="bg-[#3E5A54] text-white py-8 px-4 mt-auto mb-[80px]">
+        <footer className="bg-[#3E5A54] text-white py-8 px-4 mt-auto mb-[80px] relative z-[20]">
             <div className="container mx-auto">
                 {/* Logo */}
                 <div className="flex justify-center mb-8">

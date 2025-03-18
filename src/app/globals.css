@@ -1,6 +1,27 @@
+@import 'mapbox-gl/dist/mapbox-gl.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Phone Input Custom Styles */
+.react-tel-input {
+  font-family: inherit !important;
+}
+
+.react-tel-input input {
+  width: 100% !important;
+  height: auto !important;
+  border-radius: 9999px !important;
+  background-color: transparent !important;
+  border: none !important;
+  color: white !important;
+  font-size: 16px !important;
+}
+
+.react-tel-input input::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
 
 @layer base {
   :root {
@@ -79,5 +100,144 @@
   .animate-ellipsis::after {
     content: '';
     animation: ellipsis 2s steps(4) infinite;
+  }
+
+  /* Timeline Styles */
+  .timeline .swiper-pagination {
+    right: 15% !important;
+    height: 100%;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 18px;
+    z-index: 1;
+  }
+
+  .timeline .swiper-pagination::before {
+    content: "";
+    position: absolute;
+    left: -30px;
+    top: 0;
+    height: 100%;
+    width: 1px;
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .timeline .swiper-pagination-bullet {
+    width: auto;
+    height: auto;
+    text-align: center;
+    opacity: 1;
+    background: transparent;
+    color: #8BADA4;
+    margin: 15px 0 !important;
+    position: relative;
+  }
+
+  .timeline .swiper-pagination-bullet::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: -32.5px;
+    width: 6px;
+    height: 6px;
+    border-radius: 100%;
+    background-color: #8BADA4;
+    transform: scale(0);
+    transition: 0.2s;
+  }
+
+  .timeline .swiper-pagination-bullet-active {
+    color: #8BADA4;
+  }
+
+  .timeline .swiper-pagination-bullet-active::before {
+    transform: scale(1);
+  }
+
+  .timeline .swiper-button-next,
+  .timeline .swiper-button-prev {
+    background-size: 20px 20px;
+    top: 15%;
+    width: 20px;
+    height: 20px;
+    margin-top: 0;
+    z-index: 2;
+    transition: 0.2s;
+  }
+
+  .timeline .swiper-button-prev {
+    left: 8%;
+  }
+
+  .timeline .swiper-button-next {
+    right: 8%;
+  }
+
+  .timeline .swiper-button-prev:hover {
+    transform: translateX(-3px);
+  }
+
+  .timeline .swiper-button-next:hover {
+    transform: translateX(3px);
+  }
+
+  .timeline .swiper-button-next::after,
+  .timeline .swiper-button-prev::after {
+    color: #8BADA4;
+    font-size: 20px;
+  }
+
+  @media screen and (min-width: 768px) {
+    .timeline .swiper-pagination {
+      display: flex;
+    }
+
+    .timeline .swiper-button-prev {
+      top: 15%;
+      left: auto;
+      right: 15%;
+      transform: rotate(90deg) translate(0, 10px);
+    }
+
+    .timeline .swiper-button-prev:hover {
+      transform: rotate(90deg) translate(-3px, 10px);
+    }
+
+    .timeline .swiper-button-next {
+      top: auto;
+      bottom: 15%;
+      right: 15%;
+      transform: rotate(90deg) translate(0, 10px);
+    }
+
+    .timeline .swiper-button-next:hover {
+      transform: rotate(90deg) translate(3px, 10px);
+    }
+  }
+
+  .timeline .swiper-slide-active .timeline-year,
+  .timeline .swiper-slide-active .timeline-title,
+  .timeline .swiper-slide-active .timeline-text {
+    opacity: 0;
+    transform: translate3d(20px, 0, 0);
+    animation: slideContent 0.4s forwards 0.4s;
+  }
+
+  .timeline .swiper-slide-active .timeline-title {
+    animation-delay: 0.5s;
+  }
+
+  .timeline .swiper-slide-active .timeline-text {
+    animation-delay: 0.6s;
+  }
+
+  @keyframes slideContent {
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
   }
 } 

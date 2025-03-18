@@ -2,32 +2,34 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 
 export default function SplashScreen() {
-  const router = useRouter();
   const [show, setShow] = useState(true);
 
   useEffect(() => {
     const userChoice = localStorage.getItem('userType');
     if (userChoice) {
-      router.push(`/${userChoice}`);
+      const isMobile = window.innerWidth <= 768;
+      const basePath = isMobile ? '/mobile' : '';
+      window.location.href = `${basePath}/${userChoice}`;
       setShow(false);
     }
-  }, [router]);
+  }, []);
 
   const handleChoice = (choice: 'owner' | 'tenant') => {
     localStorage.setItem('userType', choice);
-    router.push(`/${choice}`);
+    const isMobile = window.innerWidth <= 768;
+    const basePath = isMobile ? '/mobile' : '';
+    window.location.href = `${basePath}/${choice}`;
     setShow(false);
   };
 
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 bg-white z-50 flex">
+    <div className="fixed inset-0 bg-white z-50 flex flex-col md:flex-row">
       {/* Left Half */}
-      <div className="relative w-1/2 bg-gray-900">
+      <div className="relative w-full md:w-1/2 h-1/2 md:h-full bg-gray-900">
         <Image
           src="/owner-bg.jpg"
           alt="Proprietário Background"
@@ -39,14 +41,14 @@ export default function SplashScreen() {
             onClick={() => handleChoice('owner')}
             className="text-center p-8 w-full h-full flex flex-col items-center justify-center"
           >
-            <h2 className="text-5xl font-bold mb-4">Sou Proprietário</h2>
-            <p className="text-2xl font-medium opacity-90">Maximize o retorno do seu imóvel</p>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">Sou Proprietário</h2>
+            <p className="text-xl md:text-2xl font-medium opacity-90">Maximize o retorno do seu imóvel</p>
           </button>
         </div>
       </div>
 
       {/* Right Half */}
-      <div className="relative w-1/2">
+      <div className="relative w-full md:w-1/2 h-1/2 md:h-full">
         <Image
           src="/tenant-bg.jpg"
           alt="Locatário Background"
@@ -58,22 +60,22 @@ export default function SplashScreen() {
             onClick={() => handleChoice('tenant')}
             className="text-center p-8 w-full h-full flex flex-col items-center justify-center"
           >
-            <h2 className="text-5xl font-bold mb-4">Busco um Imóvel</h2>
-            <p className="text-2xl font-medium opacity-90">Encontre o lugar perfeito para sua estadia</p>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4">Busco um Imóvel</h2>
+            <p className="text-xl md:text-2xl font-medium opacity-90">Encontre o lugar perfeito para sua estadia</p>
           </button>
         </div>
       </div>
 
       {/* Centered Logo */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-[300px] h-[300px] relative bg-white rounded-full p-10">
-          <div className="w-[220px] h-[220px] relative mx-auto">
+        <div className="w-[200px] md:w-[300px] h-[200px] md:h-[300px] relative bg-white rounded-full p-6 md:p-10">
+          <div className="w-full h-full relative mx-auto">
             <Image
               src="/logo-yallah-nobg.png"
               alt="Yallah"
               fill
               priority
-              sizes="220px"
+              sizes="(max-width: 768px) 180px, 220px"
               className="object-contain"
             />
           </div>

@@ -9,7 +9,7 @@ import Image from 'next/image';
 
 const MobileLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
-  
+
   // Determina o tipo de usuário baseado na URL
   const userType = pathname.includes('/mobile/owner') ? 'owner' : 'tenant';
   const isHome = pathname === '/mobile';
@@ -17,7 +17,7 @@ const MobileLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 bg-white px-4 py-4 flex items-center justify-center border-b z-10">
+      <header className="fixed top-0 left-0 right-0 bg-white px-4 py-4 flex items-center justify-center border-b z-[20]">
         <div className="w-[200px] h-[60px] relative">
           <Image
             src={'/logo-yallah-nobg.png'}

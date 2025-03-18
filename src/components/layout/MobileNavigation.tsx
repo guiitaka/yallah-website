@@ -68,7 +68,7 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
       )}
 
       {/* Menu de navegação mobile */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 md:hidden">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 md:hidden z-[20]">
         <div className="container mx-auto px-4">
           <div className="flex items-start justify-between pt-2 h-[80px] mb-[env(safe-area-inset-bottom,24px)]">
             <Link
@@ -86,9 +86,8 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
               >
                 <CaretUp
                   weight="light"
-                  className={`w-6 h-6 text-gray-600 transition-transform duration-300 ${
-                    isCategoryOpen ? 'rotate-180' : ''
-                  }`}
+                  className={`w-6 h-6 text-gray-600 transition-transform duration-300 ${isCategoryOpen ? 'rotate-180' : ''
+                    }`}
                 />
                 <span className="text-[10px] text-gray-600">Categorias</span>
               </button>
@@ -103,11 +102,11 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
             )}
 
             <Link
-              href="/mobile/metodo"
+              href="/mobile/owner/nosso-metodo"
               className="flex flex-col items-center gap-1"
             >
               <Lightbulb weight="light" className="w-6 h-6 text-gray-600" />
-              <span className="text-[10px] text-gray-600">Método</span>
+              <span className="text-[10px] text-gray-600">Nosso Método</span>
             </Link>
 
             <LanguageSelector />

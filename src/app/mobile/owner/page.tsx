@@ -4,42 +4,43 @@ import React from 'react';
 import Image from 'next/image';
 import MobileLayout from '@/components/layout/MobileLayout';
 import AutoplayVideo from '@/components/AutoplayVideo';
-import AboutUs from '@/components/home/AboutUs';
 import BestEvents from '@/components/home/BestEvents';
 import ContactForm from '@/components/home/ContactForm';
 import FAQ from '@/components/home/FAQ';
+import AboutSection from '@/components/mobile/AboutSection';
+import MapPresenceSection from '@/components/mobile/MapPresenceSection';
 import { Buildings, ShieldCheck, Money, ChartLineUp } from '@phosphor-icons/react';
 
 const GITHUB_VIDEO_BASE_URL = 'https://user-images.githubusercontent.com/YOUR_USER_ID/YOUR_REPO'
 
 const services = [
-  { 
-    title: 'Administração Completa', 
-    description: 'Cuidamos da gestão, locação e manutenção do seu imóvel, garantindo tranquilidade e rentabilidade máxima.', 
+  {
+    title: 'Administração Completa',
+    description: 'Cuidamos da gestão, locação e manutenção do seu imóvel, garantindo tranquilidade e rentabilidade máxima.',
     video: {
       webm: 'https://github.com/guiitaka/yallah-website/raw/refs/heads/main/public/videos/administracao.webm',
       mp4: 'https://github.com/guiitaka/yallah-website/raw/refs/heads/main/public/videos/administracao.mp4'
     }
   },
-  { 
-    title: 'Imóvel sempre Impecável', 
-    description: 'Realizamos limpeza e preparação profissional para encantar os hóspedes e valorizar seu patrimônio.', 
+  {
+    title: 'Imóvel sempre Impecável',
+    description: 'Realizamos limpeza e preparação profissional para encantar os hóspedes e valorizar seu patrimônio.',
     video: {
       webm: 'https://github.com/guiitaka/yallah-website/raw/refs/heads/main/public/videos/imovel-impecavel.webm',
       mp4: 'https://github.com/guiitaka/yallah-website/raw/refs/heads/main/public/videos/imovel-impecavel.mp4'
     }
   },
-  { 
-    title: 'Anúncios Estratégicos', 
-    description: 'Destacamos seu imóvel nas melhores plataformas para atrair viajantes e profissionais de alto padrão.', 
+  {
+    title: 'Anúncios Estratégicos',
+    description: 'Destacamos seu imóvel nas melhores plataformas para atrair viajantes e profissionais de alto padrão.',
     video: {
       webm: 'https://github.com/guiitaka/yallah-website/raw/refs/heads/main/public/videos/anuncios.webm',
       mp4: 'https://github.com/guiitaka/yallah-website/raw/refs/heads/main/public/videos/anuncios.mp4'
     }
   },
-  { 
-    title: 'Sem Complicações', 
-    description: 'Você aproveita os rendimentos enquanto a Yallah resolve tudo, do check-in ao check-out.', 
+  {
+    title: 'Sem Complicações',
+    description: 'Você aproveita os rendimentos enquanto a Yallah resolve tudo, do check-in ao check-out.',
     video: {
       webm: 'https://github.com/guiitaka/yallah-website/raw/refs/heads/main/public/videos/complicacoes.webm',
       mp4: 'https://github.com/guiitaka/yallah-website/raw/refs/heads/main/public/videos/complicacoes.mp4'
@@ -158,25 +159,11 @@ export default function MobileOwnerPage() {
           </div>
         </section>
 
-        {/* About Us Section */}
-        <div className="bg-white">
-          <AboutUs />
-        </div>
+        <AboutSection />
+        <MapPresenceSection />
 
-        {/* Best Events Section */}
-        <div className="bg-white">
-          <BestEvents />
-        </div>
-
-        {/* Contact Form Section */}
-        <div className="bg-white">
-          <ContactForm />
-        </div>
-
-        {/* FAQ Section */}
-        <div className="bg-white">
-          <FAQ />
-        </div>
+        <ContactForm />
+        <FAQ />
       </div>
     </MobileLayout>
   );

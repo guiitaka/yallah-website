@@ -34,7 +34,7 @@ export default function BestEvents() {
             className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/60 md:from-black/40 to-transparent" />
-          
+
           {/* Content */}
           <div className="absolute bottom-0 left-0 p-6 md:p-12 text-white">
             <h2 className="text-2xl md:text-4xl font-light mb-3 md:mb-4">

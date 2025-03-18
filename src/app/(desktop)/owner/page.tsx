@@ -1,11 +1,12 @@
 import Header from '@/components/layout/Header'
 import Banner from '@/components/home/Banner'
 import Promotions from '@/components/home/Promotions'
-import AboutUs from '@/components/home/AboutUs'
 import BestEvents from '@/components/home/BestEvents'
 import ContactForm from '@/components/home/ContactForm'
 import FAQ from '@/components/home/FAQ'
 import Footer from '@/components/layout/Footer'
+import AboutSection from '@/components/home/AboutSection'
+import MapPresenceSection from '@/components/home/MapPresenceSection'
 import type { Metadata, Viewport } from 'next'
 
 export const metadata: Metadata = {
@@ -27,13 +28,18 @@ export default function OwnerPage() {
       <Header userType="owner" />
       <div className="space-y-12 md:space-y-20">
         <Banner userType="owner" />
-        <Promotions />
-        <AboutUs />
-        <BestEvents />
+
+        <div className="relative">
+          <Promotions />
+        </div>
+
+        <AboutSection />
+        <MapPresenceSection />
+
         <ContactForm />
         <FAQ />
+        <Footer />
       </div>
-      <Footer />
     </main>
   )
 } 
