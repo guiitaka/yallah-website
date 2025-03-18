@@ -89,6 +89,8 @@ interface ItemProps {
     description: string;
     isActive: boolean;
     direction: 'left' | 'right';
+    type?: string;
+    color?: string;
 }
 
 const Item: React.FC<ItemProps> = ({ imageUri, heading, description, isActive, direction }) => {
@@ -243,7 +245,9 @@ export default function ReviewsCarousel() {
                 <AnimatePresence mode="wait">
                     <Item
                         key={data[activeIndex].key}
-                        {...data[activeIndex]}
+                        imageUri={data[activeIndex].imageUri}
+                        heading={data[activeIndex].heading}
+                        description={data[activeIndex].description}
                         isActive={true}
                         direction={direction}
                     />
