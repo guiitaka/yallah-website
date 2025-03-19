@@ -481,8 +481,8 @@ export default function AboutUs() {
           <div className="md:col-span-6 order-first md:order-none mb-3 md:mb-0 flex">
             <div className="bg-black/40 backdrop-blur-sm rounded-2xl p-3 w-full flex items-center justify-center animate-fadeIn opacity-0">
               {/* Slide Content - Will be populated based on timeline position */}
-              <div className="text-center w-full h-[500px] max-h-[calc(100vh-220px)] overflow-hidden transition-all duration-500 perspective">
-                <div className="slides-perspective-container relative preserve-3d min-h-[400px] h-full w-full">
+              <div className="text-center w-full h-auto max-h-[calc(100vh-150px)] overflow-hidden transition-all duration-500 perspective">
+                <div className="slides-perspective-container relative preserve-3d min-h-[400px] h-full w-full flex items-center">
                   {/* Renderize todos os slides de uma vez, mas mostre apenas o ativo */}
                   <div className={`slide-content slide-content-0 transition-all duration-500 ease-out transform ${currentSlide === 0 ? 'opacity-100 translate-y-0 scale-100 slide-visible' : 'opacity-0'} overflow-y-auto overflow-x-hidden custom-scrollbar h-full`}>
                     <div className="flex flex-col md:flex-row">
@@ -539,59 +539,59 @@ export default function AboutUs() {
                     </div>
                   </div>
 
-                  <div className={`slide-content slide-content-1 transition-all duration-500 ease-out transform ${currentSlide === 1 ? 'opacity-100 translate-y-0 scale-100 slide-visible' : 'opacity-0'} overflow-y-auto overflow-x-hidden custom-scrollbar h-full`}>
-                    <div className="flex flex-col space-y-2 h-full w-full">
+                  <div className={`slide-content slide-content-1 transition-all duration-500 ease-out transform ${currentSlide === 1 ? 'opacity-100 translate-y-0 scale-100 slide-visible' : 'opacity-0'} overflow-hidden custom-scrollbar h-full`}>
+                    <div className="flex flex-col space-y-1 h-full w-full justify-evenly">
                       {/* Cabeçalho - Duas colunas */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-1">
                         {/* Coluna da esquerda - Nosso processo */}
-                        <div className="text-left animate-item opacity-0 translate-y-8 scale-95 bg-gradient-to-br from-[#444444]/30 to-[#222222]/30 backdrop-blur-sm rounded-lg p-3" style={{ '--animation-delay': '0s' } as React.CSSProperties}>
-                          <p className="text-white/80 text-lg mb-0.5">Nosso processo</p>
-                          <h3 className="text-white text-5xl font-bold mb-0.5">95%</h3>
-                          <div className="w-full h-[1px] bg-white/30 mb-2"></div>
-                          <p className="text-white/80 text-sm leading-relaxed">
-                            Dos nossos imóveis são avaliados e preparados para o mercado em menos de 7 dias, garantindo rapidez e eficiência no início da gestão.
+                        <div className="text-left animate-item opacity-0 translate-y-8 scale-95 bg-gradient-to-br from-[#444444]/30 to-[#222222]/30 backdrop-blur-sm rounded-lg p-2 md:p-3" style={{ '--animation-delay': '0s' } as React.CSSProperties}>
+                          <p className="text-white/80 text-base md:text-lg mb-0.5">Nosso processo</p>
+                          <h3 className="text-white text-4xl md:text-5xl font-bold mb-0.5">95%</h3>
+                          <div className="w-full h-[1px] bg-white/30 mb-1"></div>
+                          <p className="text-white/80 text-xs md:text-sm leading-tight">
+                            Imóveis avaliados em menos de 7 dias.
                           </p>
                         </div>
 
                         {/* Coluna da direita - Título */}
-                        <div className="text-right animate-item opacity-0 translate-y-8 scale-95 bg-gradient-to-br from-[#25AAA2]/30 to-[#158882]/30 backdrop-blur-sm rounded-lg p-3" style={{ '--animation-delay': '0.2s' } as React.CSSProperties}>
-                          <p className="text-[#8DADA4] text-lg mb-0.5">YALLAH GESTÃO DE IMÓVEIS</p>
-                          <h2 className="text-white text-3xl font-normal">Avaliação</h2>
-                          <h2 className="text-white text-3xl font-bold">Personalizada</h2>
-                          <div className="w-full h-[1px] bg-white/30 mt-2 mb-2"></div>
-                          <p className="text-white/80 text-sm leading-relaxed text-right">
-                            Entendemos as necessidades específicas de cada imóvel para maximizar seu potencial.
+                        <div className="text-right animate-item opacity-0 translate-y-8 scale-95 bg-gradient-to-br from-[#25AAA2]/30 to-[#158882]/30 backdrop-blur-sm rounded-lg p-2 md:p-3" style={{ '--animation-delay': '0.2s' } as React.CSSProperties}>
+                          <p className="text-[#8DADA4] text-base md:text-lg mb-0.5">YALLAH GESTÃO</p>
+                          <h2 className="text-white text-2xl md:text-3xl font-normal">Avaliação</h2>
+                          <h2 className="text-white text-2xl md:text-3xl font-bold">Personalizada</h2>
+                          <div className="w-full h-[1px] bg-white/30 mt-1 mb-1"></div>
+                          <p className="text-white/80 text-xs md:text-sm leading-tight text-right">
+                            Soluções específicas para cada imóvel.
                           </p>
                         </div>
                       </div>
 
                       {/* Cards principais - Duas colunas */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-1">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                         {/* Card Mercado - Verde Yallah */}
-                        <div className="bg-gradient-to-br from-[#8CBCB4]/50 to-[#7A9A94]/50 backdrop-blur-sm rounded-2xl overflow-hidden flex flex-col justify-center items-center text-center p-2.5 shadow-lg transform transition-all duration-300 hover:scale-[1.02] animate-item opacity-0 translate-y-8 scale-95" style={{ '--animation-delay': '0.3s' } as React.CSSProperties}>
-                          <h3 className="text-white text-lg mb-0.5">Mercado</h3>
-                          <div className="text-white text-5xl font-bold mb-0.5">75%</div>
-                          <div className="w-full h-[1px] bg-white/30 mb-2 max-w-[80%] mx-auto"></div>
-                          <p className="text-white text-sm leading-relaxed px-2">
-                            Dos proprietários desconhecem o verdadeiro potencial de seus imóveis no mercado de aluguel por temporada.
+                        <div className="bg-gradient-to-br from-[#8CBCB4]/50 to-[#7A9A94]/50 backdrop-blur-sm rounded-2xl overflow-hidden flex flex-col justify-center items-center text-center p-2 shadow-lg transform transition-all duration-300 hover:scale-[1.02] animate-item opacity-0 translate-y-8 scale-95" style={{ '--animation-delay': '0.3s' } as React.CSSProperties}>
+                          <h3 className="text-white text-base md:text-lg mb-0">Mercado</h3>
+                          <div className="text-white text-4xl md:text-5xl font-bold mb-0">75%</div>
+                          <div className="w-full h-[1px] bg-white/30 mb-1 max-w-[80%] mx-auto"></div>
+                          <p className="text-white text-xs md:text-sm leading-tight px-2">
+                            Proprietários desconhecem o potencial real.
                           </p>
                         </div>
 
                         {/* Card Retorno - Branco */}
-                        <div className="bg-gradient-to-br from-white/90 to-white/80 rounded-2xl flex flex-col justify-center items-center text-center p-2.5 shadow-lg transform transition-all duration-300 hover:scale-[1.02] animate-item opacity-0 translate-y-8 scale-95" style={{ '--animation-delay': '0.4s' } as React.CSSProperties}>
-                          <h3 className="text-gray-500 text-lg mb-0.5">Retorno</h3>
-                          <div className="text-gray-900 text-5xl font-bold mb-0.5">+30%</div>
-                          <div className="w-full h-[1px] bg-gray-400/30 mb-2 max-w-[80%] mx-auto"></div>
-                          <p className="text-gray-500 text-sm leading-relaxed px-2">
-                            Aumento médio na rentabilidade após nossa avaliação e implementação de estratégias personalizadas.
+                        <div className="bg-gradient-to-br from-white/90 to-white/80 rounded-2xl flex flex-col justify-center items-center text-center p-2 shadow-lg transform transition-all duration-300 hover:scale-[1.02] animate-item opacity-0 translate-y-8 scale-95" style={{ '--animation-delay': '0.4s' } as React.CSSProperties}>
+                          <h3 className="text-gray-500 text-base md:text-lg mb-0">Retorno</h3>
+                          <div className="text-gray-900 text-4xl md:text-5xl font-bold mb-0">+30%</div>
+                          <div className="w-full h-[1px] bg-gray-400/30 mb-1 max-w-[80%] mx-auto"></div>
+                          <p className="text-gray-500 text-xs md:text-sm leading-tight px-2">
+                            Aumento médio na rentabilidade.
                           </p>
                         </div>
                       </div>
 
                       {/* Imagem e Primeiro passo - Duas colunas */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-1">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-0">
                         {/* Imagem */}
-                        <div className="rounded-2xl overflow-hidden h-32 shadow-lg transform transition-all duration-300 hover:scale-[1.02] animate-item opacity-0 translate-y-8 scale-95" style={{ '--animation-delay': '0.5s' } as React.CSSProperties}>
+                        <div className="rounded-2xl overflow-hidden h-20 md:h-24 shadow-lg transform transition-all duration-300 hover:scale-[1.02] animate-item opacity-0 translate-y-8 scale-95" style={{ '--animation-delay': '0.5s' } as React.CSSProperties}>
                           <Image
                             src="/card2.jpg"
                             alt="Avaliação do Imóvel"
@@ -603,18 +603,18 @@ export default function AboutUs() {
                         </div>
 
                         {/* Primeiro passo */}
-                        <div className="bg-gradient-to-br from-[#FFB347]/30 to-[#E89830]/30 backdrop-blur-sm rounded-2xl p-4 flex flex-col items-center text-center justify-center h-32 shadow-lg transform transition-all duration-300 hover:scale-[1.02] animate-item opacity-0 translate-y-8 scale-95" style={{ '--animation-delay': '0.6s' } as React.CSSProperties}>
-                          <div className="absolute left-4 top-4">
-                            <div className="w-12 h-12 rounded-full bg-[#8DADA4] flex items-center justify-center shadow-md">
-                              <span className="text-white text-xl font-bold">1</span>
+                        <div className="bg-gradient-to-br from-[#FFB347]/30 to-[#E89830]/30 backdrop-blur-sm rounded-2xl p-2 flex flex-col items-center text-center justify-center h-20 md:h-24 shadow-lg transform transition-all duration-300 hover:scale-[1.02] animate-item opacity-0 translate-y-8 scale-95" style={{ '--animation-delay': '0.6s' } as React.CSSProperties}>
+                          <div className="absolute left-2 top-2">
+                            <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#8DADA4] flex items-center justify-center shadow-md">
+                              <span className="text-white text-xs md:text-sm font-bold">1</span>
                             </div>
                           </div>
-                          <div className="pt-2">
-                            <h3 className="text-white text-lg font-bold leading-tight">Primeiro passo</h3>
-                            <h3 className="text-white text-lg font-bold leading-tight mb-1">do nosso método</h3>
-                            <div className="w-full h-[1px] bg-white/30 mb-2 max-w-[70%] mx-auto"></div>
-                            <p className="text-white text-xs leading-relaxed max-w-[85%] mx-auto">
-                              Entendemos que cada imóvel é único e merece uma estratégia personalizada.
+                          <div className="pt-0 md:pt-1">
+                            <h3 className="text-white text-xs md:text-sm font-bold leading-tight">Primeiro passo</h3>
+                            <h3 className="text-white text-xs md:text-sm font-bold leading-tight mb-0">do método</h3>
+                            <div className="w-full h-[1px] bg-white/30 mb-0 max-w-[70%] mx-auto"></div>
+                            <p className="text-white text-[10px] md:text-xs leading-tight max-w-[85%] mx-auto">
+                              Estratégia exclusiva para cada imóvel.
                             </p>
                           </div>
                         </div>
@@ -1325,7 +1325,7 @@ export default function AboutUs() {
           transition: all 0.7s cubic-bezier(0.645, 0.045, 0.355, 1.000);
           backface-visibility: hidden;
           transform-origin: center center;
-          overflow-y: auto;
+          overflow: hidden; /* Removida a rolagem vertical */
           overflow-x: hidden;
           display: none; /* Hide initially */
           pointer-events: none; /* Disable interactions when hidden */
@@ -1333,7 +1333,9 @@ export default function AboutUs() {
         
         .slide-visible {
           opacity: 1 !important;
-          display: block !important; /* Show when visible */
+          display: flex !important; /* Usar flex em vez de block */
+          flex-direction: column;
+          justify-content: flex-start;
           position: relative;
           transform: translate3d(0, 0, 0) scale(1) rotateX(0) rotateY(0) !important;
           z-index: 10;
@@ -1428,7 +1430,7 @@ export default function AboutUs() {
           overflow: hidden;
           display: flex;
           justify-content: center;
-          align-items: center;
+          align-items: flex-start;
         }
 
         /* Melhorar a transição entre slides */
@@ -1444,6 +1446,14 @@ export default function AboutUs() {
         @keyframes page-flash {
           0%, 100% { background-color: transparent; }
           50% { background-color: rgba(141, 173, 164, 0.1); }
+        }
+
+        /* Especificamente para o slide 1 (índice 2) */
+        .slide-content-1.slide-visible {
+          overflow: hidden !important;
+          justify-content: space-evenly;
+          height: auto !important;
+          min-height: unset !important;
         }
       `}</style>
     </div>
