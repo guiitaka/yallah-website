@@ -81,18 +81,21 @@ export default function Promotions() {
         {/* Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {services.map((service, index) => (
-            <div key={index} className="bg-white rounded-[32px] overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            <div
+              key={index}
+              className="bg-white rounded-[32px] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-gray-100 transition-all duration-300 hover:-translate-y-1"
+            >
               {/* Video Container */}
               <div className="relative aspect-square rounded-[32px] overflow-hidden bg-gray-100">
                 <AutoplayVideo
                   videoSrc={service.videoSrc}
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/10" />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/20" />
               </div>
 
               {/* Content */}
               <div className="p-8">
-                <h3 className="text-xl font-medium mb-2">{service.title}</h3>
+                <h3 className="text-xl font-semibold mb-2 text-gray-900">{service.title}</h3>
                 <p className="text-gray-500">{service.description}</p>
               </div>
             </div>
