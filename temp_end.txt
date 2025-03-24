@@ -1,9 +1,0 @@
-                                                        )}
-
-                                                        {/* Botão de consulta */}
-                                                        <button className="w-full py-3 px-4 bg-[#8BADA4] hover:bg-[#7A9D94] text-white font-medium rounded-full transition-colors flex items-center justify-center gap-2" onClick={() => handleAvailabilityConsultation(property)}>
-                                                            Consultar disponibilidade <ArrowRight weight="bold" />
-                                                        </button>
-                        )}
-    );
-} 
