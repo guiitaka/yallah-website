@@ -198,15 +198,15 @@ export default function MapPresenceSection() {
                         {/* Statistics */}
                         <div className="grid grid-cols-3 gap-4">
                             <div className="text-center">
-                                <div className="text-3xl font-bold text-primary">15+</div>
+                                <div className="text-3xl font-bold text-[#8BADA4]">15+</div>
                                 <div className="text-[#8BADA4]">Bairros</div>
                             </div>
                             <div className="text-center">
-                                <div className="text-3xl font-bold text-primary">30+</div>
+                                <div className="text-3xl font-bold text-[#8BADA4]">30+</div>
                                 <div className="text-[#8BADA4]">Imóveis</div>
                             </div>
                             <div className="text-center">
-                                <div className="text-3xl font-bold text-primary">100%</div>
+                                <div className="text-3xl font-bold text-[#8BADA4]">100%</div>
                                 <div className="text-[#8BADA4]">Satisfação</div>
                             </div>
                         </div>
