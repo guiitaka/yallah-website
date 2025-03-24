@@ -62,7 +62,7 @@ export default function Promotions() {
 
           {/* Middle - Main Title */}
           <div className="col-span-5">
-            <h1 className="text-[56px] leading-[1.1] font-light">
+            <h1 className="text-[56px] leading-[1.1] font-light text-gray-900">
               Cuidamos do seu imóvel como se fosse nosso
             </h1>
           </div>

@@ -39,8 +39,8 @@ function FAQItem({ question, answer }: FAQItem) {
         className="flex justify-between items-center w-full text-left"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className="text-lg md:text-xl pr-4">{question}</span>
-        <span className="text-xl md:text-2xl flex-shrink-0">{isOpen ? '−' : '+'}</span>
+        <span className="text-lg md:text-xl pr-4 text-gray-900 font-medium">{question}</span>
+        <span className="text-xl md:text-2xl flex-shrink-0 text-gray-900">{isOpen ? '−' : '+'}</span>
       </button>
       {isOpen && (
         <p className="mt-3 md:mt-4 text-gray-600 text-base md:text-lg leading-relaxed">
@@ -58,7 +58,7 @@ export default function FAQ() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-20">
           {/* Left Side */}
           <div className="col-span-1 md:col-span-4">
-            <h2 className="text-3xl md:text-5xl font-light">Perguntas Frequentes</h2>
+            <h2 className="text-3xl md:text-5xl font-light text-gray-900">Perguntas Frequentes</h2>
             <p className="mt-4 md:mt-6 text-gray-600 text-base md:text-lg">
               Tire suas dúvidas sobre como a Yallah pode transformar seu imóvel em uma fonte de renda sem preocupações ou encontrar o lugar perfeito para sua estadia em São Paulo.
             </p>
