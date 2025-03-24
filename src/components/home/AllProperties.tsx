@@ -17,6 +17,53 @@ import dynamic from 'next/dynamic'
 // Importação dinâmica do componente de mapa para evitar erros de SSR
 const MapComponent = dynamic(() => import('../MapComponent'), { ssr: false })
 
+// Componente FavoriteButton
+const FavoriteButton = ({ propertyId }: { propertyId: number }) => {
+    const [isFavorite, setIsFavorite] = useState(false);
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const storedFavorites = localStorage.getItem('yallah_favorites');
+        if (storedFavorites) {
+            const favorites = JSON.parse(storedFavorites);
+            setIsFavorite(favorites.includes(propertyId));
+        }
+    }, [propertyId]);
+
+    const toggleFavorite = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        let favorites: number[] = [];
+        const storedFavorites = localStorage.getItem('yallah_favorites');
+
+        if (storedFavorites) {
+            favorites = JSON.parse(storedFavorites);
+        }
+
+        if (isFavorite) {
+            favorites = favorites.filter(id => id !== propertyId);
+        } else {
+            favorites.push(propertyId);
+        }
+
+        localStorage.setItem('yallah_favorites', JSON.stringify(favorites));
+        setIsFavorite(!isFavorite);
+    };
+
+    return (
+        <button
+            onClick={toggleFavorite}
+            className="bg-white/80 hover:bg-white p-2 rounded-full shadow-md transition-all duration-300"
+            aria-label={isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+        >
+            <Heart
+                className="w-5 h-5"
+                weight={isFavorite ? "fill" : "regular"}
+                color={isFavorite ? "#8BADA4" : "#4B5563"}
+            />
+        </button>
+    );
+};
+
 // Dados para os imóveis de catálogo completo
 const allProperties = [
     {
@@ -159,6 +206,216 @@ const allProperties = [
         host: "Anfitrião: Renato",
         coordinates: [-46.5763, -23.5371] as [number, number]
     },
+    {
+        id: 21,
+        title: "Cobertura com vista para o parque",
+        location: "Paraíso, São Paulo",
+        details: "Espaço inteiro: cobertura",
+        features: "6 hóspedes · 3 quartos · 4 camas · 2 banheiros",
+        pricePerNight: 420,
+        rating: 4.8,
+        reviewCount: 58,
+        image: "/card1.jpg",
+        link: "/imoveis/cobertura-paraiso",
+        host: "Anfitrião: Miguel",
+        coordinates: [-46.6513, -23.5716] as [number, number]
+    },
+    {
+        id: 22,
+        title: "Studio design na Vila Nova",
+        location: "Vila Nova Conceição, São Paulo",
+        details: "Espaço inteiro: studio",
+        features: "2 hóspedes · Studio · 1 cama · 1 banheiro",
+        pricePerNight: 230,
+        rating: 4.7,
+        reviewCount: 45,
+        image: "/card2.jpg",
+        link: "/imoveis/studio-vila-nova",
+        host: "Anfitrião: Paula",
+        coordinates: [-46.6713, -23.5916] as [number, number]
+    },
+    {
+        id: 23,
+        title: "Apartamento com jardim privativo",
+        location: "Alto de Pinheiros, São Paulo",
+        details: "Espaço inteiro: apartamento",
+        features: "4 hóspedes · 2 quartos · 3 camas · 2 banheiros",
+        pricePerNight: 350,
+        rating: 4.9,
+        reviewCount: 62,
+        image: "/card3.jpg",
+        link: "/imoveis/jardim-pinheiros",
+        host: "Anfitrião: Ricardo",
+        coordinates: [-46.7013, -23.5516] as [number, number]
+    },
+    {
+        id: 24,
+        title: "Loft contemporâneo",
+        location: "Vila Olímpia, São Paulo",
+        details: "Espaço inteiro: loft",
+        features: "3 hóspedes · 1 quarto · 2 camas · 1 banheiro",
+        pricePerNight: 280,
+        rating: 4.6,
+        reviewCount: 39,
+        image: "/card4.jpg",
+        link: "/imoveis/loft-olimpia",
+        host: "Anfitrião: Beatriz",
+        coordinates: [-46.6813, -23.5916] as [number, number]
+    },
+    {
+        id: 25,
+        title: "Casa moderna com piscina",
+        location: "Granja Viana, São Paulo",
+        details: "Espaço inteiro: casa",
+        features: "8 hóspedes · 4 quartos · 6 camas · 3 banheiros",
+        pricePerNight: 650,
+        rating: 4.9,
+        reviewCount: 71,
+        image: "/recomendado1.jpg",
+        link: "/imoveis/casa-granja",
+        host: "Anfitrião: Fernando",
+        coordinates: [-46.8313, -23.5916] as [number, number]
+    },
+    {
+        id: 26,
+        title: "Apartamento próximo ao metrô",
+        location: "Santa Cecília, São Paulo",
+        details: "Espaço inteiro: apartamento",
+        features: "4 hóspedes · 2 quartos · 2 camas · 1 banheiro",
+        pricePerNight: 220,
+        rating: 4.7,
+        reviewCount: 48,
+        image: "/recomendado2.jpg",
+        link: "/imoveis/metro-cecilia",
+        host: "Anfitrião: Amanda",
+        coordinates: [-46.6513, -23.5366] as [number, number]
+    },
+    {
+        id: 27,
+        title: "Estúdio com varanda gourmet",
+        location: "Brooklin, São Paulo",
+        details: "Espaço inteiro: studio",
+        features: "2 hóspedes · Studio · 1 cama · 1 banheiro",
+        pricePerNight: 195,
+        rating: 4.5,
+        reviewCount: 35,
+        image: "/recomendado3.jpg",
+        link: "/imoveis/studio-brooklin",
+        host: "Anfitrião: Lucas",
+        coordinates: [-46.6913, -23.6216] as [number, number]
+    },
+    {
+        id: 28,
+        title: "Cobertura duplex com terraço",
+        location: "Itaim Bibi, São Paulo",
+        details: "Espaço inteiro: cobertura",
+        features: "6 hóspedes · 3 quartos · 4 camas · 3 banheiros",
+        pricePerNight: 580,
+        rating: 4.9,
+        reviewCount: 64,
+        image: "/card1.jpg",
+        link: "/imoveis/duplex-itaim",
+        host: "Anfitrião: Carolina",
+        coordinates: [-46.6713, -23.5816] as [number, number]
+    },
+    {
+        id: 29,
+        title: "Casa de campo moderna",
+        location: "Cotia, São Paulo",
+        details: "Espaço inteiro: casa",
+        features: "10 hóspedes · 5 quartos · 7 camas · 4 banheiros",
+        pricePerNight: 720,
+        rating: 4.8,
+        reviewCount: 53,
+        image: "/card2.jpg",
+        link: "/imoveis/casa-cotia",
+        host: "Anfitrião: Roberto",
+        coordinates: [-46.9213, -23.6016] as [number, number]
+    },
+    {
+        id: 30,
+        title: "Apartamento com vista para o parque",
+        location: "Moema, São Paulo",
+        details: "Espaço inteiro: apartamento",
+        features: "4 hóspedes · 2 quartos · 3 camas · 2 banheiros",
+        pricePerNight: 340,
+        rating: 4.7,
+        reviewCount: 49,
+        image: "/card3.jpg",
+        link: "/imoveis/vista-moema",
+        host: "Anfitrião: Patricia",
+        coordinates: [-46.6613, -23.6016] as [number, number]
+    },
+    {
+        id: 31,
+        title: "Studio minimalista",
+        location: "República, São Paulo",
+        details: "Espaço inteiro: studio",
+        features: "2 hóspedes · Studio · 1 cama · 1 banheiro",
+        pricePerNight: 180,
+        rating: 4.6,
+        reviewCount: 41,
+        image: "/card4.jpg",
+        link: "/imoveis/studio-republica",
+        host: "Anfitrião: Thiago",
+        coordinates: [-46.6413, -23.5416] as [number, number]
+    },
+    {
+        id: 32,
+        title: "Apartamento com home office",
+        location: "Vila Mariana, São Paulo",
+        details: "Espaço inteiro: apartamento",
+        features: "3 hóspedes · 2 quartos · 2 camas · 1 banheiro",
+        pricePerNight: 250,
+        rating: 4.7,
+        reviewCount: 46,
+        image: "/recomendado1.jpg",
+        link: "/imoveis/office-mariana",
+        host: "Anfitrião: Juliana",
+        coordinates: [-46.6313, -23.5816] as [number, number]
+    },
+    {
+        id: 33,
+        title: "Cobertura com vista 360°",
+        location: "Jardins, São Paulo",
+        details: "Espaço inteiro: cobertura",
+        features: "6 hóspedes · 3 quartos · 4 camas · 3 banheiros",
+        pricePerNight: 620,
+        rating: 4.9,
+        reviewCount: 68,
+        image: "/recomendado2.jpg",
+        link: "/imoveis/cobertura-jardins",
+        host: "Anfitrião: Marcelo",
+        coordinates: [-46.6613, -23.5716] as [number, number]
+    },
+    {
+        id: 34,
+        title: "Casa com área de lazer",
+        location: "Santana, São Paulo",
+        details: "Espaço inteiro: casa",
+        features: "8 hóspedes · 4 quartos · 5 camas · 3 banheiros",
+        pricePerNight: 480,
+        rating: 4.8,
+        reviewCount: 57,
+        image: "/recomendado3.jpg",
+        link: "/imoveis/casa-santana",
+        host: "Anfitrião: Rafael",
+        coordinates: [-46.6213, -23.5016] as [number, number]
+    },
+    {
+        id: 35,
+        title: "Loft industrial moderno",
+        location: "Berrini, São Paulo",
+        details: "Espaço inteiro: loft",
+        features: "4 hóspedes · 2 quartos · 2 camas · 2 banheiros",
+        pricePerNight: 380,
+        rating: 4.7,
+        reviewCount: 52,
+        image: "/card1.jpg",
+        link: "/imoveis/loft-berrini",
+        host: "Anfitrião: Gabriela",
+        coordinates: [-46.6913, -23.6116] as [number, number]
+    }
 ]
 
 // Função auxiliar para calcular o número de dias entre duas datas
@@ -184,6 +441,25 @@ export default function AllProperties() {
     const [consultationMessage, setConsultationMessage] = useState('');
     // Estado para controlar a aba ativa
     const [activeTab, setActiveTab] = useState('descricao');
+    // Estado para controlar o slide atual
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const itemsPerPage = 10; // 5 cards por linha, 2 linhas
+    const totalSlides = Math.ceil(allProperties.length / itemsPerPage);
+
+    // Função para navegar para o próximo slide
+    const nextSlide = () => {
+        setCurrentSlide((prev) => (prev + 1) % totalSlides);
+    };
+
+    // Função para navegar para o slide anterior
+    const prevSlide = () => {
+        setCurrentSlide((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
+    };
+
+    // Função para ir para um slide específico
+    const goToSlide = (slideIndex: number) => {
+        setCurrentSlide(slideIndex);
+    };
 
     // Função para expandir um card
     const expandCard = (propertyId: number) => {
@@ -290,9 +566,9 @@ export default function AllProperties() {
     };
 
     return (
-        <div id="all-properties" className="w-full py-12 md:py-20 -mt-8 md:-mt-16 bg-white overflow-hidden relative">
+        <div id="all-properties" className="w-full py-12 md:py-16 -mt-8 md:-mt-16 bg-white overflow-hidden relative">
             <div className="max-w-[1600px] mx-auto px-4">
-                <div className="flex justify-between items-center mb-6 md:mb-10">
+                <div className="flex justify-between items-center mb-6">
                     <div className="flex flex-col">
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-gray-900">
                             Confira todos os imóveis da Yallah
@@ -306,87 +582,202 @@ export default function AllProperties() {
                     </Link>
                 </div>
 
-                {/* Duas fileiras de 5 imóveis */}
-                {[0, 1].map((row) => (
-                    <div key={`row-${row}`} className="mb-8 md:mb-10">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
-                            {allProperties.slice(row * 5, (row + 1) * 5).map((property) => (
-                                <div
-                                    key={property.id}
-                                    className={`group relative rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1
-                                               ${expandedCard === property.id ? 'opacity-0 pointer-events-none' : 'z-10'}`}
-                                    onClick={() => expandCard(property.id)}
-                                    style={{ borderRadius: '1.5rem' }}
-                                >
-                                    <div className="relative aspect-[3/4] rounded-3xl overflow-hidden">
-                                        <Image
-                                            src={property.image}
-                                            alt={property.title}
-                                            fill
-                                            className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                                        />
+                {/* Container dos slides com controles de navegação */}
+                <div className="relative">
+                    {/* Botão Anterior */}
+                    <button
+                        onClick={prevSlide}
+                        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-6 z-10 w-12 h-12 rounded-full bg-[#8BADA4] shadow-lg flex items-center justify-center hover:bg-[#7A9D94] transition-colors"
+                        aria-label="Slide anterior"
+                    >
+                        <CaretLeft className="w-6 h-6 text-white" />
+                    </button>
 
-                                        {/* Overlay com gradiente */}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                    {/* Container dos cards com transição suave */}
+                    <div className="overflow-hidden">
+                        <div
+                            className="transition-transform duration-300 ease-in-out"
+                            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                        >
+                            <div className="flex">
+                                {Array.from({ length: totalSlides }).map((_, slideIndex) => (
+                                    <div key={`slide-${slideIndex}`} className="w-full flex-none">
+                                        <div className="grid grid-rows-2 gap-6">
+                                            <div className="grid grid-cols-5 gap-4">
+                                                {allProperties
+                                                    .slice(slideIndex * itemsPerPage, slideIndex * itemsPerPage + 5)
+                                                    .map((property) => (
+                                                        <div
+                                                            key={property.id}
+                                                            className={`group relative rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1
+                                                                  ${expandedCard === property.id ? 'opacity-0 pointer-events-none' : 'z-10'}`}
+                                                            onClick={() => expandCard(property.id)}
+                                                            style={{ borderRadius: '1.5rem' }}
+                                                        >
+                                                            <div className="relative aspect-[3/4] rounded-3xl overflow-hidden">
+                                                                <Image
+                                                                    src={property.image}
+                                                                    alt={property.title}
+                                                                    fill
+                                                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                                                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                                                                />
 
-                                        {/* Botão de favoritos */}
-                                        <button
-                                            className="absolute top-4 right-4 bg-white/80 hover:bg-white p-2 rounded-full shadow-md z-10 transition-all duration-300"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                // lógica para favoritar aqui
-                                            }}
-                                        >
-                                            <Heart className="w-5 h-5 text-gray-700" weight="regular" />
-                                        </button>
+                                                                {/* Overlay com gradiente */}
+                                                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
-                                        {/* Badge com preço */}
-                                        <div className="absolute top-4 left-4 bg-white/90 px-3 py-1.5 rounded-full shadow-md text-sm font-medium text-black">
-                                            R$ {property.pricePerNight}/noite
-                                        </div>
+                                                                {/* Botão de favoritos */}
+                                                                <div className="absolute top-4 right-4 z-10">
+                                                                    <FavoriteButton propertyId={property.id} />
+                                                                </div>
 
-                                        {/* Conteúdo do card */}
-                                        <div className="absolute bottom-0 left-0 w-full p-5">
-                                            {/* Localização */}
-                                            <div className="text-white/80 text-sm mb-1">{property.location}</div>
+                                                                {/* Badge com preço */}
+                                                                <div className="absolute top-4 left-4 bg-white/90 px-3 py-1.5 rounded-full shadow-md text-sm font-medium text-black">
+                                                                    R$ {property.pricePerNight}/noite
+                                                                </div>
 
-                                            {/* Título */}
-                                            <h3 className="text-lg md:text-xl text-white font-bold mb-1 line-clamp-2">
-                                                {property.title}
-                                            </h3>
+                                                                {/* Conteúdo do card */}
+                                                                <div className="absolute bottom-0 left-0 w-full p-4">
+                                                                    {/* Localização */}
+                                                                    <div className="text-white/80 text-sm mb-1">{property.location}</div>
 
-                                            {/* Características */}
-                                            <p className="text-white/80 text-sm mb-2 line-clamp-1">
-                                                {property.features}
-                                            </p>
+                                                                    {/* Título */}
+                                                                    <h3 className="text-base md:text-lg text-white font-bold mb-1 line-clamp-2">
+                                                                        {property.title}
+                                                                    </h3>
 
-                                            {/* Avaliações */}
-                                            <div className="flex items-center mb-3">
-                                                <Star className="w-4 h-4 text-yellow-400 mr-1" weight="fill" />
-                                                <span className="text-white text-sm font-medium">
-                                                    {property.rating} <span className="text-white/70">({property.reviewCount})</span>
-                                                </span>
+                                                                    {/* Características */}
+                                                                    <p className="text-white/80 text-sm mb-2 line-clamp-1">
+                                                                        {property.features}
+                                                                    </p>
+
+                                                                    {/* Avaliações */}
+                                                                    <div className="flex items-center mb-2">
+                                                                        <Star className="w-4 h-4 text-yellow-400 mr-1" weight="fill" />
+                                                                        <span className="text-white text-sm font-medium">
+                                                                            {property.rating} <span className="text-white/70">({property.reviewCount})</span>
+                                                                        </span>
+                                                                    </div>
+
+                                                                    {/* Botão de ação */}
+                                                                    <button
+                                                                        className="w-full flex items-center justify-center gap-2 bg-white text-black px-4 py-2 rounded-full hover:bg-[#8BADA4] hover:text-white transition-colors duration-300 text-sm"
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            expandCard(property.id);
+                                                                        }}
+                                                                    >
+                                                                        Ver detalhes
+                                                                        <ArrowRight className="w-4 h-4" weight="bold" />
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
                                             </div>
+                                            <div className="grid grid-cols-5 gap-4">
+                                                {allProperties
+                                                    .slice(slideIndex * itemsPerPage + 5, slideIndex * itemsPerPage + 10)
+                                                    .map((property) => (
+                                                        <div
+                                                            key={property.id}
+                                                            className={`group relative rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1
+                                                                  ${expandedCard === property.id ? 'opacity-0 pointer-events-none' : 'z-10'}`}
+                                                            onClick={() => expandCard(property.id)}
+                                                            style={{ borderRadius: '1.5rem' }}
+                                                        >
+                                                            <div className="relative aspect-[3/4] rounded-3xl overflow-hidden">
+                                                                <Image
+                                                                    src={property.image}
+                                                                    alt={property.title}
+                                                                    fill
+                                                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                                                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                                                                />
 
-                                            {/* Botão de ação */}
-                                            <button
-                                                className="w-full flex items-center justify-center gap-2 bg-white text-black px-4 py-2 rounded-full hover:bg-[#8BADA4] hover:text-white transition-colors duration-300 text-sm"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    expandCard(property.id);
-                                                }}
-                                            >
-                                                Ver detalhes
-                                                <ArrowRight className="w-4 h-4" weight="bold" />
-                                            </button>
+                                                                {/* Overlay com gradiente */}
+                                                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+
+                                                                {/* Botão de favoritos */}
+                                                                <div className="absolute top-4 right-4 z-10">
+                                                                    <FavoriteButton propertyId={property.id} />
+                                                                </div>
+
+                                                                {/* Badge com preço */}
+                                                                <div className="absolute top-4 left-4 bg-white/90 px-3 py-1.5 rounded-full shadow-md text-sm font-medium text-black">
+                                                                    R$ {property.pricePerNight}/noite
+                                                                </div>
+
+                                                                {/* Conteúdo do card */}
+                                                                <div className="absolute bottom-0 left-0 w-full p-4">
+                                                                    {/* Localização */}
+                                                                    <div className="text-white/80 text-sm mb-1">{property.location}</div>
+
+                                                                    {/* Título */}
+                                                                    <h3 className="text-base md:text-lg text-white font-bold mb-1 line-clamp-2">
+                                                                        {property.title}
+                                                                    </h3>
+
+                                                                    {/* Características */}
+                                                                    <p className="text-white/80 text-sm mb-2 line-clamp-1">
+                                                                        {property.features}
+                                                                    </p>
+
+                                                                    {/* Avaliações */}
+                                                                    <div className="flex items-center mb-2">
+                                                                        <Star className="w-4 h-4 text-yellow-400 mr-1" weight="fill" />
+                                                                        <span className="text-white text-sm font-medium">
+                                                                            {property.rating} <span className="text-white/70">({property.reviewCount})</span>
+                                                                        </span>
+                                                                    </div>
+
+                                                                    {/* Botão de ação */}
+                                                                    <button
+                                                                        className="w-full flex items-center justify-center gap-2 bg-white text-black px-4 py-2 rounded-full hover:bg-[#8BADA4] hover:text-white transition-colors duration-300 text-sm"
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            expandCard(property.id);
+                                                                        }}
+                                                                    >
+                                                                        Ver detalhes
+                                                                        <ArrowRight className="w-4 h-4" weight="bold" />
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
                     </div>
-                ))}
+
+                    {/* Botão Próximo */}
+                    <button
+                        onClick={nextSlide}
+                        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 z-10 w-12 h-12 rounded-full bg-[#8BADA4] shadow-lg flex items-center justify-center hover:bg-[#7A9D94] transition-colors"
+                        aria-label="Próximo slide"
+                    >
+                        <CaretRight className="w-6 h-6 text-white" />
+                    </button>
+
+                    {/* Dots de navegação */}
+                    <div className="flex justify-center items-center gap-2 mt-6">
+                        {Array.from({ length: totalSlides }).map((_, index) => (
+                            <button
+                                key={index}
+                                onClick={() => goToSlide(index)}
+                                className={`w-2 h-2 rounded-full transition-all duration-300 ${currentSlide === index
+                                    ? 'bg-[#8BADA4] w-4'
+                                    : 'bg-gray-300 hover:bg-gray-400'
+                                    }`}
+                                aria-label={`Ir para slide ${index + 1}`}
+                            />
+                        ))}
+                    </div>
+                </div>
 
                 {/* Botão móvel */}
                 <div className="flex md:hidden justify-center mt-4">
