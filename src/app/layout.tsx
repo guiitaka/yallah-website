@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Montserrat, Playfair_Display } from 'next/font/google'
 import '@/app/globals.css'
-import ClientLayout from '@/components/layout/ClientLayout'
+import BodyWrapper from '@/components/layout/BodyWrapper'
 
 const montserrat = Montserrat({ subsets: ['latin'] })
 const playfair = Playfair_Display({
@@ -39,9 +39,9 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       </head>
-      <body>
+      <BodyWrapper>
         {children}
-      </body>
+      </BodyWrapper>
     </html>
   )
 } 

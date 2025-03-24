@@ -1,11 +1,9 @@
-import Header from '@/components/layout/Header'
 import Banner from '@/components/home/Banner'
-import PopularDestinations from '@/components/home/PopularDestinations'
-import AboutUs from '@/components/home/AboutUs'
-import BestEvents from '@/components/home/BestEvents'
 import Recommended from '@/components/home/Recommended'
-import CallToAction from '@/components/home/CallToAction'
 import Footer from '@/components/layout/Footer'
+import FeaturedProperties from '@/components/home/FeaturedProperties'
+import AllProperties from '@/components/home/AllProperties'
+import InstitutionalHero from '@/components/home/InstitutionalHero'
 import type { Metadata, Viewport } from 'next'
 
 export const metadata: Metadata = {
@@ -23,14 +21,12 @@ export const viewport: Viewport = {
 
 export default function TenantPage() {
   return (
-    <main className="pt-[180px]">
-      <Header userType="tenant" />
+    <main className="pt-0">
       <Banner userType="tenant" />
-      <PopularDestinations />
-      <AboutUs />
-      <BestEvents />
       <Recommended />
-      <CallToAction />
+      <FeaturedProperties />
+      <AllProperties />
+      <InstitutionalHero />
       <Footer />
     </main>
   )

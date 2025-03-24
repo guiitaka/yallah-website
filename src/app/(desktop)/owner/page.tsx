@@ -1,7 +1,6 @@
 import Header from '@/components/layout/Header'
 import Banner from '@/components/home/Banner'
 import Promotions from '@/components/home/Promotions'
-import BestEvents from '@/components/home/BestEvents'
 import ContactForm from '@/components/home/ContactForm'
 import FAQ from '@/components/home/FAQ'
 import Footer from '@/components/layout/Footer'
