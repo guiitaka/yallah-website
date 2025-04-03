@@ -269,80 +269,172 @@ export function useAirbnbImport() {
         let allData: any = {};
 
         try {
-            if (!url || !url.includes('airbnb')) {
-                throw new Error('URL inválida. Por favor, insira uma URL do Airbnb.');
+            // Validação mais flexível para URLs do Airbnb
+            const isValidUrl = url && (
+                url.includes('airbnb.com') ||
+                url.includes('airbnb.com.br')
+            ) && url.includes('/rooms/');
+
+            if (!isValidUrl) {
+                throw new Error('URL inválida. Por favor, insira uma URL válida do Airbnb no formato: https://www.airbnb.com.br/rooms/NÚMERO_DO_ANÚNCIO');
             }
+
+            // Remover parâmetros de query desnecessários que podem atrapalhar o scraping
+            let cleanUrl = url;
+            if (url.includes('?')) {
+                const urlObj = new URL(url);
+                // Manter apenas o parâmetro "check_in" e "check_out" se existirem
+                const checkIn = urlObj.searchParams.get('check_in');
+                const checkOut = urlObj.searchParams.get('check_out');
+
+                // Limpar todos os parâmetros
+                cleanUrl = url.split('?')[0];
+
+                // Adicionar de volta apenas os parâmetros essenciais
+                if (checkIn && checkOut) {
+                    cleanUrl += `?check_in=${checkIn}&check_out=${checkOut}`;
+                }
+            }
+
+            console.log('URL limpa para scraping:', cleanUrl);
 
             // ETAPA 1: Título, descrição e tipo do imóvel
             console.log('Etapa 1: Obtendo título, descrição e tipo do imóvel');
-            const step1Response = await fetch('/api/scrape-airbnb', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url, step: 1 }),
-            });
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 55000); // 55 segundos de timeout
 
-            if (!step1Response.ok) {
-                const errorData = await step1Response.json();
-                throw new Error(errorData.error || 'Erro ao importar dados básicos do Airbnb');
+                const step1Response = await fetch('/api/scrape-airbnb', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: cleanUrl, step: 1 }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                if (!step1Response.ok) {
+                    const errorData = await step1Response.json();
+                    if (step1Response.status === 504 || errorData.message?.includes('timeout')) {
+                        throw new Error('O servidor demorou muito para responder. Tente usar uma URL mais simples ou tente novamente mais tarde.');
+                    }
+                    throw new Error(errorData.error || errorData.message || 'Erro ao importar dados básicos do Airbnb');
+                }
+
+                const step1Result: ScrapingStep = await step1Response.json();
+                allData = { ...allData, ...step1Result.data };
+                console.log('Etapa 1 concluída:', step1Result);
+            } catch (error: any) {
+                if (error.name === 'AbortError' || error.message?.includes('aborted')) {
+                    throw new Error('A requisição demorou muito tempo e foi cancelada. Tente novamente mais tarde.');
+                }
+                throw error;
             }
-
-            const step1Result: ScrapingStep = await step1Response.json();
-            allData = { ...allData, ...step1Result.data };
-            console.log('Etapa 1 concluída:', step1Result);
 
             // ETAPA 2: Preço, quartos, banheiros, camas e hóspedes
             setProgress({ step: 2, total: 4, message: 'Obtendo preço e capacidade...' });
             console.log('Etapa 2: Obtendo preço e capacidade');
-            const step2Response = await fetch('/api/scrape-airbnb', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url, step: 2 }),
-            });
 
-            if (!step2Response.ok) {
-                const errorData = await step2Response.json();
-                throw new Error(errorData.error || 'Erro ao importar preço e capacidade do Airbnb');
+            try {
+                const controller2 = new AbortController();
+                const timeoutId2 = setTimeout(() => controller2.abort(), 55000);
+
+                const step2Response = await fetch('/api/scrape-airbnb', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: cleanUrl, step: 2 }),
+                    signal: controller2.signal
+                });
+
+                clearTimeout(timeoutId2);
+
+                if (!step2Response.ok) {
+                    const errorData = await step2Response.json();
+                    if (step2Response.status === 504 || errorData.message?.includes('timeout')) {
+                        throw new Error('O servidor demorou muito para responder na etapa 2. Tente usar uma URL mais simples ou tente novamente mais tarde.');
+                    }
+                    throw new Error(errorData.error || errorData.message || 'Erro ao importar preço e capacidade do Airbnb');
+                }
+
+                const step2Result: ScrapingStep = await step2Response.json();
+                allData = { ...allData, ...step2Result.data };
+                console.log('Etapa 2 concluída:', step2Result);
+            } catch (error: any) {
+                if (error.name === 'AbortError' || error.message?.includes('aborted')) {
+                    throw new Error('A requisição da etapa 2 demorou muito tempo e foi cancelada. Tente novamente mais tarde.');
+                }
+
+                // Podemos continuar com dados parciais
+                console.error('Erro na etapa 2, continuando com dados parciais:', error);
             }
-
-            const step2Result: ScrapingStep = await step2Response.json();
-            allData = { ...allData, ...step2Result.data };
-            console.log('Etapa 2 concluída:', step2Result);
 
             // ETAPA 3: Comodidades
             setProgress({ step: 3, total: 4, message: 'Obtendo comodidades...' });
             console.log('Etapa 3: Obtendo comodidades');
-            const step3Response = await fetch('/api/scrape-airbnb', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url, step: 3 }),
-            });
 
-            if (!step3Response.ok) {
-                const errorData = await step3Response.json();
-                throw new Error(errorData.error || 'Erro ao importar comodidades do Airbnb');
+            try {
+                const controller3 = new AbortController();
+                const timeoutId3 = setTimeout(() => controller3.abort(), 55000);
+
+                const step3Response = await fetch('/api/scrape-airbnb', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: cleanUrl, step: 3 }),
+                    signal: controller3.signal
+                });
+
+                clearTimeout(timeoutId3);
+
+                if (!step3Response.ok) {
+                    const errorData = await step3Response.json();
+                    if (step3Response.status === 504 || errorData.message?.includes('timeout')) {
+                        console.warn('Timeout na etapa 3, continuando com dados parciais.');
+                    } else {
+                        console.warn('Erro na etapa 3:', errorData.error || errorData.message);
+                    }
+                } else {
+                    const step3Result: ScrapingStep = await step3Response.json();
+                    allData = { ...allData, ...step3Result.data };
+                    console.log('Etapa 3 concluída:', step3Result);
+                }
+            } catch (error: any) {
+                // Podemos continuar com dados parciais
+                console.error('Erro na etapa 3, continuando com dados parciais:', error);
             }
-
-            const step3Result: ScrapingStep = await step3Response.json();
-            allData = { ...allData, ...step3Result.data };
-            console.log('Etapa 3 concluída:', step3Result);
 
             // ETAPA 4: Fotos do anúncio
             setProgress({ step: 4, total: 4, message: 'Obtendo fotos do anúncio...' });
             console.log('Etapa 4: Obtendo fotos do anúncio');
-            const step4Response = await fetch('/api/scrape-airbnb', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url, step: 4 }),
-            });
 
-            if (!step4Response.ok) {
-                const errorData = await step4Response.json();
-                throw new Error(errorData.error || 'Erro ao importar fotos do Airbnb');
+            try {
+                const controller4 = new AbortController();
+                const timeoutId4 = setTimeout(() => controller4.abort(), 55000);
+
+                const step4Response = await fetch('/api/scrape-airbnb', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: cleanUrl, step: 4 }),
+                    signal: controller4.signal
+                });
+
+                clearTimeout(timeoutId4);
+
+                if (!step4Response.ok) {
+                    const errorData = await step4Response.json();
+                    if (step4Response.status === 504 || errorData.message?.includes('timeout')) {
+                        console.warn('Timeout na etapa 4, continuando com dados parciais.');
+                    } else {
+                        console.warn('Erro na etapa 4:', errorData.error || errorData.message);
+                    }
+                } else {
+                    const step4Result: ScrapingStep = await step4Response.json();
+                    allData = { ...allData, ...step4Result.data };
+                    console.log('Etapa 4 concluída:', step4Result);
+                }
+            } catch (error: any) {
+                // Podemos continuar com dados parciais
+                console.error('Erro na etapa 4, continuando com dados parciais:', error);
             }
-
-            const step4Result: ScrapingStep = await step4Response.json();
-            allData = { ...allData, ...step4Result.data };
-            console.log('Etapa 4 concluída:', step4Result);
 
             setProgress({ step: 4, total: 4, message: 'Processando dados...' });
 

@@ -4,14 +4,21 @@ import { scrapeAirbnb } from '../../../utils/airbnb-scraper';
 // Marcar este arquivo como apenas servidor para evitar que o Next.js tente bundlar no cliente
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+export const maxDuration = 60; // Aumentar o tempo máximo para 60 segundos
 
 export async function POST(request: Request) {
     try {
         const { url, step = 1 } = await request.json();
 
-        if (!url || !url.includes('airbnb.com')) {
+        // Validação mais flexível para URLs do Airbnb
+        const isValidUrl = url && (
+            url.includes('airbnb.com') ||
+            url.includes('airbnb.com.br')
+        ) && url.includes('/rooms/');
+
+        if (!isValidUrl) {
             return NextResponse.json(
-                { error: 'URL inválida. Por favor, forneça uma URL válida do Airbnb' },
+                { error: 'URL inválida. Por favor, forneça uma URL válida do Airbnb', message: 'The string did not match the expected pattern.' },
                 { status: 400 }
             );
         }
