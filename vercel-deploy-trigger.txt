@@ -1,4 +1,4 @@
-Deploy triggered at: 2025-04-04T00:00:00Z
+Deploy triggered at: 2025-04-04T00:30:00Z
 API URL: https://airbnb-scraper-api.onrender.com
 Correções:
 - Otimização do scraper para lidar com URLs complexas do Airbnb
@@ -9,3 +9,4 @@ Correções:
 - Adicionado arquivo server.js para corrigir erro de deploy no Render
 - Corrigida configuração CORS para permitir requisições do domínio yallah.com.br
 - Adicionados cabeçalhos CORS e credentials no cliente da API para melhorar comunicação
+- Corrigido problema com o Chrome em ambiente serverless
