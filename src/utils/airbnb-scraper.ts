@@ -20,10 +20,14 @@ export async function scrapeAirbnb(url: string, step: number = 1) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Origin': 'https://www.yallah.com.br',
+                'Referer': 'https://www.yallah.com.br/'
             },
             body: JSON.stringify({ url, step }),
             // Aumentar o timeout para dar tempo para o scraping
+            credentials: 'include',
             cache: 'no-store',
+            mode: 'cors'
         });
 
         console.log(`📊 Status da resposta: ${response.status}`);
@@ -54,7 +58,13 @@ export async function checkScraperStatus() {
 
         const response = await fetch(`${SCRAPER_API_URL}`, {
             method: 'GET',
+            headers: {
+                'Origin': 'https://www.yallah.com.br',
+                'Referer': 'https://www.yallah.com.br/'
+            },
+            credentials: 'include',
             cache: 'no-store',
+            mode: 'cors'
         });
 
         console.log(`📊 Status da API: ${response.status}`);
@@ -80,4 +90,4 @@ export async function checkScraperStatus() {
             message: `Erro ao conectar: ${error instanceof Error ? error.message : 'Erro desconhecido'}`
         };
     }
-} 
+}
