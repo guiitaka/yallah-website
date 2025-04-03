@@ -54,17 +54,23 @@ export async function POST(request: Request) {
 
         console.log(`Iniciando scraping da URL: ${url}, Etapa: ${step}`);
 
-        // Iniciar browser com configuração ajustada para Vercel
-        const executablePath = process.env.NODE_ENV === 'production'
-            ? await chrome.executablePath()
-            : process.env.PUPPETEER_EXECUTABLE_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+        // Iniciar browser com configuração simplificada para versão antiga do puppeteer
+        let executablePath;
+        let args;
+
+        if (process.env.NODE_ENV === 'production') {
+            executablePath = await chrome.executablePath();
+            args = chrome.args;
+        } else {
+            executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+            args = ['--disable-web-security', '--no-sandbox'];
+        }
 
         const browser = await puppeteer.launch({
             headless: true,
-            args: [...chrome.args, '--disable-web-security', '--no-sandbox'],
+            args,
             executablePath,
-            ignoreDefaultArgs: ['--disable-extensions'],
-            // @ts-ignore - ignoring TypeScript errors for Vercel deployment compatibility
+            // Propriedades simplificadas compatíveis com versão 19 do puppeteer
         });
 
         const page = await browser.newPage() as unknown as ExtendedPage;
