@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import puppeteer, { Page } from 'puppeteer';
+import puppeteer, { Page } from 'puppeteer-core';
+import chrome from '@sparticuz/chromium';
+import { PuppeteerLaunchOptions } from 'puppeteer';
 
 // Helper function for timeout that works regardless of Puppeteer version
 const safeWaitForTimeout = async (page: Page | ExtendedPage, timeout: number) => {
@@ -49,10 +51,17 @@ export async function POST(request: Request) {
 
         console.log(`Iniciando scraping da URL: ${url}, Etapa: ${step}`);
 
-        // Iniciar browser
+        // Iniciar browser com configuração ajustada para Vercel
+        const executablePath = process.env.NODE_ENV === 'production'
+            ? await chrome.executablePath()
+            : process.env.PUPPETEER_EXECUTABLE_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+
         const browser = await puppeteer.launch({
             headless: true,
-            args: ['--disable-web-security', '--no-sandbox'],
+            args: [...chrome.args, '--disable-web-security', '--no-sandbox'],
+            executablePath,
+            ignoreDefaultArgs: ['--disable-extensions'],
+            // @ts-ignore - ignoring TypeScript errors for Vercel deployment compatibility
         });
 
         const page = await browser.newPage() as unknown as ExtendedPage;

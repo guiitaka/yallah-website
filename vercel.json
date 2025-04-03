@@ -2,8 +2,16 @@
   "version": 2,
   "functions": {
     "src/app/api/scrape-airbnb/route.ts": {
-      "memory": 1024,
-      "maxDuration": 10
+      "memory": 1536,
+      "maxDuration": 60
     }
+  },
+  "build": {
+    "env": {
+      "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true"
+    }
+  },
+  "env": {
+    "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true"
   }
 } 
