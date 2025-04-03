@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import puppeteer, { Page } from 'puppeteer-core';
 import chrome from '@sparticuz/chromium';
-import { PuppeteerLaunchOptions } from 'puppeteer';
 
 // Helper function for timeout that works regardless of Puppeteer version
 const safeWaitForTimeout = async (page: Page | ExtendedPage, timeout: number) => {
