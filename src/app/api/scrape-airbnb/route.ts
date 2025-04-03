@@ -54,25 +54,39 @@ export async function POST(request: Request) {
 
         console.log(`Iniciando scraping da URL: ${url}, Etapa: ${step}`);
 
-        // Iniciar browser com configuração simplificada para versão antiga do puppeteer
-        let executablePath;
-        let args;
+        // Iniciar browser com configuração otimizada para serverless e detecção de ambiente
+        const isServerless = process.env.NODE_ENV === 'production';
 
-        if (process.env.NODE_ENV === 'production') {
-            executablePath = await chrome.executablePath();
-            args = chrome.args;
-        } else {
-            executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-            args = ['--disable-web-security', '--no-sandbox'];
-        }
+        // Flags que devem ser incluídas no ambiente serverless
+        const serverlessFlags = [
+            '--disable-web-security',
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--no-first-run',
+            '--no-zygote',
+            '--single-process',
+            '--disable-gpu'
+        ];
 
-        const browser = await puppeteer.launch({
-            headless: true,
-            args,
-            executablePath,
-            // Propriedades simplificadas compatíveis com versão 19 do puppeteer
-        });
+        // Configurações específicas para cada ambiente
+        const browser = await puppeteer.launch(
+            isServerless
+                ? {
+                    args: chrome.args.concat(serverlessFlags),
+                    defaultViewport: chrome.defaultViewport,
+                    executablePath: await chrome.executablePath(),
+                    headless: true
+                }
+                : {
+                    headless: true,
+                    args: ['--disable-web-security', '--no-sandbox'],
+                    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+                }
+        );
 
+        console.log('Browser iniciado com sucesso');
         const page = await browser.newPage() as unknown as ExtendedPage;
 
         // Timeout para caso a página não carregue
