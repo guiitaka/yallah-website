@@ -1,6 +1,8 @@
-Deploy triggered at: 2025-04-03T21:15:00Z
+Deploy triggered at: 2025-04-03T22:15:00Z
 API URL: https://airbnb-scraper-api.onrender.com
 Correções:
-- Aumentado timeout para 60 segundos
-- Melhorada validação de URLs
-- Adicionado tratamento de erros na importação
+- Otimização do scraper para lidar com URLs complexas do Airbnb
+- Migração para utilizar @sparticuz/chromium para ambientes serverless
+- Adicionados múltiplos seletores para maior compatibilidade
+- Implementada limpeza de URL automática para remover parâmetros desnecessários
+- Melhorado o tratamento de timeouts com promise racing
