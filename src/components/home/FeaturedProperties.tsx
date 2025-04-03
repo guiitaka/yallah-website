@@ -121,7 +121,9 @@ const gridProperties = {
         rating: 4.9,
         reviewCount: 28,
         image: "/card4.jpg",
-        link: "/imoveis/studio-rm"
+        link: "/imoveis/studio-rm",
+        location: "Copacabana, Brasil",
+        coordinates: [-43.1822, -22.9789] as [number, number]
     },
     available: {
         id: 2,
@@ -132,7 +134,9 @@ const gridProperties = {
         rating: 4.8,
         reviewCount: 56,
         image: "/card2.jpg",
-        link: "/imoveis/loft-jardins"
+        link: "/imoveis/loft-jardins",
+        location: "Jardins, São Paulo",
+        coordinates: [-46.6554, -23.5646] as [number, number]
     },
     experience: {
         id: 3,
@@ -143,7 +147,9 @@ const gridProperties = {
         rating: 5.0,
         reviewCount: 42,
         image: "/card1.jpg",
-        link: "/imoveis/luxo-brooklin"
+        link: "/imoveis/luxo-brooklin",
+        location: "Brooklin, São Paulo",
+        coordinates: [-46.6869, -23.6109] as [number, number]
     }
 };
 
@@ -464,24 +470,17 @@ export default function FeaturedProperties() {
     // Função para expandir um card
     const expandCard = (propertyId: number) => {
         if (expandedCard === propertyId) {
-            // Se clicar no mesmo card já expandido, colapsa
             setIsClosing(true);
             setIsTransitioning(true);
             setTimeout(() => {
                 setExpandedCard(null);
                 setIsTransitioning(false);
                 setIsClosing(false);
-                // Resetar campos de formulário
-                setDateRange([null, null]);
-                setConsultationMessage('');
             }, 300);
         } else {
-            // Expande o card
             setIsTransitioning(true);
             setIsClosing(false);
             setExpandedCard(propertyId);
-            // Resetar mensagem caso abra outro card
-            setConsultationMessage('');
             setTimeout(() => {
                 setIsTransitioning(false);
             }, 300);
@@ -498,9 +497,6 @@ export default function FeaturedProperties() {
                 setExpandedCard(null);
                 setIsTransitioning(false);
                 setIsClosing(false);
-                // Resetar campos de formulário
-                setDateRange([null, null]);
-                setConsultationMessage('');
             }, 300);
         }
     };
@@ -515,9 +511,6 @@ export default function FeaturedProperties() {
                     setExpandedCard(null);
                     setIsTransitioning(false);
                     setIsClosing(false);
-                    // Resetar campos de formulário
-                    setDateRange([null, null]);
-                    setConsultationMessage('');
                 }, 300);
             }
         };
@@ -701,12 +694,12 @@ export default function FeaturedProperties() {
                                     <div className="bg-white px-4 py-2 rounded-full shadow-md text-black text-sm font-medium">
                                         R$ {gridProperties.comfort.pricePerNight} / Noite
                                     </div>
-                                    <Link
-                                        href={gridProperties.comfort.link}
+                                    <button
+                                        onClick={() => expandCard(gridProperties.comfort.id)}
                                         className="inline-flex items-center justify-center bg-white text-black px-6 py-3 rounded-full hover:bg-white/90 transition-colors text-sm font-medium w-fit"
                                     >
-                                        Agendar Visita <ArrowRight className="ml-2 w-4 h-4" weight="bold" />
-                                    </Link>
+                                        Ver detalhes <ArrowRight className="ml-2 w-4 h-4" weight="bold" />
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -744,12 +737,12 @@ export default function FeaturedProperties() {
                                     <div className="bg-white px-4 py-2 rounded-full shadow-md text-black text-sm font-medium">
                                         R$ {gridProperties.available.pricePerNight} / Noite
                                     </div>
-                                    <Link
-                                        href={gridProperties.available.link}
+                                    <button
+                                        onClick={() => expandCard(gridProperties.available.id)}
                                         className="inline-flex items-center justify-center bg-white text-black px-6 py-2 rounded-full hover:bg-white/90 transition-colors text-sm font-medium w-fit"
                                     >
-                                        Agendar Visita <ArrowRight className="ml-2 w-4 h-4" weight="bold" />
-                                    </Link>
+                                        Ver detalhes <ArrowRight className="ml-2 w-4 h-4" weight="bold" />
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -788,12 +781,12 @@ export default function FeaturedProperties() {
                                 <div className="bg-white px-4 py-2 rounded-full shadow-md text-black text-sm font-medium">
                                     R$ {gridProperties.experience.pricePerNight} / Noite
                                 </div>
-                                <Link
-                                    href={gridProperties.experience.link}
+                                <button
+                                    onClick={() => expandCard(gridProperties.experience.id)}
                                     className="inline-flex items-center justify-center bg-white text-black px-6 py-3 rounded-full hover:bg-white/90 transition-colors text-sm md:text-base font-medium w-fit"
                                 >
-                                    Agendar Visita <ArrowRight className="ml-2 w-4 h-4" weight="bold" />
-                                </Link>
+                                    Ver detalhes <ArrowRight className="ml-2 w-4 h-4" weight="bold" />
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -879,27 +872,45 @@ export default function FeaturedProperties() {
                                 </div>
                             </div>
                         ))}
+                    </div>
+                </div>
+            </div>
 
-                        {/* Card Expandido Overlay */}
-                        {expandedCard !== null && (
-                            <div
-                                className={`fixed inset-0 overlay-backdrop bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 md:p-8
-                                           ${isTransitioning && !isClosing ? 'animate-fade-in' : ''}
-                                           ${isClosing ? 'animate-fade-out' : ''}`}
-                                onClick={closeExpandedCard}
-                            >
-                                {recommendedProperties.filter(p => p.id === expandedCard).map(property => (
-                                    <div
-                                        key={`expanded-${property.id}`}
-                                        className={`bg-white rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl
-                                                  ${isTransitioning && !isClosing ? 'animate-scale-in' : ''}
-                                                  ${isClosing ? 'animate-scale-out' : ''}`}
-                                        onClick={(e) => e.stopPropagation()} // Previne que feche ao clicar no card
-                                    >
-                                        {/* Galeria de Imagens */}
-                                        <div className="grid grid-cols-12 gap-2 p-2">
-                                            {/* Imagem principal (maior) */}
-                                            <div className="col-span-6 relative h-[300px] rounded-l-xl overflow-hidden">
+            {/* Card Expandido Overlay */}
+            {expandedCard !== null && (
+                <div
+                    className={`fixed inset-0 z-50 flex items-center justify-center p-4 overlay-backdrop ${isTransitioning ? (isClosing ? 'animate-fadeOut' : 'animate-fadeIn') : ''
+                        }`}
+                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+                    onClick={closeExpandedCard}
+                >
+                    <div
+                        className={`bg-white rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-y-auto rounded-scroll-container ${isTransitioning ? (isClosing ? 'animate-slideOut' : 'animate-slideIn') : ''
+                            }`}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Conteúdo do card expandido */}
+                        {[...recommendedProperties, gridProperties.comfort, gridProperties.available, gridProperties.experience]
+                            .filter(property => property.id === expandedCard)
+                            .slice(0, 1) // Pegar apenas o primeiro resultado, evitando duplicações
+                            .map(property => (
+                                <div key={`expanded-${property.id}`}>
+                                    {/* Galeria de Imagens */}
+                                    <div className="grid grid-cols-12 gap-2 p-2">
+                                        {/* Imagem principal (maior) */}
+                                        <div className="col-span-6 relative h-[300px] rounded-l-xl overflow-hidden">
+                                            <Image
+                                                src={property.image}
+                                                alt={property.title}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        </div>
+
+                                        {/* Coluna direita com 2 imagens */}
+                                        <div className="col-span-6 grid grid-rows-2 gap-2">
+                                            {/* Imagem superior direita */}
+                                            <div className="relative h-[146px] rounded-tr-xl overflow-hidden">
                                                 <Image
                                                     src={property.image}
                                                     alt={property.title}
@@ -908,10 +919,9 @@ export default function FeaturedProperties() {
                                                 />
                                             </div>
 
-                                            {/* Coluna direita com 2 imagens */}
-                                            <div className="col-span-6 grid grid-rows-2 gap-2">
-                                                {/* Imagem superior direita */}
-                                                <div className="relative h-[146px] rounded-tr-xl overflow-hidden">
+                                            {/* Duas imagens inferiores */}
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div className="relative h-[146px] overflow-hidden">
                                                     <Image
                                                         src={property.image}
                                                         alt={property.title}
@@ -920,435 +930,370 @@ export default function FeaturedProperties() {
                                                     />
                                                 </div>
 
-                                                {/* Duas imagens inferiores */}
-                                                <div className="grid grid-cols-2 gap-2">
-                                                    <div className="relative h-[146px] overflow-hidden">
-                                                        <Image
-                                                            src={property.image}
-                                                            alt={property.title}
-                                                            fill
-                                                            className="object-cover"
-                                                        />
-                                                    </div>
-
-                                                    {/* Mapa ou última imagem com botão de expandir */}
-                                                    <div className="relative h-[146px] rounded-br-xl overflow-hidden">
-                                                        <MapComponent
-                                                            center={property.coordinates as [number, number]}
-                                                            zoom={16}
-                                                            showMarker={true}
-                                                            onClick={() => setActiveTab('localizacao')}
-                                                            showControls={false}
-                                                            useCustomMarker={false}
-                                                        />
-                                                        <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(0deg, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.1) 100%)' }}></div>
-                                                        <button
-                                                            className="absolute bottom-2 right-2 p-1.5 bg-white rounded-md shadow-md z-10 transition-all hover:bg-gray-100"
-                                                            aria-label="Expandir mapa"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setActiveTab('localizacao');
-                                                            }}
-                                                        >
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#8BADA4">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5-5-5m5 5v-4m0 4h-4" />
-                                                            </svg>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Botão de fechar - agora posicionado no canto superior direito absoluto */}
-                                        <button
-                                            className="absolute top-4 right-4 p-2 rounded-full bg-white shadow-md hover:shadow-lg hover:bg-gray-100 transition-all z-10"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                expandCard(property.id);
-                                            }}
-                                            aria-label="Fechar"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="stroke-gray-600">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-
-                                        <div className="p-6">
-                                            {/* Layout de duas colunas para o conteúdo principal */}
-                                            <div className="grid grid-cols-12 gap-6">
-                                                {/* Coluna principal (esquerda) */}
-                                                <div className="col-span-12 md:col-span-8">
-                                                    {/* Cabeçalho do imóvel */}
-                                                    <div className="mb-6">
-                                                        {/* Badge de destaque */}
-                                                        <div className="mb-2 inline-flex items-center text-green-600 gap-1">
-                                                            <span className="inline-block w-4 h-4 rounded-full bg-green-600"></span>
-                                                            <span className="text-sm font-medium">Destaque</span>
-                                                        </div>
-
-                                                        {/* Cabeçalho com ações */}
-                                                        <div className="flex justify-between items-start">
-                                                            <h2 className="text-2xl font-bold text-gray-900">{property.title}</h2>
-
-                                                            <div className="flex gap-2">
-                                                                <FavoriteButton propertyId={property.id} />
-                                                                <button className="p-2 rounded-full border border-gray-200 hover:bg-gray-50" aria-label="Compartilhar">
-                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="stroke-gray-600">
-                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                                                                    </svg>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Informações básicas */}
-                                                        <div className="flex gap-2 items-center text-gray-700 mt-2">
-                                                            <span>{property.features}</span>
-                                                        </div>
-
-                                                        {/* Categorias/Tags */}
-                                                        <div className="flex flex-wrap gap-2 mt-3">
-                                                            <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{property.details}</span>
-                                                            <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{property.location}</span>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Navegação por abas */}
-                                                    <div className="border-b border-gray-200 mb-4">
-                                                        <div className="flex gap-6 overflow-x-auto scrollbar-hide">
-                                                            <button
-                                                                className={`py-2 whitespace-nowrap ${activeTab === 'descricao' ? 'border-b-2 border-[#8BADA4] text-[#8BADA4] font-medium' : 'text-gray-500 hover:text-gray-700'}`}
-                                                                onClick={() => setActiveTab('descricao')}
-                                                            >
-                                                                Descrição
-                                                            </button>
-                                                            <button
-                                                                className={`py-2 whitespace-nowrap ${activeTab === 'oferecemos' ? 'border-b-2 border-[#8BADA4] text-[#8BADA4] font-medium' : 'text-gray-500 hover:text-gray-700'}`}
-                                                                onClick={() => setActiveTab('oferecemos')}
-                                                            >
-                                                                O que oferecemos
-                                                            </button>
-                                                            <button
-                                                                className={`py-2 whitespace-nowrap ${activeTab === 'saber' ? 'border-b-2 border-[#8BADA4] text-[#8BADA4] font-medium' : 'text-gray-500 hover:text-gray-700'}`}
-                                                                onClick={() => setActiveTab('saber')}
-                                                            >
-                                                                O que você deve saber
-                                                            </button>
-                                                            <button
-                                                                className={`py-2 whitespace-nowrap ${activeTab === 'localizacao' ? 'border-b-2 border-[#8BADA4] text-[#8BADA4] font-medium' : 'text-gray-500 hover:text-gray-700'}`}
-                                                                onClick={() => setActiveTab('localizacao')}
-                                                            >
-                                                                Localização
-                                                            </button>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Conteúdo da descrição */}
-                                                    {activeTab === 'descricao' && (
-                                                        <div>
-                                                            <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Nosso imóvel</h3>
-                                                            <p className="text-gray-700 mb-4">
-                                                                Este charmoso imóvel localizado em {property.location} oferece um ambiente aconchegante e moderno.
-                                                                Com {property.features.split('·').join(', ')}, o espaço é perfeito para uma estadia confortável.
-                                                            </p>
-                                                            <p className="text-gray-700">
-                                                                Próximo a restaurantes, comércio e transporte público. O imóvel conta com Wi-Fi de alta velocidade,
-                                                                ar-condicionado e todas as comodidades para uma estadia perfeita.
-                                                            </p>
-                                                        </div>
-                                                    )}
-
-                                                    {/* Conteúdo do que oferecemos */}
-                                                    {activeTab === 'oferecemos' && (
-                                                        <div>
-                                                            <h3 className="text-xl font-semibold mb-4 text-[#8BADA4]">O que esse lugar oferece</h3>
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
-                                                                <div className="flex items-center gap-4">
-                                                                    <div className="w-10 h-10 flex items-center justify-center">
-                                                                        <Lock className="w-6 h-6 text-gray-700" />
-                                                                    </div>
-                                                                    <span className="text-gray-700">Tranca na porta do quarto</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-4">
-                                                                    <div className="w-10 h-10 flex items-center justify-center">
-                                                                        <Waves className="w-6 h-6 text-gray-700" />
-                                                                    </div>
-                                                                    <span className="text-gray-700">Vista para a praia</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-4">
-                                                                    <div className="w-10 h-10 flex items-center justify-center">
-                                                                        <CookingPot className="w-6 h-6 text-gray-700" />
-                                                                    </div>
-                                                                    <span className="text-gray-700">Cozinha</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-4">
-                                                                    <div className="w-10 h-10 flex items-center justify-center">
-                                                                        <WifiHigh className="w-6 h-6 text-gray-700" />
-                                                                    </div>
-                                                                    <span className="text-gray-700">Wi-Fi</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-4">
-                                                                    <div className="w-10 h-10 flex items-center justify-center">
-                                                                        <Desktop className="w-6 h-6 text-gray-700" />
-                                                                    </div>
-                                                                    <span className="text-gray-700">Espaço de trabalho exclusivo</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-4">
-                                                                    <div className="w-10 h-10 flex items-center justify-center">
-                                                                        <Television className="w-6 h-6 text-gray-700" />
-                                                                    </div>
-                                                                    <span className="text-gray-700">TV</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-4">
-                                                                    <div className="w-10 h-10 flex items-center justify-center">
-                                                                        <Dog className="w-6 h-6 text-gray-700" />
-                                                                    </div>
-                                                                    <span className="text-gray-700">Permitido animais</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-4">
-                                                                    <div className="w-10 h-10 flex items-center justify-center">
-                                                                        <House className="w-6 h-6 text-gray-700" />
-                                                                    </div>
-                                                                    <span className="text-gray-700">Pátio ou varanda</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-4">
-                                                                    <div className="w-10 h-10 flex items-center justify-center">
-                                                                        <Lightning className="w-6 h-6 text-gray-400 line-through" />
-                                                                    </div>
-                                                                    <span className="text-gray-400 line-through">Alarme de monóxido de carbono</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-4">
-                                                                    <div className="w-10 h-10 flex items-center justify-center">
-                                                                        <Fire className="w-6 h-6 text-gray-400 line-through" />
-                                                                    </div>
-                                                                    <span className="text-gray-400 line-through">Detector de fumaça</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    {/* Conteúdo do que você deve saber */}
-                                                    {activeTab === 'saber' && (
-                                                        <div className="space-y-8">
-                                                            <div>
-                                                                <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Regras da Casa</h3>
-                                                                <p className="text-gray-700 mb-3">
-                                                                    Check-in: após as 15:00h<br />
-                                                                    Check-out: até as 11:00h<br />
-                                                                    Máximo de 4 hóspedes<br />
-                                                                    Não é permitido festas ou eventos<br />
-                                                                    Proibido fumar dentro do imóvel
-                                                                </p>
-                                                                <p className="text-gray-700">
-                                                                    Os hóspedes devem manter o silêncio após as 22:00h, respeitando o condomínio e vizinhos. Animais de estimação são permitidos mediante consulta prévia e sob responsabilidade do proprietário.
-                                                                </p>
-                                                            </div>
-
-                                                            <div>
-                                                                <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Segurança e propriedade</h3>
-                                                                <p className="text-gray-700 mb-3">
-                                                                    Evite surpresas ao conferir estas informações importantes sobre a propriedade do seu anfitrião.
-                                                                </p>
-                                                                <p className="text-gray-700 mb-3">
-                                                                    O anfitrião não informou que a propriedade tem um detector de monóxido de carbono. Sugerimos levar um detector portátil para sua viagem.
-                                                                </p>
-                                                                <p className="text-gray-700">
-                                                                    O anfitrião não informou que a propriedade tem um detector de fumaça. Sugerimos levar um detector portátil para sua viagem.
-                                                                </p>
-                                                            </div>
-
-                                                            <div>
-                                                                <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Política de cancelamento</h3>
-                                                                <p className="text-gray-700 mb-3">
-                                                                    Cancelamento gratuito até 48 horas antes do check-in. Após esse período, será cobrada uma taxa equivalente a 50% do valor total da reserva.
-                                                                </p>
-                                                                <p className="text-gray-700">
-                                                                    Em caso de cancelamento no dia do check-in ou no-show, não haverá reembolso. Recomendamos a contratação de um seguro viagem para imprevistos.
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    {/* Conteúdo sobre a localização */}
-                                                    {activeTab === 'localizacao' && (
-                                                        <div>
-                                                            <h3 className="text-xl font-semibold mb-4 text-[#8BADA4]">Onde você estará</h3>
-                                                            <p className="text-gray-700 mb-4">
-                                                                {property.location}, Brasil
-                                                            </p>
-                                                            <div className="h-[350px] rounded-xl overflow-hidden relative mb-4">
-                                                                <MapComponent
-                                                                    center={property.coordinates as [number, number]}
-                                                                    zoom={13}
-                                                                    showMarker={true}
-                                                                    showControls={true}
-                                                                    useCustomMarker={true}
-                                                                />
-                                                                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white py-2 px-4 rounded-lg shadow-md text-center max-w-xs">
-                                                                    <p className="font-medium text-gray-800">O local exato é fornecido depois da reserva.</p>
-                                                                </div>
-                                                            </div>
-                                                            <div className="text-gray-700">
-                                                                <p className="mb-3">
-                                                                    Este imóvel está localizado em uma área privilegiada de {property.location.split(",")[0]}, oferecendo fácil acesso a:
-                                                                </p>
-                                                                <ul className="list-disc pl-5 space-y-1">
-                                                                    <li>Transporte público a 200m</li>
-                                                                    <li>Restaurantes e cafés a 5 minutos a pé</li>
-                                                                    <li>Supermercados e farmácias próximos</li>
-                                                                    <li>Parques e áreas de lazer nas redondezas</li>
-                                                                </ul>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-
-                                                {/* Coluna lateral (direita) - Reserva */}
-                                                <div className="col-span-12 md:col-span-4">
-                                                    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-md">
-                                                        {/* Preço e avaliação */}
-                                                        <div className="flex justify-between items-start mb-4">
-                                                            <div>
-                                                                <span className="text-2xl font-bold text-gray-900">R$ {property.pricePerNight}</span>
-                                                                <span className="text-gray-600 ml-1">/ noite</span>
-                                                            </div>
-                                                            <div className="inline-flex items-center gap-1 bg-white px-2 py-1 rounded-full shadow-sm">
-                                                                <Star weight="fill" className="w-4 h-4 text-yellow-500" />
-                                                                <span className="text-sm font-medium text-black">{property.rating}</span>
-                                                                <span className="text-xs text-gray-500">({property.reviewCount})</span>
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Campos de data */}
-                                                        <div className="mb-4">
-                                                            <label className="block text-sm text-gray-600 mb-1">Datas</label>
-                                                            <div className="relative">
-                                                                <DatePicker
-                                                                    selectsRange={true}
-                                                                    startDate={startDate}
-                                                                    endDate={endDate}
-                                                                    onChange={(update) => {
-                                                                        setDateRange(update);
-                                                                    }}
-                                                                    isClearable={true}
-                                                                    placeholderText="dd/mm/yyyy"
-                                                                    dateFormat="dd/MM/yyyy"
-                                                                    locale={ptBR}
-                                                                    className="w-full appearance-none bg-transparent border border-gray-200 rounded-xl p-3 text-gray-700 pr-10"
-                                                                    calendarClassName="rounded-lg shadow-xl border-0"
-                                                                    showPopperArrow={false}
-                                                                    monthsShown={2}
-                                                                    popperPlacement="bottom"
-                                                                    popperProps={{
-                                                                        strategy: "fixed"
-                                                                    }}
-                                                                    customInput={
-                                                                        <div className="flex items-center justify-between cursor-pointer">
-                                                                            <input
-                                                                                type="text"
-                                                                                value={startDate ? `${format(startDate, 'dd/MM/yyyy')}${endDate ? ` - ${format(endDate, 'dd/MM/yyyy')}` : ''}` : ''}
-                                                                                placeholder="dd/mm/yyyy"
-                                                                                className="w-full appearance-none bg-transparent text-gray-700 text-base cursor-pointer pr-10"
-                                                                                readOnly
-                                                                            />
-                                                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex gap-1 items-center text-gray-400">
-                                                                                <div className="w-5 h-5 relative">
-                                                                                    <CalendarIcon weight="regular" className="w-5 h-5 text-gray-400" />
-                                                                                </div>
-                                                                                <CaretDown className="w-4 h-4" />
-                                                                            </div>
-                                                                        </div>
-                                                                    }
-                                                                />
-                                                            </div>
-                                                            <style jsx global>{`
-                                                                .react-datepicker-popper {
-                                                                    z-index: 9999 !important;
-                                                                    position: fixed !important;
-                                                                }
-                                                                .react-datepicker-wrapper {
-                                                                    width: 100% !important;
-                                                                }
-                                                                .react-datepicker {
-                                                                    font-family: inherit !important;
-                                                                    border-radius: 0.75rem !important;
-                                                                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
-                                                                    border: none !important;
-                                                                    background-color: white !important;
-                                                                }
-                                                                .react-datepicker__month-container {
-                                                                    background: white !important;
-                                                                    border-radius: 0.5rem !important;
-                                                                    padding: 8px !important;
-                                                                }
-                                                                .react-datepicker__day--selected, 
-                                                                .react-datepicker__day--range-start, 
-                                                                .react-datepicker__day--range-end {
-                                                                    background-color: #8BADA4 !important;
-                                                                }
-                                                                .react-datepicker__day--in-range, 
-                                                                .react-datepicker__day--in-selecting-range {
-                                                                    background-color: rgba(139, 173, 164, 0.2) !important;
-                                                                }
-                                                                .react-datepicker__day--keyboard-selected {
-                                                                    background-color: rgba(139, 173, 164, 0.5) !important;
-                                                                }
-                                                                .react-datepicker__header {
-                                                                    background-color: white !important;
-                                                                    border-bottom: 1px solid #f0f0f0 !important;
-                                                                    padding-top: 8px !important;
-                                                                }
-                                                                .react-datepicker__triangle {
-                                                                    display: none !important;
-                                                                }
-                                                            `}</style>
-                                                        </div>
-
-                                                        {/* Resumo de valores */}
-                                                        <div className="border-t border-gray-200 py-4 space-y-2">
-                                                            <div className="flex justify-between">
-                                                                <span className="text-gray-600">R$ {property.pricePerNight} x {calculateNights(startDate, endDate)} noites</span>
-                                                                <span className="text-black">R$ {property.pricePerNight * calculateNights(startDate, endDate)}</span>
-                                                            </div>
-                                                            <div className="flex justify-between">
-                                                                <span className="text-gray-600">Desconto</span>
-                                                                <span className="text-green-600">-R$ 50</span>
-                                                            </div>
-                                                            <div className="flex justify-between">
-                                                                <span className="text-gray-600">Taxa de serviço</span>
-                                                                <span className="text-black">R$ 35</span>
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Total */}
-                                                        <div className="border-t border-gray-200 pt-4 mb-4">
-                                                            <div className="flex justify-between font-bold">
-                                                                <span>Total</span>
-                                                                <span className="text-black">R$ {(property.pricePerNight * calculateNights(startDate, endDate)) - 50 + 35}</span>
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Mensagem de feedback */}
-                                                        {consultationMessage && (
-                                                            <div className="mb-4 p-3 bg-green-50 text-green-700 text-sm rounded-lg">
-                                                                {consultationMessage}
-                                                            </div>
-                                                        )}
-
-                                                        {/* Botão de consulta */}
-                                                        <button className="w-full py-3 px-4 bg-[#8BADA4] hover:bg-[#7A9D94] text-white font-medium rounded-full transition-colors flex items-center justify-center gap-2" onClick={() => handleAvailabilityConsultation(property)}>
-                                                            Consultar disponibilidade <ArrowRight weight="bold" />
-                                                        </button>
-                                                    </div>
+                                                {/* Mapa ou última imagem com botão de expandir */}
+                                                <div className="relative h-[146px] rounded-br-xl overflow-hidden">
+                                                    <MapComponent
+                                                        center={property.coordinates as [number, number]}
+                                                        zoom={16}
+                                                        showMarker={true}
+                                                        onClick={() => setActiveTab('localizacao')}
+                                                        showControls={false}
+                                                        useCustomMarker={false}
+                                                    />
+                                                    <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(0deg, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.1) 100%)' }}></div>
+                                                    <button
+                                                        className="absolute bottom-2 right-2 p-1.5 bg-white rounded-md shadow-md z-10 transition-all hover:bg-gray-100"
+                                                        aria-label="Expandir mapa"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setActiveTab('localizacao');
+                                                        }}
+                                                    >
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#8BADA4">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5-5-5m5 5v-4m0 4h-4" />
+                                                        </svg>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-                        )}
+
+                                    {/* Botão de fechar - posicionado no canto superior direito absoluto */}
+                                    <button
+                                        className="absolute top-4 right-4 p-2 rounded-full bg-white shadow-md hover:shadow-lg hover:bg-gray-100 transition-all z-10"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            expandCard(property.id);
+                                        }}
+                                        aria-label="Fechar"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="stroke-gray-600">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+
+                                    <div className="p-6">
+                                        {/* Layout de duas colunas para o conteúdo principal */}
+                                        <div className="grid grid-cols-12 gap-6">
+                                            {/* Coluna principal (esquerda) */}
+                                            <div className="col-span-12 md:col-span-7">
+                                                {/* Cabeçalho do imóvel */}
+                                                <div className="mb-6">
+                                                    {/* Badge de destaque */}
+                                                    <div className="mb-2 inline-flex items-center text-green-600 gap-1">
+                                                        <span className="inline-block w-4 h-4 rounded-full bg-green-600"></span>
+                                                        <span className="text-sm font-medium">Destaque</span>
+                                                    </div>
+
+                                                    {/* Cabeçalho com ações */}
+                                                    <div className="flex justify-between items-start">
+                                                        <h2 className="text-2xl font-bold text-gray-900">{property.title}</h2>
+
+                                                        <div className="flex gap-2">
+                                                            <FavoriteButton propertyId={property.id} />
+                                                            <button className="p-2 rounded-full border border-gray-200 hover:bg-gray-50" aria-label="Compartilhar">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="stroke-gray-600">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Informações básicas */}
+                                                    <div className="flex gap-2 items-center text-gray-700 mt-2">
+                                                        <span>{property.features}</span>
+                                                    </div>
+
+                                                    {/* Categorias/Tags */}
+                                                    <div className="flex flex-wrap gap-2 mt-3">
+                                                        <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{property.details}</span>
+                                                        <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{property.location}</span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Navegação por abas */}
+                                                <div className="border-b border-gray-200 mb-4">
+                                                    <div className="flex gap-6 overflow-x-auto scrollbar-hide">
+                                                        <button
+                                                            className={`py-2 whitespace-nowrap ${activeTab === 'descricao' ? 'border-b-2 border-[#8BADA4] text-[#8BADA4] font-medium' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            onClick={() => setActiveTab('descricao')}
+                                                        >
+                                                            Descrição
+                                                        </button>
+                                                        <button
+                                                            className={`py-2 whitespace-nowrap ${activeTab === 'oferecemos' ? 'border-b-2 border-[#8BADA4] text-[#8BADA4] font-medium' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            onClick={() => setActiveTab('oferecemos')}
+                                                        >
+                                                            O que oferecemos
+                                                        </button>
+                                                        <button
+                                                            className={`py-2 whitespace-nowrap ${activeTab === 'saber' ? 'border-b-2 border-[#8BADA4] text-[#8BADA4] font-medium' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            onClick={() => setActiveTab('saber')}
+                                                        >
+                                                            O que você deve saber
+                                                        </button>
+                                                        <button
+                                                            className={`py-2 whitespace-nowrap ${activeTab === 'localizacao' ? 'border-b-2 border-[#8BADA4] text-[#8BADA4] font-medium' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            onClick={() => setActiveTab('localizacao')}
+                                                        >
+                                                            Localização
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                {/* Conteúdo da descrição */}
+                                                {activeTab === 'descricao' && (
+                                                    <div>
+                                                        <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Nosso imóvel</h3>
+                                                        <p className="text-gray-700 mb-4">
+                                                            Este charmoso imóvel localizado em {property.location} oferece um ambiente aconchegante e moderno.
+                                                            Com {property.features.split('·').join(', ')}, o espaço é perfeito para uma estadia confortável.
+                                                        </p>
+                                                        <p className="text-gray-700">
+                                                            Próximo a restaurantes, comércio e transporte público. O imóvel conta com Wi-Fi de alta velocidade,
+                                                            ar-condicionado e todas as comodidades para uma estadia perfeita.
+                                                        </p>
+                                                    </div>
+                                                )}
+
+                                                {/* Conteúdo do que oferecemos */}
+                                                {activeTab === 'oferecemos' && (
+                                                    <div>
+                                                        <h3 className="text-xl font-semibold mb-4 text-[#8BADA4]">O que esse lugar oferece</h3>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10 flex items-center justify-center">
+                                                                    <Lock className="w-6 h-6 text-gray-700" />
+                                                                </div>
+                                                                <span className="text-gray-700">Tranca na porta do quarto</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10 flex items-center justify-center">
+                                                                    <Waves className="w-6 h-6 text-gray-700" />
+                                                                </div>
+                                                                <span className="text-gray-700">Vista para a praia</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10 flex items-center justify-center">
+                                                                    <CookingPot className="w-6 h-6 text-gray-700" />
+                                                                </div>
+                                                                <span className="text-gray-700">Cozinha</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10 flex items-center justify-center">
+                                                                    <WifiHigh className="w-6 h-6 text-gray-700" />
+                                                                </div>
+                                                                <span className="text-gray-700">Wi-Fi</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10 flex items-center justify-center">
+                                                                    <Desktop className="w-6 h-6 text-gray-700" />
+                                                                </div>
+                                                                <span className="text-gray-700">Espaço de trabalho exclusivo</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-10 h-10 flex items-center justify-center">
+                                                                    <Television className="w-6 h-6 text-gray-700" />
+                                                                </div>
+                                                                <span className="text-gray-700">TV</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Conteúdo do que você deve saber */}
+                                                {activeTab === 'saber' && (
+                                                    <div className="space-y-8">
+                                                        <div>
+                                                            <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Regras da Casa</h3>
+                                                            <p className="text-gray-700 mb-3">
+                                                                Check-in: após as 15:00h<br />
+                                                                Check-out: até as 11:00h<br />
+                                                                Máximo de 4 hóspedes<br />
+                                                                Não é permitido festas ou eventos<br />
+                                                                Proibido fumar dentro do imóvel
+                                                            </p>
+                                                        </div>
+
+                                                        <div>
+                                                            <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Política de cancelamento</h3>
+                                                            <p className="text-gray-700 mb-3">
+                                                                Cancelamento gratuito até 48 horas antes do check-in. Após esse período, será cobrada uma taxa equivalente a 50% do valor total da reserva.
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Conteúdo sobre a localização */}
+                                                {activeTab === 'localizacao' && (
+                                                    <div>
+                                                        <h3 className="text-xl font-semibold mb-4 text-[#8BADA4]">Onde você estará</h3>
+                                                        <p className="text-gray-700 mb-4">
+                                                            {property.location}, Brasil
+                                                        </p>
+                                                        <div className="h-[350px] rounded-xl overflow-hidden relative mb-4">
+                                                            <MapComponent
+                                                                center={property.coordinates as [number, number]}
+                                                                zoom={13}
+                                                                showMarker={true}
+                                                                showControls={true}
+                                                                useCustomMarker={true}
+                                                            />
+                                                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white py-2 px-4 rounded-lg shadow-md text-center max-w-xs">
+                                                                <p className="font-medium text-gray-800">Localização exata do imóvel após reserva</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Coluna lateral (direita) - Reserva */}
+                                            <div className="col-span-12 md:col-span-5">
+                                                <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-md">
+                                                    {/* Preço e avaliação */}
+                                                    <div className="flex justify-between items-start mb-4">
+                                                        <div>
+                                                            <span className="text-2xl font-bold text-gray-900">R$ {property.pricePerNight}</span>
+                                                            <span className="text-gray-600 ml-1">/ noite</span>
+                                                        </div>
+                                                        <div className="inline-flex items-center gap-1 bg-white px-2 py-1 rounded-full shadow-sm">
+                                                            <Star weight="fill" className="w-4 h-4 text-yellow-500" />
+                                                            <span className="text-sm font-medium text-black">{property.rating}</span>
+                                                            <span className="text-xs text-gray-500">({property.reviewCount})</span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Campos de data */}
+                                                    <div className="mb-4">
+                                                        <label className="block text-sm text-gray-600 mb-1">Datas</label>
+                                                        <div className="relative">
+                                                            <DatePicker
+                                                                selectsRange={true}
+                                                                startDate={startDate}
+                                                                endDate={endDate}
+                                                                onChange={(update) => {
+                                                                    setDateRange(update);
+                                                                }}
+                                                                isClearable={false}
+                                                                placeholderText="dd/mm/yyyy"
+                                                                dateFormat="dd/MM/yyyy"
+                                                                locale={ptBR}
+                                                                className="w-full appearance-none bg-transparent border border-gray-200 rounded-xl p-3 text-gray-700 pr-10"
+                                                                calendarClassName="rounded-lg shadow-xl border-0"
+                                                                showPopperArrow={false}
+                                                                monthsShown={2}
+                                                                popperPlacement="bottom"
+                                                                popperProps={{
+                                                                    strategy: "fixed"
+                                                                }}
+                                                                customInput={
+                                                                    <div className="flex items-center justify-center cursor-pointer">
+                                                                        <input
+                                                                            type="text"
+                                                                            value={startDate ? `${format(startDate, 'dd/MM/yyyy')}${endDate ? ` - ${format(endDate, 'dd/MM/yyyy')}` : ''}` : ''}
+                                                                            placeholder="dd/mm/yyyy"
+                                                                            className="w-full text-ellipsis appearance-none bg-transparent text-gray-700 text-sm cursor-pointer text-center px-10"
+                                                                            readOnly
+                                                                        />
+                                                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none flex gap-1 items-center text-gray-400">
+                                                                            <div className="w-5 h-5 relative">
+                                                                                <CalendarIcon weight="regular" className="w-5 h-5 text-gray-400" />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                }
+                                                            />
+                                                        </div>
+                                                        <style jsx global>{`
+                                                            .react-datepicker-popper {
+                                                                z-index: 9999 !important;
+                                                                position: fixed !important;
+                                                            }
+                                                            .react-datepicker-wrapper {
+                                                                width: 100% !important;
+                                                            }
+                                                            .react-datepicker {
+                                                                font-family: inherit !important;
+                                                                border-radius: 0.75rem !important;
+                                                                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+                                                                border: none !important;
+                                                                background-color: white !important;
+                                                            }
+                                                            .react-datepicker__month-container {
+                                                                background: white !important;
+                                                                border-radius: 0.5rem !important;
+                                                                padding: 8px !important;
+                                                            }
+                                                            .react-datepicker__day--selected, 
+                                                            .react-datepicker__day--range-start, 
+                                                            .react-datepicker__day--range-end {
+                                                                background-color: #8BADA4 !important;
+                                                            }
+                                                            .react-datepicker__day--in-range, 
+                                                            .react-datepicker__day--in-selecting-range {
+                                                                background-color: rgba(139, 173, 164, 0.2) !important;
+                                                            }
+                                                            .react-datepicker__day--keyboard-selected {
+                                                                background-color: rgba(139, 173, 164, 0.5) !important;
+                                                            }
+                                                            .react-datepicker__header {
+                                                                background-color: white !important;
+                                                                border-bottom: 1px solid #f0f0f0 !important;
+                                                                padding-top: 8px !important;
+                                                            }
+                                                            .react-datepicker__triangle {
+                                                                display: none !important;
+                                                            }
+                                                        `}</style>
+                                                    </div>
+
+                                                    {/* Resumo de valores */}
+                                                    <div className="border-t border-gray-200 py-4 space-y-2">
+                                                        <div className="flex justify-between">
+                                                            <span className="text-gray-600">R$ {property.pricePerNight} x {calculateNights(startDate, endDate)} noites</span>
+                                                            <span className="text-black">R$ {property.pricePerNight * calculateNights(startDate, endDate)}</span>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                            <span className="text-gray-600">Desconto</span>
+                                                            <span className="text-green-600">-R$ 50</span>
+                                                        </div>
+                                                        <div className="flex justify-between">
+                                                            <span className="text-gray-600">Taxa de serviço</span>
+                                                            <span className="text-black">R$ 35</span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Total */}
+                                                    <div className="border-t border-gray-200 pt-4 mb-4">
+                                                        <div className="flex justify-between font-bold">
+                                                            <span>Total</span>
+                                                            <span className="text-black">R$ {(property.pricePerNight * calculateNights(startDate, endDate)) - 50 + 35}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Mensagem de feedback */}
+                                                    {consultationMessage && (
+                                                        <div className="mb-4 p-3 bg-green-50 text-green-700 text-sm rounded-lg">
+                                                            {consultationMessage}
+                                                        </div>
+                                                    )}
+
+                                                    {/* Botão de consulta */}
+                                                    <button
+                                                        className="w-full py-3 px-4 bg-[#8BADA4] hover:bg-[#7A9D94] text-white font-medium rounded-full transition-colors flex items-center justify-center gap-2 text-sm whitespace-nowrap"
+                                                        onClick={() => handleAvailabilityConsultation(property)}
+                                                    >
+                                                        Consultar disponibilidade <ArrowRight weight="bold" className="min-w-4 min-h-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
                     </div>
                 </div>
-            </div>
+            )}
         </div>
-    )
-} 
+    );
+}

@@ -733,14 +733,13 @@ export default function AllProperties() {
 
                                                                     {/* Botão de ação */}
                                                                     <button
-                                                                        className="w-full flex items-center justify-center gap-2 bg-white text-black px-4 py-2 rounded-full hover:bg-[#8BADA4] hover:text-white transition-colors duration-300 text-sm"
+                                                                        className="w-full py-3 px-4 bg-[#8BADA4] hover:bg-[#7A9D94] text-white font-medium rounded-full transition-colors flex items-center justify-center gap-2 text-sm whitespace-nowrap"
                                                                         onClick={(e) => {
                                                                             e.stopPropagation();
                                                                             expandCard(property.id);
                                                                         }}
                                                                     >
-                                                                        Ver detalhes
-                                                                        <ArrowRight className="w-4 h-4" weight="bold" />
+                                                                        Consultar disponibilidade <ArrowRight weight="bold" className="min-w-4 min-h-4" />
                                                                     </button>
                                                                 </div>
                                                             </div>
@@ -801,10 +800,10 @@ export default function AllProperties() {
                         {allProperties.filter(p => p.id === expandedCard).map(property => (
                             <div
                                 key={`expanded-${property.id}`}
-                                className={`bg-white rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl
+                                className={`bg-white rounded-3xl max-w-6xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl rounded-scroll-container
                                           ${isTransitioning && !isClosing ? 'animate-scale-in' : ''}
                                           ${isClosing ? 'animate-scale-out' : ''}`}
-                                onClick={(e) => e.stopPropagation()} // Previne que feche ao clicar no card
+                                onClick={(e) => e.stopPropagation()}
                             >
                                 {/* Galeria de Imagens */}
                                 <div className="grid grid-cols-12 gap-2 p-2">
@@ -887,7 +886,7 @@ export default function AllProperties() {
                                     {/* Layout de duas colunas para o conteúdo principal */}
                                     <div className="grid grid-cols-12 gap-6">
                                         {/* Coluna principal (esquerda) */}
-                                        <div className="col-span-12 md:col-span-8">
+                                        <div className="col-span-12 md:col-span-7">
                                             {/* Cabeçalho do imóvel */}
                                             <div className="mb-6">
                                                 {/* Badge de destaque */}
@@ -1115,8 +1114,8 @@ export default function AllProperties() {
                                         </div>
 
                                         {/* Coluna lateral (direita) - Reserva */}
-                                        <div className="col-span-12 md:col-span-4">
-                                            <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-md">
+                                        <div className="col-span-12 md:col-span-5">
+                                            <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-md">
                                                 {/* Preço e avaliação */}
                                                 <div className="flex justify-between items-start mb-4">
                                                     <div>
@@ -1141,7 +1140,7 @@ export default function AllProperties() {
                                                             onChange={(update) => {
                                                                 setDateRange(update);
                                                             }}
-                                                            isClearable={true}
+                                                            isClearable={false}
                                                             placeholderText="dd/mm/yyyy"
                                                             dateFormat="dd/MM/yyyy"
                                                             locale={ptBR}
@@ -1159,14 +1158,13 @@ export default function AllProperties() {
                                                                         type="text"
                                                                         value={startDate ? `${format(startDate, 'dd/MM/yyyy')}${endDate ? ` - ${format(endDate, 'dd/MM/yyyy')}` : ''}` : ''}
                                                                         placeholder="dd/mm/yyyy"
-                                                                        className="w-full appearance-none bg-transparent text-gray-700 text-base cursor-pointer pr-10"
+                                                                        className="w-full text-ellipsis appearance-none bg-transparent text-gray-700 text-sm cursor-pointer text-center px-10"
                                                                         readOnly
                                                                     />
-                                                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex gap-1 items-center text-gray-400">
+                                                                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none flex gap-1 items-center text-gray-400">
                                                                         <div className="w-5 h-5 relative">
                                                                             <CalendarIcon weight="regular" className="w-5 h-5 text-gray-400" />
                                                                         </div>
-                                                                        <CaretDown className="w-4 h-4" />
                                                                     </div>
                                                                 </div>
                                                             }
@@ -1247,8 +1245,8 @@ export default function AllProperties() {
                                                 )}
 
                                                 {/* Botão de consulta */}
-                                                <button className="w-full py-3 px-4 bg-[#8BADA4] hover:bg-[#7A9D94] text-white font-medium rounded-full transition-colors flex items-center justify-center gap-2" onClick={() => handleAvailabilityConsultation(property)}>
-                                                    Consultar disponibilidade <ArrowRight weight="bold" />
+                                                <button className="w-full py-3 px-4 bg-[#8BADA4] hover:bg-[#7A9D94] text-white font-medium rounded-full transition-colors flex items-center justify-center gap-2 text-sm whitespace-nowrap" onClick={() => handleAvailabilityConsultation(property)}>
+                                                    Consultar disponibilidade <ArrowRight weight="bold" className="min-w-4 min-h-4" />
                                                 </button>
                                             </div>
                                         </div>

@@ -16,10 +16,10 @@ import {
   Waves,
   Train,
   Desktop,
-  Mountains
+  Mountains,
+  Wrench
 } from '@phosphor-icons/react'
 import { useState } from 'react'
-import LanguageSelector from '../ui/LanguageSelector'
 
 type MobileNavigationProps = {
   userType: 'owner' | 'tenant'
@@ -72,34 +72,20 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
         <div className="container mx-auto px-4">
           <div className="flex items-start justify-between pt-2 h-[80px] mb-[env(safe-area-inset-bottom,24px)]">
             <Link
-              href="/mobile/a-yallah"
+              href="/mobile/owner"
               className="flex flex-col items-center gap-1"
             >
               <House weight="light" className="w-6 h-6 text-gray-600" />
               <span className="text-[10px] text-gray-600">A Yallah</span>
             </Link>
 
-            {userType === 'tenant' ? (
-              <button
-                onClick={() => setIsCategoryOpen(!isCategoryOpen)}
-                className="flex flex-col items-center gap-1"
-              >
-                <CaretUp
-                  weight="light"
-                  className={`w-6 h-6 text-gray-600 transition-transform duration-300 ${isCategoryOpen ? 'rotate-180' : ''
-                    }`}
-                />
-                <span className="text-[10px] text-gray-600">Categorias</span>
-              </button>
-            ) : (
-              <Link
-                href="/mobile/como-funciona"
-                className="flex flex-col items-center gap-1"
-              >
-                <Info weight="light" className="w-6 h-6 text-gray-600" />
-                <span className="text-[10px] text-gray-600">Como Funciona</span>
-              </Link>
-            )}
+            <Link
+              href="/mobile/owner/como-funciona"
+              className="flex flex-col items-center gap-1"
+            >
+              <Info weight="light" className="w-6 h-6 text-gray-600" />
+              <span className="text-[10px] text-gray-600">Como Funciona</span>
+            </Link>
 
             <Link
               href="/mobile/owner/nosso-metodo"
@@ -109,10 +95,16 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
               <span className="text-[10px] text-gray-600">Nosso Método</span>
             </Link>
 
-            <LanguageSelector />
+            <Link
+              href="/mobile/owner/servicos"
+              className="flex flex-col items-center gap-1"
+            >
+              <Wrench weight="light" className="w-6 h-6 text-gray-600" />
+              <span className="text-[10px] text-gray-600">Serviços</span>
+            </Link>
 
             <Link
-              href="/mobile/contato"
+              href="/mobile/owner/fale-conosco"
               className="flex flex-col items-center gap-1"
             >
               <Headset weight="light" className="w-6 h-6 text-gray-600" />

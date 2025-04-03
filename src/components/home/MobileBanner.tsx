@@ -226,7 +226,7 @@ export default function MobileBanner() {
                 onChange={(update) => {
                   setDateRange(update)
                 }}
-                isClearable={true}
+                isClearable={false}
                 placeholderText="dd/mm/yyyy"
                 dateFormat="dd/MM/yyyy"
                 locale={ptBR}
@@ -244,15 +244,14 @@ export default function MobileBanner() {
                       type="text"
                       value={startDate ? `${format(startDate, 'dd/MM/yyyy')}${endDate ? ` - ${format(endDate, 'dd/MM/yyyy')}` : ''}` : ''}
                       placeholder="dd/mm/yyyy"
-                      className="w-full appearance-none bg-transparent cursor-pointer pr-10 text-[13px]"
+                      className="w-full appearance-none bg-transparent cursor-pointer text-center px-10 text-[13px]"
                       readOnly
                       style={{ fontSize: '13px' }}
                     />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex gap-1 items-center text-gray-400">
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none flex gap-1 items-center text-gray-400">
                       <div className="w-5 h-5 relative">
                         <CalendarIcon weight="regular" className="w-5 h-5 text-gray-400" />
                       </div>
-                      <CaretDown className="w-4 h-4" />
                     </div>
                   </div>
                 }

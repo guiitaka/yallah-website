@@ -9,7 +9,7 @@ export function middleware(request: NextRequest) {
 
   // Verifica se é uma requisição de asset estático
   const isStaticAsset = /\.(jpg|jpeg|png|gif|svg|webm|mp4|webp|css|js|ico|json)$/i.test(url.pathname);
-  
+
   // Se for asset estático ou estiver na pasta public, não redireciona
   if (isStaticAsset || url.pathname.startsWith('/videos/') || url.pathname.startsWith('/icons/')) {
     return NextResponse.next();
@@ -27,6 +27,24 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Verificar se é a rota admin
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    // Configuração de segurança do painel administrativo:
+    // - Persistência de sessão temporária: sessão expira quando o navegador é fechado
+    // - Cookie com duração de 2 horas: forçando autenticação periódica
+    // - Verificação de token em todas as rotas protegidas
+
+    // Se não for exatamente /admin (página de login) e não tiver um token, redirecionar para a página de login
+    if (request.nextUrl.pathname !== '/admin' && !request.cookies.get('admin_session')) {
+      return NextResponse.redirect(new URL('/admin', request.url));
+    }
+
+    // Se for exatamente /admin (página de login) e já tiver um token, redirecionar para o dashboard
+    if (request.nextUrl.pathname === '/admin' && request.cookies.get('admin_session')) {
+      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+    }
+  }
+
   return NextResponse.next();
 }
 
@@ -40,5 +58,6 @@ export const config = {
      * - favicon.ico (favicon file)
      */
     '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/admin/:path*'
   ],
 }; 

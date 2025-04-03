@@ -23,6 +23,13 @@
   color: rgba(255, 255, 255, 0.6) !important;
 }
 
+/* Garantir que inputs nos modais de propriedades tenham texto preto */
+.bg-white input,
+.bg-white textarea,
+.bg-white select {
+  color: #1a202c !important; /* text-gray-900 equivalente */
+}
+
 @layer base {
   :root {
     --foreground-rgb: 0, 0, 0;

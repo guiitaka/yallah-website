@@ -1,0 +1,33 @@
+'use client'
+
+// ... [mantenha todo o conteúdo existente até o Card Expandido Overlay] ...
+
+            {/* Card Expandido Overlay */}
+            {expandedCard !== null && (
+                <div
+                    className={`fixed inset-0 z-50 flex items-center justify-center p-4 overlay-backdrop ${
+                        isTransitioning ? (isClosing ? 'animate-fadeOut' : 'animate-fadeIn') : ''
+                    }`}
+                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+                    onClick={closeExpandedCard}
+                >
+                    <div
+                        className={`bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto ${
+                            isTransitioning ? (isClosing ? 'animate-slideOut' : 'animate-slideIn') : ''
+                        }`}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Conteúdo do card expandido */}
+                        {[...recommendedProperties, gridProperties.comfort, gridProperties.available, gridProperties.experience]
+                            .filter(property => property.id === expandedCard)
+                            .map(property => (
+                                <div key={`expanded-${property.id}`}>
+                                    {/* Seu conteúdo existente do card expandido */}
+                                </div>
+                            ))}
+                    </div>
+                </div>
+            )}
+        </div>
+    )
+} 
