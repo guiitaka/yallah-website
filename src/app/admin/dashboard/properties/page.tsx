@@ -389,11 +389,14 @@ export default function PropertiesPage() {
     };
 
     useEffect(() => {
-        if (!loading && !user) {
-            router.push('/admin');
-        } else if (user) {
-            const email = user.email || '';
-            setUsername(email.split('@')[0]);
+        // Só verificar redirecionamento quando loading for false
+        if (!loading) {
+            if (!user) {
+                router.push('/admin');
+            } else {
+                const email = user.email || '';
+                setUsername(email.split('@')[0]);
+            }
         }
     }, [user, loading, router]);
 
@@ -606,6 +609,15 @@ export default function PropertiesPage() {
         setImportUrl('');
         setImportedData(null);
     };
+
+    // Adicionando verificação de loading antes de renderizar o conteúdo
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-100">
+                <div className="text-xl">Carregando...</div>
+            </div>
+        );
+    }
 
     // Start of the JSX
     return (
