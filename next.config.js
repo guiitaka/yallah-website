@@ -16,6 +16,13 @@ const nextConfig = {
                 hostname: '**',
             }
         ]
+    },
+    webpack: (config, { isServer }) => {
+        if (isServer) {
+            // Adiciona pacotes que só devem ser bundled no servidor
+            config.externals = [...config.externals, 'puppeteer-core', '@sparticuz/chromium'];
+        }
+        return config;
     }
 }
 

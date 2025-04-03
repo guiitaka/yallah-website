@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import puppeteer, { Page } from 'puppeteer-core';
 import chrome from '@sparticuz/chromium';
 
+// Marcar este arquivo como apenas servidor para evitar que o Next.js tente bundlar no cliente
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 // Helper function for timeout that works regardless of Puppeteer version
 const safeWaitForTimeout = async (page: Page | ExtendedPage, timeout: number) => {
     if (typeof (page as ExtendedPage).waitForTimeout === 'function') {
