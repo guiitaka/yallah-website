@@ -21,6 +21,9 @@ import { sampleProperties, Property } from '@/data/sampleProperties';
 import { useAirbnbImport } from '@/hooks/useAirbnbImport';
 import { normalizeAmenities, categorizeAmenities } from '@/utils/amenities-utils';
 import AdminHeader from '@/components/admin/Header';
+import { checkScraperStatus } from '@/utils/airbnb-scraper';
+import { ApiStatusIndicator } from '@/components/admin/ApiStatus';
+import { mockScrapeAirbnb } from '@/utils/mockScraper';
 
 // Componente para renderizar amenities com ícones
 const PropertyAmenityItem = ({ amenity }: { amenity: { text: string; svgIcon?: string; category?: string } }) => {
@@ -515,10 +518,29 @@ export default function PropertiesPage() {
             // Clear imported data before starting
             setImportedData(null);
 
-            console.log('Starting Airbnb import for URL:', importUrl);
+            console.log('Verificando status da API de scraping...');
+            const apiStatus = await checkScraperStatus();
 
-            // Import data from Airbnb
-            const result = await importFromAirbnb(importUrl);
+            let result;
+
+            // Se a API estiver offline, usar o simulador
+            if (!apiStatus.online) {
+                console.log('API de scraping offline. Usando simulador...');
+
+                // Mostrar aviso ao usuário
+                setImportProgress({
+                    step: 1,
+                    total: 3,
+                    message: 'API offline - Usando modo de simulação para demonstração'
+                });
+
+                // Usar o simulador mockScrapeAirbnb
+                result = await mockScrapeAirbnb(importUrl);
+            } else {
+                console.log('Starting Airbnb import for URL:', importUrl);
+                // Import data from Airbnb using the real API
+                result = await importFromAirbnb(importUrl);
+            }
 
             if (!result) {
                 console.error('No result returned from scraping');
@@ -1191,9 +1213,12 @@ export default function PropertiesPage() {
                             {/* Show URL form if not importing and no imported data */}
                             {!isImporting && !importedData && (
                                 <div>
-                                    <p className="text-gray-600 mb-4">
-                                        Cole a URL do anúncio do Airbnb para importar os dados do imóvel automaticamente.
-                                    </p>
+                                    <div className="flex justify-between mb-4">
+                                        <p className="text-gray-600">
+                                            Cole a URL do anúncio do Airbnb para importar os dados do imóvel automaticamente.
+                                        </p>
+                                        <ApiStatusIndicator />
+                                    </div>
 
                                     <div className="mb-6">
                                         <label htmlFor="importUrl" className="block text-gray-700 mb-2">URL do Airbnb</label>

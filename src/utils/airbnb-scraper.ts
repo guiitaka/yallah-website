@@ -13,6 +13,9 @@ const SCRAPER_API_URL = process.env.NEXT_PUBLIC_SCRAPER_API_URL || 'https://airb
  */
 export async function scrapeAirbnb(url: string, step: number = 1) {
     try {
+        console.log(`🔍 Iniciando scraping do Airbnb - URL: ${url}, Etapa: ${step}`);
+        console.log(`🌐 API URL: ${SCRAPER_API_URL}/scrape-airbnb`);
+
         const response = await fetch(`${SCRAPER_API_URL}/scrape-airbnb`, {
             method: 'POST',
             headers: {
@@ -23,14 +26,21 @@ export async function scrapeAirbnb(url: string, step: number = 1) {
             cache: 'no-store',
         });
 
+        console.log(`📊 Status da resposta: ${response.status}`);
+
         if (!response.ok) {
             const errorText = await response.text();
+            console.error(`❌ Erro na resposta da API de scraping: ${response.status}`, errorText);
             throw new Error(`Erro ao fazer scraping: ${response.status} - ${errorText}`);
         }
 
-        return await response.json();
+        const responseData = await response.json();
+        console.log(`✅ Resposta recebida da API de scraping:`,
+            JSON.stringify(responseData).substring(0, 200) + '...');
+
+        return responseData;
     } catch (error) {
-        console.error('Erro ao consumir API de scraping:', error);
+        console.error('❌ Erro ao consumir API de scraping:', error);
         throw error;
     }
 }
@@ -40,19 +50,34 @@ export async function scrapeAirbnb(url: string, step: number = 1) {
  */
 export async function checkScraperStatus() {
     try {
-        const response = await fetch(SCRAPER_API_URL, {
+        console.log(`🔍 Verificando status da API de scraping: ${SCRAPER_API_URL}`);
+
+        const response = await fetch(`${SCRAPER_API_URL}`, {
             method: 'GET',
             cache: 'no-store',
         });
 
+        console.log(`📊 Status da API: ${response.status}`);
+
         if (!response.ok) {
-            return { online: false, error: `Status: ${response.status}` };
+            return {
+                online: false,
+                status: response.status,
+                message: `API offline ou indisponível (${response.status})`
+            };
         }
 
-        const data = await response.json();
-        return { online: data.status === 'online', data };
+        return {
+            online: true,
+            status: response.status,
+            message: 'API online e respondendo'
+        };
     } catch (error) {
-        console.error('Erro ao verificar status da API de scraping:', error);
-        return { online: false, error: String(error) };
+        console.error('❌ Erro ao verificar status da API de scraping:', error);
+        return {
+            online: false,
+            status: 0,
+            message: `Erro ao conectar: ${error instanceof Error ? error.message : 'Erro desconhecido'}`
+        };
     }
 } 
