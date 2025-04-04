@@ -316,9 +316,9 @@ export function useAirbnbImport() {
                 if (!step1Response.ok) {
                     const errorData = await step1Response.json();
                     if (step1Response.status === 504 || errorData.message?.includes('timeout')) {
-                        throw new Error('O servidor demorou muito para responder. Tente usar uma URL mais simples ou tente novamente mais tarde.');
+                        throw new Error('Os servidores do Airbnb estão congestionados e não foi possível obter os dados neste momento. Por favor, tente novamente mais tarde.');
                     }
-                    throw new Error(errorData.error || errorData.message || 'Erro ao importar dados básicos do Airbnb');
+                    throw new Error(errorData.error || errorData.message || 'Os servidores do Airbnb estão congestionados e não foi possível obter os dados neste momento. Por favor, tente novamente mais tarde.');
                 }
 
                 const step1Result: ScrapingStep = await step1Response.json();
@@ -326,7 +326,7 @@ export function useAirbnbImport() {
                 console.log('Etapa 1 concluída:', step1Result);
             } catch (error: any) {
                 if (error.name === 'AbortError' || error.message?.includes('aborted')) {
-                    throw new Error('A requisição demorou muito tempo e foi cancelada. Tente novamente mais tarde.');
+                    throw new Error('Os servidores do Airbnb estão congestionados e não foi possível obter os dados neste momento. Por favor, tente novamente mais tarde.');
                 }
                 throw error;
             }
@@ -351,9 +351,9 @@ export function useAirbnbImport() {
                 if (!step2Response.ok) {
                     const errorData = await step2Response.json();
                     if (step2Response.status === 504 || errorData.message?.includes('timeout')) {
-                        throw new Error('O servidor demorou muito para responder na etapa 2. Tente usar uma URL mais simples ou tente novamente mais tarde.');
+                        throw new Error('Os servidores do Airbnb estão congestionados e não foi possível obter os dados neste momento. Por favor, tente novamente mais tarde.');
                     }
-                    throw new Error(errorData.error || errorData.message || 'Erro ao importar preço e capacidade do Airbnb');
+                    throw new Error(errorData.error || errorData.message || 'Os servidores do Airbnb estão congestionados e não foi possível obter os dados neste momento. Por favor, tente novamente mais tarde.');
                 }
 
                 const step2Result: ScrapingStep = await step2Response.json();
@@ -361,11 +361,11 @@ export function useAirbnbImport() {
                 console.log('Etapa 2 concluída:', step2Result);
             } catch (error: any) {
                 if (error.name === 'AbortError' || error.message?.includes('aborted')) {
-                    throw new Error('A requisição da etapa 2 demorou muito tempo e foi cancelada. Tente novamente mais tarde.');
+                    throw new Error('Os servidores do Airbnb estão congestionados e não foi possível obter os dados neste momento. Por favor, tente novamente mais tarde.');
                 }
 
-                // Podemos continuar com dados parciais
-                console.error('Erro na etapa 2, continuando com dados parciais:', error);
+                // Em caso de erro na etapa 2, não prosseguir com dados incompletos
+                throw new Error('Os servidores do Airbnb estão congestionados e não foi possível obter os dados neste momento. Por favor, tente novamente mais tarde.');
             }
 
             // ETAPA 3: Comodidades
@@ -388,18 +388,20 @@ export function useAirbnbImport() {
                 if (!step3Response.ok) {
                     const errorData = await step3Response.json();
                     if (step3Response.status === 504 || errorData.message?.includes('timeout')) {
-                        console.warn('Timeout na etapa 3, continuando com dados parciais.');
-                    } else {
-                        console.warn('Erro na etapa 3:', errorData.error || errorData.message);
+                        throw new Error('Os servidores do Airbnb estão congestionados e não foi possível obter os dados neste momento. Por favor, tente novamente mais tarde.');
                     }
-                } else {
-                    const step3Result: ScrapingStep = await step3Response.json();
-                    allData = { ...allData, ...step3Result.data };
-                    console.log('Etapa 3 concluída:', step3Result);
+                    throw new Error(errorData.error || errorData.message || 'Os servidores do Airbnb estão congestionados e não foi possível obter os dados neste momento. Por favor, tente novamente mais tarde.');
                 }
+
+                const step3Result: ScrapingStep = await step3Response.json();
+                allData = { ...allData, ...step3Result.data };
+                console.log('Etapa 3 concluída:', step3Result);
             } catch (error: any) {
-                // Podemos continuar com dados parciais
-                console.error('Erro na etapa 3, continuando com dados parciais:', error);
+                if (error.name === 'AbortError' || error.message?.includes('aborted')) {
+                    throw new Error('Os servidores do Airbnb estão congestionados e não foi possível obter os dados neste momento. Por favor, tente novamente mais tarde.');
+                }
+
+                throw new Error('Os servidores do Airbnb estão congestionados e não foi possível obter os dados neste momento. Por favor, tente novamente mais tarde.');
             }
 
             // ETAPA 4: Fotos do anúncio
@@ -422,18 +424,20 @@ export function useAirbnbImport() {
                 if (!step4Response.ok) {
                     const errorData = await step4Response.json();
                     if (step4Response.status === 504 || errorData.message?.includes('timeout')) {
-                        console.warn('Timeout na etapa 4, continuando com dados parciais.');
-                    } else {
-                        console.warn('Erro na etapa 4:', errorData.error || errorData.message);
+                        throw new Error('Os servidores do Airbnb estão congestionados e não foi possível obter os dados neste momento. Por favor, tente novamente mais tarde.');
                     }
-                } else {
-                    const step4Result: ScrapingStep = await step4Response.json();
-                    allData = { ...allData, ...step4Result.data };
-                    console.log('Etapa 4 concluída:', step4Result);
+                    throw new Error(errorData.error || errorData.message || 'Os servidores do Airbnb estão congestionados e não foi possível obter os dados neste momento. Por favor, tente novamente mais tarde.');
                 }
+
+                const step4Result: ScrapingStep = await step4Response.json();
+                allData = { ...allData, ...step4Result.data };
+                console.log('Etapa 4 concluída:', step4Result);
             } catch (error: any) {
-                // Podemos continuar com dados parciais
-                console.error('Erro na etapa 4, continuando com dados parciais:', error);
+                if (error.name === 'AbortError' || error.message?.includes('aborted')) {
+                    throw new Error('Os servidores do Airbnb estão congestionados e não foi possível obter os dados neste momento. Por favor, tente novamente mais tarde.');
+                }
+
+                throw new Error('Os servidores do Airbnb estão congestionados e não foi possível obter os dados neste momento. Por favor, tente novamente mais tarde.');
             }
 
             setProgress({ step: 4, total: 4, message: 'Processando dados...' });

@@ -23,7 +23,6 @@ import { normalizeAmenities, categorizeAmenities } from '@/utils/amenities-utils
 import AdminHeader from '@/components/admin/Header';
 import { checkScraperStatus } from '@/utils/airbnb-scraper';
 import { ApiStatusIndicator } from '@/components/admin/ApiStatus';
-import { mockScrapeAirbnb } from '@/utils/mockScraper';
 
 // Componente para renderizar amenities com ícones
 const PropertyAmenityItem = ({ amenity }: { amenity: { text: string; svgIcon?: string; category?: string } }) => {
@@ -521,30 +520,23 @@ export default function PropertiesPage() {
             console.log('Verificando status da API de scraping...');
             const apiStatus = await checkScraperStatus();
 
-            let result;
-
-            // Se a API estiver offline, usar o simulador
+            // Se a API estiver offline ou não conseguir obter dados do Airbnb
             if (!apiStatus.online) {
-                console.log('API de scraping offline. Usando simulador...');
+                console.log('API de scraping offline ou servidores Airbnb congestionados.');
 
-                // Mostrar aviso ao usuário
-                setImportProgress({
-                    step: 1,
-                    total: 3,
-                    message: 'API offline - Usando modo de simulação para demonstração'
-                });
-
-                // Usar o simulador mockScrapeAirbnb
-                result = await mockScrapeAirbnb(importUrl);
-            } else {
-                console.log('Starting Airbnb import for URL:', importUrl);
-                // Import data from Airbnb using the real API
-                result = await importFromAirbnb(importUrl);
+                // Mostrar mensagem de erro ao usuário
+                setImportError('Os servidores do Airbnb estão congestionados e não foi possível obter os dados neste momento. Por favor, tente novamente mais tarde.');
+                setIsImporting(false);
+                return;
             }
+
+            console.log('Starting Airbnb import for URL:', importUrl);
+            // Import data from Airbnb using the real API
+            const result = await importFromAirbnb(importUrl);
 
             if (!result) {
                 console.error('No result returned from scraping');
-                setImportError('Erro ao importar dados do Airbnb. Verifique a URL e tente novamente.');
+                setImportError('Os servidores do Airbnb estão congestionados e não foi possível obter os dados neste momento. Por favor, tente novamente mais tarde.');
                 return;
             }
 
@@ -572,7 +564,7 @@ export default function PropertiesPage() {
             setImportedData(enhancedResult);
         } catch (error) {
             console.error('Error during Airbnb import:', error);
-            setImportError(error instanceof Error ? error.message : 'Erro ao importar dados do Airbnb.');
+            setImportError('Os servidores do Airbnb estão congestionados e não foi possível obter os dados neste momento. Por favor, tente novamente mais tarde.');
         } finally {
             setIsImporting(false);
         }
