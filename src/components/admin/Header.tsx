@@ -82,7 +82,6 @@ export default function AdminHeader() {
                                     <Building className="mr-2 h-5 w-5" />
                                     Imóveis
                                 </Link>
-                                {/* Link temporariamente removido - Página ainda não implementada
                                 <Link
                                     href="/admin/dashboard/support"
                                     className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-full hover:bg-opacity-80 transition-colors"
@@ -94,7 +93,6 @@ export default function AdminHeader() {
                                     <MessageCircle className="mr-2 h-5 w-5" />
                                     Suporte
                                 </Link>
-                                */}
                             </nav>
                         </div>
 
