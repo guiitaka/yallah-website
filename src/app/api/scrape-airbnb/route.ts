@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { scrapeAirbnb } from '../../../utils/airbnb-scraper';
+import { scrapeAirbnb } from './lib/airbnb-scraper';
 
 // Marcar este arquivo como apenas servidor para evitar que o Next.js tente bundlar no cliente
 export const runtime = 'nodejs';
