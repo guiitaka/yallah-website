@@ -540,6 +540,19 @@ export default function PropertiesPage() {
                 return;
             }
 
+            // Verificar se os dados retornados são válidos/completos
+            const hasValidData = result.title &&
+                result.title.trim() !== '' &&
+                result.pricePerNight > 0 &&
+                (result.images && result.images.length > 0);
+
+            if (!hasValidData) {
+                console.error('Dados incompletos ou inválidos retornados pelo scraping:', result);
+                setImportError('Os servidores do Airbnb estão congestionados e não foi possível obter os dados completos neste momento. Por favor, tente novamente mais tarde.');
+                setIsImporting(false);
+                return;
+            }
+
             console.log('Dados importados do Airbnb:', result);
 
             // Process the imported data
@@ -550,8 +563,10 @@ export default function PropertiesPage() {
                 console.log(`Usando ${processedImages.length} imagens reais do Airbnb`);
             } else {
                 console.warn('No images received from scraping');
-                // Add at least one default image if none were found
-                processedImages = ['/card1.jpg'];
+                // Em vez de usar imagens locais, informar erro
+                setImportError('Os servidores do Airbnb estão congestionados e não foi possível obter as imagens do imóvel. Por favor, tente novamente mais tarde.');
+                setIsImporting(false);
+                return;
             }
 
             // Store imported data with processed images
