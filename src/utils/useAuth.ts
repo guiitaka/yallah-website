@@ -78,14 +78,19 @@ export const useAuth = () => {
                 // Criar um email padrão a partir do username
                 const email = `${username}@yallah.com.br`;
 
-                // Verificar se o usuário já existe
                 try {
-                    return await signIn(email, password);
-                } catch (error: any) {
-                    // Se o usuário não existir, criá-lo
-                    if (error.code === 'auth/user-not-found') {
+                    // Forçar a criação de um novo usuário primeiro
+                    try {
                         return await createAdminUser(email, password);
+                    } catch (createError: any) {
+                        // Se o usuário já existir, tente fazer login
+                        if (createError.code === 'auth/email-already-in-use') {
+                            return await signIn(email, password);
+                        }
+                        throw createError;
                     }
+                } catch (error: any) {
+                    console.error('Erro ao autenticar:', error);
                     throw error;
                 }
             } else {
