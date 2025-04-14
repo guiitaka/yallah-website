@@ -18,8 +18,8 @@ interface ScraperResult {
     data: any;
 }
 
-// URL do serviço de scraping no Render
-const RENDER_SCRAPER_URL = process.env.RENDER_SCRAPER_URL || 'https://yallah-airbnb-scraper.onrender.com/api/scrape-airbnb';
+// URL do serviço de scraping no Render - Usando a variável configurada na Vercel
+const RENDER_SCRAPER_URL = process.env.NEXT_PUBLIC_SCRAPER_API_URL || 'https://airbnb-scraper-api.onrender.com/scrape-airbnb';
 
 // Função para verificar se estamos no ambiente Vercel
 const isVercelEnvironment = () => {
