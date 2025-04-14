@@ -18,10 +18,23 @@ interface ScraperResult {
     data: any;
 }
 
+// Verificar e logar variáveis de ambiente disponíveis
+console.log('[DIAGNÓSTICO] Variáveis de ambiente disponíveis:', {
+    NEXT_PUBLIC_SCRAPER_API_URL: process.env.NEXT_PUBLIC_SCRAPER_API_URL,
+    VERCEL_ENV: process.env.VERCEL_ENV,
+    isVercel: !!process.env.VERCEL
+});
+
 // URL base do serviço de scraping no Render - Usando a variável configurada na Vercel
 const RENDER_SCRAPER_BASE_URL = process.env.NEXT_PUBLIC_SCRAPER_API_URL || 'https://airbnb-scraper-api.onrender.com';
 // Caminho para o endpoint de scraping
 const SCRAPE_ENDPOINT = '/scrape-airbnb';
+
+console.log('[DIAGNÓSTICO] URLs configuradas:', {
+    baseUrl: RENDER_SCRAPER_BASE_URL,
+    endpoint: SCRAPE_ENDPOINT,
+    fullUrl: `${RENDER_SCRAPER_BASE_URL}${SCRAPE_ENDPOINT}`
+});
 
 // Função para verificar se estamos no ambiente Vercel
 const isVercelEnvironment = () => {
@@ -30,6 +43,7 @@ const isVercelEnvironment = () => {
 
 // Função para verificar o status da API antes de fazer a requisição
 async function checkApiStatus() {
+    console.log('[DIAGNÓSTICO] Verificando status da API:', RENDER_SCRAPER_BASE_URL);
     try {
         // Tenta acessar a raiz da API, não o endpoint de scraping
         const response = await fetch(RENDER_SCRAPER_BASE_URL, {
@@ -37,21 +51,59 @@ async function checkApiStatus() {
             headers: { 'Accept': 'application/json' }
         });
 
+        console.log('[DIAGNÓSTICO] Resposta da verificação:', {
+            status: response.status,
+            ok: response.ok,
+            statusText: response.statusText
+        });
+
         if (response.ok) {
+            try {
+                const data = await response.json();
+                console.log('[DIAGNÓSTICO] Resposta JSON:', data);
+            } catch (e) {
+                console.log('[DIAGNÓSTICO] Não foi possível ler resposta como JSON');
+            }
             return { online: true };
         }
 
         return { online: false, status: response.status };
     } catch (error: any) {  // Especificando o tipo como 'any' para evitar o erro unknown
-        console.error('Erro ao verificar status da API:', error);
+        console.error('[DIAGNÓSTICO] Erro ao verificar status da API:', error);
         return { online: false, error: error.message };
     }
 }
 
+// Adiciona trailing slash à URL base se não existir
+function ensureTrailingSlash(url: string): string {
+    if (!url.endsWith('/') && !SCRAPE_ENDPOINT.startsWith('/')) {
+        return `${url}/`;
+    }
+    return url;
+}
+
+// Remove barras duplicadas entre base e endpoint
+function combineUrls(base: string, endpoint: string): string {
+    // Normaliza a base para terminar com uma barra, se o endpoint não começar com uma
+    const normalizedBase = base.endsWith('/') || endpoint.startsWith('/')
+        ? base
+        : `${base}/`;
+
+    // Normaliza o endpoint para não começar com barra se a base já terminar com uma
+    const normalizedEndpoint = base.endsWith('/') && endpoint.startsWith('/')
+        ? endpoint.slice(1)
+        : endpoint;
+
+    return `${normalizedBase}${normalizedEndpoint}`;
+}
+
 export async function POST(request: Request) {
     try {
+        console.log('[DIAGNÓSTICO] Iniciando processamento de requisição POST');
         const requestData = await request.json();
         const { url, step = 1 } = requestData;
+
+        console.log('[DIAGNÓSTICO] Dados da requisição:', { url, step });
 
         // Validação mais flexível para URLs do Airbnb
         const isValidUrl = url && (
@@ -77,12 +129,14 @@ export async function POST(request: Request) {
 
         // Se estamos na Vercel, redirecionar para o Render
         if (isVercelEnvironment()) {
-            console.log(`Ambiente Vercel detectado. Verificando disponibilidade da API: ${RENDER_SCRAPER_BASE_URL}`);
+            console.log(`[DIAGNÓSTICO] Ambiente Vercel detectado. Verificando disponibilidade da API: ${RENDER_SCRAPER_BASE_URL}`);
 
             // Verificar se a API está online
             const apiStatus = await checkApiStatus();
+            console.log('[DIAGNÓSTICO] Status da API:', apiStatus);
+
             if (!apiStatus.online) {
-                console.error('API de scraping offline:', apiStatus);
+                console.error('[DIAGNÓSTICO] API de scraping offline:', apiStatus);
                 return NextResponse.json(
                     {
                         status: 'error',
@@ -96,14 +150,18 @@ export async function POST(request: Request) {
                 );
             }
 
-            console.log(`API online. Redirecionando requisição para: ${RENDER_SCRAPER_BASE_URL}${SCRAPE_ENDPOINT}`);
+            // Construir URL completa garantindo que não haja problemas com barras
+            const fullUrl = combineUrls(RENDER_SCRAPER_BASE_URL, SCRAPE_ENDPOINT);
+            console.log(`[DIAGNÓSTICO] API online. Redirecionando requisição para: ${fullUrl}`);
 
             try {
                 // Combinar URL base com o endpoint para o POST
-                const renderResponse = await fetch(`${RENDER_SCRAPER_BASE_URL}${SCRAPE_ENDPOINT}`, {
+                const renderResponse = await fetch(fullUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        // Adicionar headers para evitar problemas de CORS
+                        'Origin': 'https://www.yallah.com.br'
                     },
                     body: JSON.stringify(requestData),
                     // Aumentar o timeout para permitir que o Render processe a requisição
@@ -111,14 +169,21 @@ export async function POST(request: Request) {
                     signal: AbortSignal.timeout(55000), // 55 segundos para deixar margem
                 });
 
+                console.log('[DIAGNÓSTICO] Resposta do Render:', {
+                    status: renderResponse.status,
+                    ok: renderResponse.ok,
+                    statusText: renderResponse.statusText
+                });
+
                 if (!renderResponse.ok) {
                     throw new Error(`Erro na resposta do Render: ${renderResponse.status} ${renderResponse.statusText}`);
                 }
 
                 const renderData = await renderResponse.json();
+                console.log('[DIAGNÓSTICO] Dados recebidos do Render:', renderData);
                 return NextResponse.json(renderData);
             } catch (error: any) {
-                console.error('Erro ao redirecionar para o Render:', error);
+                console.error('[DIAGNÓSTICO] Erro ao redirecionar para o Render:', error);
                 return NextResponse.json(
                     {
                         status: 'error',
@@ -150,7 +215,7 @@ export async function POST(request: Request) {
             return NextResponse.json(result);
         }
     } catch (error: any) {
-        console.error('Erro não tratado durante o scraping:', error);
+        console.error('[DIAGNÓSTICO] Erro não tratado durante o scraping:', error);
 
         // Resposta de erro estruturada
         return NextResponse.json(
