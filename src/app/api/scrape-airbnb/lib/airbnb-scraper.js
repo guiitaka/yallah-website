@@ -2,23 +2,46 @@ const puppeteer = require('puppeteer-core');
 const chrome = require('@sparticuz/chromium');
 const fs = require('fs').promises;
 const path = require('path');
+const https = require('https');
+const http = require('http');
+
+// Importar utilitários de forma estática para evitar warnings de dependência crítica
+let browserFingerprint = {};
+let proxyRotator = {};
+let cookiesManager = {};
+let browserConfig = {};
+let scrapeHelpers = {};
 
 // Carregar utilitários com tratamento de erro para maior resiliência
-const loadUtility = (modulePath) => {
-    try {
-        return require(modulePath);
-    } catch (error) {
-        console.warn(`Aviso: Não foi possível carregar o módulo ${modulePath}: ${error.message}`);
-        return {}; // Retornar objeto vazio como fallback
-    }
-};
+try {
+    browserFingerprint = require('../utils/browser-fingerprint');
+} catch (error) {
+    console.warn(`Aviso: Não foi possível carregar o módulo browser-fingerprint: ${error.message}`);
+}
 
-// Carregar módulos de utilitários com tratamento de erro
-const browserFingerprint = loadUtility('../utils/browser-fingerprint');
-const proxyRotator = loadUtility('../utils/proxy-rotator');
-const cookiesManager = loadUtility('../utils/cookies-manager');
-const browserConfig = loadUtility('../utils/browser-config');
-const scrapeHelpers = loadUtility('../utils/scrape-helpers');
+try {
+    proxyRotator = require('../utils/proxy-rotator');
+} catch (error) {
+    console.warn(`Aviso: Não foi possível carregar o módulo proxy-rotator: ${error.message}`);
+}
+
+try {
+    cookiesManager = require('../utils/cookies-manager');
+} catch (error) {
+    console.warn(`Aviso: Não foi possível carregar o módulo cookies-manager: ${error.message}`);
+}
+
+try {
+    browserConfig = require('../utils/browser-config');
+} catch (error) {
+    console.warn(`Aviso: Não foi possível carregar o módulo browser-config: ${error.message}`);
+}
+
+try {
+    scrapeHelpers = require('../utils/scrape-helpers');
+} catch (error) {
+    console.warn(`Aviso: Não foi possível carregar o módulo scrape-helpers: ${error.message}`);
+}
 
 // Caminho para armazenar cookies de sessões bem-sucedidas
 // Em ambientes sem acesso a disco, usaremos memória
@@ -896,6 +919,54 @@ async function setupBrowserEvasion(page, userAgent) {
 }
 
 /**
+ * Testa se um proxy está funcionando
+ * @param {Object} proxy - Objeto proxy com host, port e protocol
+ * @returns {Promise<boolean>} - true se o proxy funcionar
+ */
+async function testProxy(proxy) {
+    try {
+        // Implementação básica para Node sem necessidade de dependências adicionais
+        const protocol = proxy.protocol === 'https' ? https : http;
+        const url = new URL('https://www.airbnb.com');
+
+        return new Promise((resolve) => {
+            const timeoutId = setTimeout(() => {
+                resolve(false);
+            }, 5000);
+
+            const req = protocol.request({
+                host: proxy.host,
+                port: proxy.port,
+                path: url.pathname,
+                method: 'HEAD',
+                timeout: 5000,
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                }
+            }, (res) => {
+                clearTimeout(timeoutId);
+                resolve(res.statusCode < 400);
+            });
+
+            req.on('error', () => {
+                clearTimeout(timeoutId);
+                resolve(false);
+            });
+
+            req.on('timeout', () => {
+                req.destroy();
+                clearTimeout(timeoutId);
+                resolve(false);
+            });
+
+            req.end();
+        });
+    } catch (error) {
+        return false;
+    }
+}
+
+/**
  * Tenta diferentes abordagens para extrair dados do Airbnb
  */
 async function executeScrapingWithRetry(url, maxRetries = 3) {
@@ -916,11 +987,15 @@ async function executeScrapingWithRetry(url, maxRetries = 3) {
 
     // Tentar obter um proxy (opcional)
     try {
-        proxyServer = await proxyRotator.getWorkingProxy();
-        if (proxyServer) {
-            console.log(`Usando proxy: ${proxyServer.host}:${proxyServer.port}`);
+        if (proxyRotator && proxyRotator.getWorkingProxy) {
+            proxyServer = await proxyRotator.getWorkingProxy();
+            if (proxyServer) {
+                console.log(`Usando proxy: ${proxyServer.host}:${proxyServer.port}`);
+            } else {
+                console.log('Nenhum proxy disponível, usando conexão direta');
+            }
         } else {
-            console.log('Nenhum proxy disponível, usando conexão direta');
+            console.log('Módulo de proxy não disponível, usando conexão direta');
         }
     } catch (error) {
         console.log('Erro ao tentar obter proxy, continuando sem proxy:', error.message);
@@ -1036,9 +1111,14 @@ async function executeScrapingWithRetry(url, maxRetries = 3) {
                     // Se estamos usando proxy e falhou, tentar obter um novo proxy
                     if (proxyServer && attempt < maxRetries - 1) {
                         try {
-                            proxyServer = await proxyRotator.getWorkingProxy();
-                            if (proxyServer) {
-                                console.log(`Tentando novo proxy: ${proxyServer.host}:${proxyServer.port}`);
+                            if (proxyRotator && proxyRotator.getWorkingProxy) {
+                                proxyServer = await proxyRotator.getWorkingProxy();
+                                if (proxyServer) {
+                                    console.log(`Tentando novo proxy: ${proxyServer.host}:${proxyServer.port}`);
+                                }
+                            } else {
+                                console.log('Módulo de proxy não disponível para rotação');
+                                proxyServer = null;
                             }
                         } catch (e) {
                             console.log('Erro ao obter novo proxy:', e.message);
