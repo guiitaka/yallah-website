@@ -18,13 +18,35 @@ interface ScraperResult {
     data: any;
 }
 
-// URL do serviço de scraping no Render - Usando a variável configurada na Vercel
-const RENDER_SCRAPER_URL = process.env.NEXT_PUBLIC_SCRAPER_API_URL || 'https://airbnb-scraper-api.onrender.com/scrape-airbnb';
+// URL base do serviço de scraping no Render - Usando a variável configurada na Vercel
+const RENDER_SCRAPER_BASE_URL = process.env.NEXT_PUBLIC_SCRAPER_API_URL || 'https://airbnb-scraper-api.onrender.com';
+// Caminho para o endpoint de scraping
+const SCRAPE_ENDPOINT = '/scrape-airbnb';
 
 // Função para verificar se estamos no ambiente Vercel
 const isVercelEnvironment = () => {
     return !!process.env.VERCEL || process.env.VERCEL_ENV;
 };
+
+// Função para verificar o status da API antes de fazer a requisição
+async function checkApiStatus() {
+    try {
+        // Tenta acessar a raiz da API, não o endpoint de scraping
+        const response = await fetch(RENDER_SCRAPER_BASE_URL, {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+            return { online: true };
+        }
+
+        return { online: false, status: response.status };
+    } catch (error: any) {  // Especificando o tipo como 'any' para evitar o erro unknown
+        console.error('Erro ao verificar status da API:', error);
+        return { online: false, error: error.message };
+    }
+}
 
 export async function POST(request: Request) {
     try {
@@ -55,10 +77,30 @@ export async function POST(request: Request) {
 
         // Se estamos na Vercel, redirecionar para o Render
         if (isVercelEnvironment()) {
-            console.log(`Ambiente Vercel detectado. Redirecionando requisição para Render: ${RENDER_SCRAPER_URL}`);
+            console.log(`Ambiente Vercel detectado. Verificando disponibilidade da API: ${RENDER_SCRAPER_BASE_URL}`);
+
+            // Verificar se a API está online
+            const apiStatus = await checkApiStatus();
+            if (!apiStatus.online) {
+                console.error('API de scraping offline:', apiStatus);
+                return NextResponse.json(
+                    {
+                        status: 'error',
+                        step: 1,
+                        totalSteps: 4,
+                        message: 'Serviço de scraping indisponível no momento',
+                        error: `API offline: ${JSON.stringify(apiStatus)}`,
+                        data: {}
+                    },
+                    { status: 503 }
+                );
+            }
+
+            console.log(`API online. Redirecionando requisição para: ${RENDER_SCRAPER_BASE_URL}${SCRAPE_ENDPOINT}`);
 
             try {
-                const renderResponse = await fetch(RENDER_SCRAPER_URL, {
+                // Combinar URL base com o endpoint para o POST
+                const renderResponse = await fetch(`${RENDER_SCRAPER_BASE_URL}${SCRAPE_ENDPOINT}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
