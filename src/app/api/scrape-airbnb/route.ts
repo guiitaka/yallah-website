@@ -11,8 +11,6 @@ export const maxDuration = 60; // Limite do plano gratuito da Vercel
 // Definir o tipo de retorno do scraper para o TypeScript
 interface ScraperResult {
     status: string;
-    step: number;
-    totalSteps: number;
     message: string;
     error?: string;
     data: any;
@@ -101,9 +99,9 @@ export async function POST(request: Request) {
     try {
         console.log('[DIAGNÓSTICO] Iniciando processamento de requisição POST');
         const requestData = await request.json();
-        const { url, step = 1 } = requestData;
+        const { url } = requestData;
 
-        console.log('[DIAGNÓSTICO] Dados da requisição:', { url, step });
+        console.log('[DIAGNÓSTICO] Dados da requisição:', { url });
 
         // Validação mais flexível para URLs do Airbnb
         const isValidUrl = url && (
@@ -117,8 +115,6 @@ export async function POST(request: Request) {
             return NextResponse.json(
                 {
                     status: 'error',
-                    step: 1,
-                    totalSteps: 4,
                     message: 'URL inválida. Por favor, forneça uma URL válida do Airbnb',
                     error: 'The URL did not match the expected Airbnb listing pattern',
                     data: {}
@@ -140,8 +136,6 @@ export async function POST(request: Request) {
                 return NextResponse.json(
                     {
                         status: 'error',
-                        step: 1,
-                        totalSteps: 4,
                         message: 'Serviço de scraping indisponível no momento',
                         error: `API offline: ${JSON.stringify(apiStatus)}`,
                         data: {}
@@ -187,8 +181,6 @@ export async function POST(request: Request) {
                 return NextResponse.json(
                     {
                         status: 'error',
-                        step: 1,
-                        totalSteps: 4,
                         message: 'Erro ao conectar com o serviço de scraping',
                         error: error.message || 'Erro desconhecido na conexão com Render',
                         data: {}
@@ -198,10 +190,10 @@ export async function POST(request: Request) {
             }
         } else {
             // No ambiente Render, executar o scraping localmente
-            console.log(`Ambiente Render detectado. Iniciando scraping local para: ${url}, Etapa: ${step}`);
+            console.log(`Ambiente Render detectado. Iniciando scraping local para: ${url}`);
 
             // Usar nosso scraper local
-            const result = await scrapeAirbnb(url, step) as ScraperResult;
+            const result = await scrapeAirbnb(url) as ScraperResult;
 
             // Verificar se obtivemos dados válidos
             if (result.status === 'error') {
@@ -221,8 +213,6 @@ export async function POST(request: Request) {
         return NextResponse.json(
             {
                 status: 'error',
-                step: 1,
-                totalSteps: 4,
                 message: 'Ocorreu um erro inesperado durante o scraping',
                 error: error.message || 'Erro desconhecido',
                 data: {}
