@@ -20,7 +20,7 @@ import { Property } from '@/data/sampleProperties'
 const MapComponent = dynamic(() => import('../MapComponent'), { ssr: false })
 
 // Componente FavoriteButton
-const FavoriteButton = ({ propertyId }: { propertyId: number }) => {
+const FavoriteButton = ({ propertyId }: { propertyId: number | string }) => {
     const [isFavorite, setIsFavorite] = useState(false);
 
     useEffect(() => {
@@ -34,7 +34,7 @@ const FavoriteButton = ({ propertyId }: { propertyId: number }) => {
 
     const toggleFavorite = (e: React.MouseEvent) => {
         e.stopPropagation();
-        let favorites: number[] = [];
+        let favorites: (number | string)[] = [];
         const storedFavorites = localStorage.getItem('yallah_favorites');
 
         if (storedFavorites) {
@@ -450,7 +450,7 @@ const calculateNights = (checkIn: Date | null, checkOut: Date | null): number =>
 
 export default function AllProperties() {
     // Estados para controlar a expansão de cards
-    const [expandedCard, setExpandedCard] = useState<number | null>(null)
+    const [expandedCard, setExpandedCard] = useState<number | string | null>(null)
     const [isTransitioning, setIsTransitioning] = useState(false)
     const [isClosing, setIsClosing] = useState(false)
     // Estados para inputs de data
@@ -463,6 +463,13 @@ export default function AllProperties() {
     const [currentSlide, setCurrentSlide] = useState(0);
     const itemsPerPage = 10; // 5 cards por linha, 2 linhas
     const totalSlides = Math.ceil(staticAllProperties.length / itemsPerPage);
+
+    // Função para atualizar o intervalo de datas
+    const setDateRange = (update: [Date | null, Date | null]) => {
+        const [start, end] = update;
+        setStartDate(start);
+        setEndDate(end);
+    };
 
     // Use the hook to fetch properties from Firebase
     const { properties: firebaseProperties, loading: loadingProperties } = useProperties({
@@ -508,7 +515,7 @@ export default function AllProperties() {
     };
 
     // Função para expandir um card
-    const expandCard = (propertyId: number) => {
+    const expandCard = (propertyId: number | string) => {
         if (expandedCard === propertyId) {
             // Se clicar no mesmo card já expandido, colapsa
             setIsClosing(true);
