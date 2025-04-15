@@ -4,17 +4,17 @@ import { getFirestore, collection } from 'firebase/firestore';
 
 // Configuração do Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyCDYcCTzJXapKq-XbScFRXF0tKOyFrRTjQ",
-    authDomain: "yallah-admin.firebaseapp.com",
-    projectId: "yallah-admin",
-    storageBucket: "yallah-admin.appspot.com",
-    messagingSenderId: "969314011610",
-    appId: "1:969314011610:web:2bf93b97a7fd56b49398e3"
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
 // Para debug - verificar se a configuração está sendo carregada corretamente
 console.log('Firebase Config carregada:', {
-    apiKey: firebaseConfig.apiKey.substring(0, 5) + '...',
+    apiKey: firebaseConfig.apiKey?.substring(0, 5) + '...',
     projectId: firebaseConfig.projectId
 });
 
