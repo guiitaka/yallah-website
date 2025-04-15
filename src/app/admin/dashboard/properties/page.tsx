@@ -23,6 +23,14 @@ import { normalizeAmenities, categorizeAmenities } from '@/utils/amenities-utils
 import AdminHeader from '@/components/admin/Header';
 import { checkScraperStatus } from '@/utils/airbnb-scraper';
 import { ApiStatusIndicator } from '@/components/admin/ApiStatus';
+import {
+    saveProperty,
+    updateProperty,
+    deleteProperty,
+    fetchProperties,
+    fetchFilteredProperties,
+    uploadMultiplePropertyImages
+} from '@/services/propertyService';
 
 // Componente para renderizar amenities com ícones
 const PropertyAmenityItem = ({ amenity }: { amenity: { text: string; svgIcon?: string; category?: string } }) => {
@@ -159,7 +167,8 @@ export default function PropertiesPage() {
     const pathname = usePathname();
     const [username, setUsername] = useState<string>('');
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState<boolean>(false);
-    const [properties, setProperties] = useState<Property[]>(sampleProperties);
+    const [properties, setProperties] = useState<Property[]>([]);
+    const [loadingProperties, setLoadingProperties] = useState<boolean>(true);
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [filterStatus, setFilterStatus] = useState<string>('all');
     const [showAddModal, setShowAddModal] = useState<boolean>(false);
@@ -172,6 +181,8 @@ export default function PropertiesPage() {
     const [isImporting, setIsImporting] = useState<boolean>(false);
     const [importProgress, setImportProgress] = useState<ImportProgress>({ step: 0, total: 3, message: '' });
     const [importedData, setImportedData] = useState<any>(null);
+    const [imageUploadProgress, setImageUploadProgress] = useState<number>(0);
+    const [isUploadingImages, setIsUploadingImages] = useState<boolean>(false);
 
     const [formData, setFormData] = useState<FormData>({
         id: '',
@@ -242,17 +253,109 @@ export default function PropertiesPage() {
         });
     };
 
-    const handleAddProperty = () => {
-        const newProperty: Property = {
-            ...formData,
-            id: (Math.random() * 1000000).toString(),
-            amenities: formData.amenities || [],
-            images: formData.images || [],
-        };
+    const handleAddProperty = async () => {
+        try {
+            // Preparar os dados da propriedade (sem o ID, que será gerado pelo Firebase)
+            const propertyData: Omit<Property, 'id'> = {
+                title: formData.title,
+                description: formData.description,
+                type: formData.type,
+                location: formData.location,
+                price: formData.price,
+                bedrooms: formData.bedrooms,
+                bathrooms: formData.bathrooms,
+                beds: formData.beds || 1,
+                guests: formData.guests || 2,
+                area: formData.area,
+                status: formData.status,
+                featured: formData.featured,
+                images: [], // Será atualizado após o upload
+                amenities: formData.amenities || [],
+                categorizedAmenities: formData.categorizedAmenities || {},
+                houseRules: formData.houseRules || {
+                    checkIn: '15:00',
+                    checkOut: '11:00',
+                    maxGuests: 2,
+                    additionalRules: [],
+                },
+                safety: formData.safety || {
+                    hasCoAlarm: false,
+                    hasSmokeAlarm: false,
+                    hasCameras: false,
+                },
+                cancellationPolicy: formData.cancellationPolicy || 'Flexível'
+            };
 
-        setProperties([...properties, newProperty]);
-        resetForm();
-        setShowAddModal(false);
+            // Salvar a propriedade no Firebase
+            const propertyId = await saveProperty(propertyData);
+
+            // Converter as URLs de objeto para arquivos (se estiverem na memória)
+            // ou manter as URLs remotas
+            const imageFiles: File[] = [];
+            const remoteUrls: string[] = [];
+
+            // Processar as imagens
+            if (formData.images && formData.images.length > 0) {
+                setIsUploadingImages(true);
+
+                for (const imageUrl of formData.images) {
+                    // Se for uma URL de objeto local
+                    if (imageUrl.startsWith('blob:') || imageUrl.startsWith('data:')) {
+                        try {
+                            // Converter para arquivo
+                            const response = await fetch(imageUrl);
+                            const blob = await response.blob();
+                            const file = new File([blob], `image-${Date.now()}.jpg`, { type: 'image/jpeg' });
+                            imageFiles.push(file);
+                        } catch (error) {
+                            console.error('Erro ao processar imagem local:', error);
+                        }
+                    } else {
+                        // Se for uma URL remota, adicionar diretamente
+                        remoteUrls.push(imageUrl);
+                    }
+                }
+
+                // Fazer upload das imagens
+                if (imageFiles.length > 0) {
+                    const uploadedUrls = await uploadMultiplePropertyImages(
+                        imageFiles,
+                        propertyId,
+                        (progress) => {
+                            setImageUploadProgress(progress);
+                        }
+                    );
+
+                    // Atualizar a propriedade com as URLs das imagens
+                    await updateProperty(propertyId, {
+                        images: [...remoteUrls, ...uploadedUrls]
+                    });
+                } else if (remoteUrls.length > 0) {
+                    // Se só tiver URLs remotas, atualizar diretamente
+                    await updateProperty(propertyId, { images: remoteUrls });
+                }
+
+                setIsUploadingImages(false);
+            }
+
+            // Atualizar a lista na interface
+            const newProperty: Property = {
+                ...propertyData,
+                id: propertyId,
+                // Usar as URLs das imagens já processadas
+                images: [...remoteUrls, ...imageFiles.map(() => '')]
+            };
+
+            setProperties(prev => [...prev, newProperty]);
+            resetForm();
+            setShowAddModal(false);
+
+            // Recarregar as propriedades para ter os dados atualizados
+            loadPropertiesFromFirebase();
+        } catch (error) {
+            console.error('Erro ao adicionar propriedade:', error);
+            alert('Erro ao adicionar propriedade. Tente novamente.');
+        }
     };
 
     const handleEditProperty = (property: Property) => {
@@ -290,47 +393,104 @@ export default function PropertiesPage() {
         setShowEditModal(true);
     };
 
-    const handleUpdateProperty = () => {
+    const handleUpdateProperty = async () => {
         if (!currentProperty) return;
 
-        const updatedProperties = properties.map(p => {
-            if (p.id === currentProperty.id) {
-                return {
-                    ...p,
-                    title: formData.title as string,
-                    price: formData.price as number,
-                    location: formData.location as string,
-                    type: formData.type as string,
-                    bedrooms: formData.bedrooms as number,
-                    bathrooms: formData.bathrooms as number,
-                    area: formData.area as number,
-                    status: formData.status as 'available' | 'rented' | 'maintenance',
-                    images: formData.images as string[],
-                    featured: formData.featured as boolean,
-                    description: formData.description || '',
-                    beds: formData.beds || 1,
-                    guests: formData.guests || 2,
-                    amenities: formData.amenities || [],
-                    categorizedAmenities: formData.categorizedAmenities || {},
-                    houseRules: formData.houseRules || {
-                        checkIn: '15:00',
-                        checkOut: '11:00',
-                        maxGuests: 2,
-                        additionalRules: [],
-                    },
-                    safety: formData.safety || {
-                        hasCoAlarm: false,
-                        hasSmokeAlarm: false,
-                        hasCameras: false,
-                    },
-                    cancellationPolicy: formData.cancellationPolicy || 'Flexível'
-                };
-            }
-            return p;
-        });
+        try {
+            // Preparar os dados atualizados
+            const propertyData: Partial<Property> = {
+                title: formData.title,
+                price: formData.price,
+                location: formData.location,
+                type: formData.type,
+                bedrooms: formData.bedrooms,
+                bathrooms: formData.bathrooms,
+                area: formData.area,
+                status: formData.status,
+                featured: formData.featured,
+                description: formData.description || '',
+                beds: formData.beds || 1,
+                guests: formData.guests || 2,
+                amenities: formData.amenities || [],
+                categorizedAmenities: formData.categorizedAmenities || {},
+                houseRules: formData.houseRules || {
+                    checkIn: '15:00',
+                    checkOut: '11:00',
+                    maxGuests: 2,
+                    additionalRules: [],
+                },
+                safety: formData.safety || {
+                    hasCoAlarm: false,
+                    hasSmokeAlarm: false,
+                    hasCameras: false,
+                },
+                cancellationPolicy: formData.cancellationPolicy || 'Flexível'
+            };
 
-        setProperties(updatedProperties);
-        setShowEditModal(false);
+            // Processar as imagens, similar ao processo de adição
+            const imageFiles: File[] = [];
+            const remoteUrls: string[] = [];
+
+            if (formData.images && formData.images.length > 0) {
+                setIsUploadingImages(true);
+
+                for (const imageUrl of formData.images) {
+                    if (imageUrl.startsWith('blob:') || imageUrl.startsWith('data:')) {
+                        try {
+                            const response = await fetch(imageUrl);
+                            const blob = await response.blob();
+                            const file = new File([blob], `image-${Date.now()}.jpg`, { type: 'image/jpeg' });
+                            imageFiles.push(file);
+                        } catch (error) {
+                            console.error('Erro ao processar imagem local:', error);
+                        }
+                    } else {
+                        remoteUrls.push(imageUrl);
+                    }
+                }
+
+                // Fazer upload apenas das novas imagens
+                if (imageFiles.length > 0) {
+                    const uploadedUrls = await uploadMultiplePropertyImages(
+                        imageFiles,
+                        currentProperty.id,
+                        (progress) => {
+                            setImageUploadProgress(progress);
+                        }
+                    );
+
+                    // Incluir as URLs no objeto de atualização
+                    propertyData.images = [...remoteUrls, ...uploadedUrls];
+                } else {
+                    propertyData.images = remoteUrls;
+                }
+
+                setIsUploadingImages(false);
+            }
+
+            // Atualizar no Firebase
+            await updateProperty(currentProperty.id, propertyData);
+
+            // Atualizar a lista localmente
+            const updatedProperties = properties.map(p => {
+                if (p.id === currentProperty.id) {
+                    return {
+                        ...p,
+                        ...propertyData
+                    };
+                }
+                return p;
+            });
+
+            setProperties(updatedProperties);
+            setShowEditModal(false);
+
+            // Recarregar as propriedades para ter os dados atualizados
+            loadPropertiesFromFirebase();
+        } catch (error) {
+            console.error('Erro ao atualizar propriedade:', error);
+            alert('Erro ao atualizar propriedade. Tente novamente.');
+        }
     };
 
     const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -640,8 +800,51 @@ export default function PropertiesPage() {
         setImportedData(null);
     };
 
-    // Adicionando verificação de loading antes de renderizar o conteúdo
-    if (loading) {
+    // Carregar propriedades do Firebase ao iniciar
+    useEffect(() => {
+        if (!loading && user) {
+            loadPropertiesFromFirebase();
+        }
+    }, [loading, user]);
+
+    // Função para carregar propriedades do Firebase
+    const loadPropertiesFromFirebase = async () => {
+        try {
+            setLoadingProperties(true);
+            const propertiesData = await fetchProperties();
+
+            // Se não houver dados ainda no Firebase, usar os dados de exemplo
+            if (propertiesData.length === 0) {
+                setProperties(sampleProperties);
+            } else {
+                setProperties(propertiesData);
+            }
+        } catch (error) {
+            console.error('Erro ao carregar propriedades:', error);
+            // Em caso de erro, usar os dados de exemplo
+            setProperties(sampleProperties);
+        } finally {
+            setLoadingProperties(false);
+        }
+    };
+
+    // Função para remover propriedade
+    const handleDeleteProperty = async (id: string) => {
+        if (confirm('Tem certeza que deseja excluir esta propriedade?')) {
+            try {
+                await deleteProperty(id);
+
+                // Atualizar a lista localmente
+                setProperties(properties.filter(p => p.id !== id));
+            } catch (error) {
+                console.error('Erro ao excluir propriedade:', error);
+                alert('Erro ao excluir propriedade. Tente novamente.');
+            }
+        }
+    };
+
+    // Renderização condicionada à carga de propriedades
+    if (loading || loadingProperties) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
                 <div className="text-xl">Carregando...</div>
@@ -752,11 +955,7 @@ export default function PropertiesPage() {
                                                 <Pencil size={16} />
                                             </button>
                                             <button
-                                                onClick={() => {
-                                                    if (window.confirm('Tem certeza que deseja excluir este imóvel?')) {
-                                                        setProperties(properties.filter(p => p.id !== property.id));
-                                                    }
-                                                }}
+                                                onClick={() => handleDeleteProperty(property.id)}
                                                 className="bg-white/80 hover:bg-white text-red-600 rounded-full p-1.5"
                                             >
                                                 <Trash2 size={16} />
@@ -1264,6 +1463,24 @@ export default function PropertiesPage() {
                             )}
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* Adicionar indicador de progresso de upload nos modais de adição e edição */}
+            {isUploadingImages && (
+                <div className="mb-4">
+                    <p className="text-sm font-medium text-gray-700 mb-1">
+                        Enviando imagens...
+                    </p>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                        <div
+                            className="bg-[#8BADA4] h-2.5 rounded-full"
+                            style={{ width: `${imageUploadProgress}%` }}
+                        ></div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                        {Math.round(imageUploadProgress)}% concluído
+                    </p>
                 </div>
             )}
         </div>

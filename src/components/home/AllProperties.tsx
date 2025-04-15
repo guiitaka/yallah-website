@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -9,10 +9,12 @@ import {
     WifiHigh, Desktop, Television, Dog, House, Lightning, Fire, Calendar as CalendarIcon, CaretDown
 } from '@phosphor-icons/react'
 import DatePicker from 'react-datepicker'
-import { format } from 'date-fns'
+import { format, addDays, differenceInDays } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import "react-datepicker/dist/react-datepicker.css"
 import dynamic from 'next/dynamic'
+import { useProperties } from '@/hooks/useProperties'
+import { Property } from '@/data/sampleProperties'
 
 // Importação dinâmica do componente de mapa para evitar erros de SSR
 const MapComponent = dynamic(() => import('../MapComponent'), { ssr: false })
@@ -64,8 +66,24 @@ const FavoriteButton = ({ propertyId }: { propertyId: number }) => {
     );
 };
 
-// Dados para os imóveis de catálogo completo
-const allProperties = [
+// Define a type for the property data structure
+interface PropertyCard {
+    id: number | string;
+    title: string;
+    location: string;
+    details?: string;
+    features: string;
+    pricePerNight: number;
+    rating: number;
+    reviewCount: number;
+    image: string;
+    link?: string;
+    host?: string;
+    coordinates?: [number, number];
+}
+
+// Static property data as fallback
+const staticAllProperties: PropertyCard[] = [
     {
         id: 11,
         title: "Estúdio com decoração vintage",
@@ -432,19 +450,47 @@ const calculateNights = (checkIn: Date | null, checkOut: Date | null): number =>
 
 export default function AllProperties() {
     // Estados para controlar a expansão de cards
-    const [expandedCard, setExpandedCard] = useState<null | number>(null)
+    const [expandedCard, setExpandedCard] = useState<number | null>(null)
     const [isTransitioning, setIsTransitioning] = useState(false)
     const [isClosing, setIsClosing] = useState(false)
     // Estados para inputs de data
-    const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null])
-    const [startDate, endDate] = dateRange
+    const [startDate, setStartDate] = useState<Date | null>(null);
+    const [endDate, setEndDate] = useState<Date | null>(null);
     const [consultationMessage, setConsultationMessage] = useState('');
     // Estado para controlar a aba ativa
     const [activeTab, setActiveTab] = useState('descricao');
     // Estado para controlar o slide atual
     const [currentSlide, setCurrentSlide] = useState(0);
     const itemsPerPage = 10; // 5 cards por linha, 2 linhas
-    const totalSlides = Math.ceil(allProperties.length / itemsPerPage);
+    const totalSlides = Math.ceil(staticAllProperties.length / itemsPerPage);
+
+    // Use the hook to fetch properties from Firebase
+    const { properties: firebaseProperties, loading: loadingProperties } = useProperties({
+        realtime: true, // Real-time updates
+        sortBy: 'featured', // Sort by featured first
+        sortDirection: 'desc'
+    });
+
+    // Map Firebase properties to the format expected by the component
+    const firebaseMappedProperties = firebaseProperties.map((prop) => ({
+        id: Number(prop.id) || prop.id, // Convert to number if possible for compatibility
+        title: prop.title,
+        location: prop.location,
+        details: prop.description || "Espaço inteiro",
+        features: `${prop.guests || 2} hóspedes · ${prop.bedrooms} ${prop.bedrooms === 1 ? 'quarto' : 'quartos'} · ${prop.beds || prop.bedrooms} ${(prop.beds || prop.bedrooms) === 1 ? 'cama' : 'camas'} · ${prop.bathrooms} ${prop.bathrooms === 1 ? 'banheiro' : 'banheiros'}`,
+        pricePerNight: prop.price,
+        rating: 4.7, // Default rating
+        reviewCount: 30, // Default review count
+        image: prop.images && prop.images.length > 0 ? prop.images[0] : '/card1.jpg',
+        link: `/imoveis/${prop.id}`,
+        host: "Anfitrião",
+        coordinates: [-46.6554, -23.5646] // Default coordinates
+    }));
+
+    // Use Firebase properties if available, otherwise use static data
+    const allProperties = firebaseMappedProperties.length > 0
+        ? firebaseMappedProperties
+        : staticAllProperties; // Keep original reference as fallback
 
     // Função para navegar para o próximo slide
     const nextSlide = () => {
@@ -472,7 +518,8 @@ export default function AllProperties() {
                 setIsTransitioning(false);
                 setIsClosing(false);
                 // Resetar campos de formulário
-                setDateRange([null, null]);
+                setStartDate(null);
+                setEndDate(null);
                 setConsultationMessage('');
             }, 300);
         } else {
@@ -499,7 +546,8 @@ export default function AllProperties() {
                 setIsTransitioning(false);
                 setIsClosing(false);
                 // Resetar campos de formulário
-                setDateRange([null, null]);
+                setStartDate(null);
+                setEndDate(null);
                 setConsultationMessage('');
             }, 300);
         }
@@ -516,7 +564,8 @@ export default function AllProperties() {
                     setIsTransitioning(false);
                     setIsClosing(false);
                     // Resetar campos de formulário
-                    setDateRange([null, null]);
+                    setStartDate(null);
+                    setEndDate(null);
                     setConsultationMessage('');
                 }, 300);
             }
@@ -561,9 +610,24 @@ export default function AllProperties() {
 
         // Limpar as datas após alguns segundos
         setTimeout(() => {
-            setDateRange([null, null]);
+            setStartDate(null);
+            setEndDate(null);
         }, 5000);
     };
+
+    // Add a loading state if necessary
+    if (loadingProperties) {
+        return (
+            <div className="container mx-auto py-10">
+                <div className="text-center py-20">
+                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+                        <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Carregando...</span>
+                    </div>
+                    <p className="mt-2 text-gray-600">Carregando imóveis...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div id="all-properties" className="w-full py-12 md:py-16 -mt-8 md:-mt-16 bg-white overflow-hidden relative">
@@ -610,7 +674,7 @@ export default function AllProperties() {
                                                         <div
                                                             key={property.id}
                                                             className={`group relative rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1
-                                                                  ${expandedCard === property.id ? 'opacity-0 pointer-events-none' : 'z-10'}`}
+                                                              ${expandedCard === property.id ? 'opacity-0 pointer-events-none' : 'z-10'}`}
                                                             onClick={() => expandCard(property.id)}
                                                             style={{ borderRadius: '1.5rem' }}
                                                         >

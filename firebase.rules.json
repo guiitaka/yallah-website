@@ -1,0 +1,8 @@
+{
+  "firestore": {
+    "rules": "service cloud.firestore {\n  match /databases/{database}/documents {\n    // Base rule - authenticated users can read properties\n    match /properties/{propertyId} {\n      allow read: if true; // Anyone can read property data\n      allow write: if request.auth != null && request.auth.token.admin == true; // Only admin users can write\n    }\n    \n    // User profiles and preferences - users can read/write their own data\n    match /users/{userId} {\n      allow read, write: if request.auth != null && request.auth.uid == userId;\n    }\n    \n    // Admin dashboard collections\n    match /admin/{document=**} {\n      allow read, write: if request.auth != null && request.auth.token.admin == true;\n    }\n  }\n}"
+  },
+  "storage": {
+    "rules": "service firebase.storage {\n  match /b/{bucket}/o {\n    // Allow read access to all images in properties folder to anyone\n    match /properties/{propertyId}/images/{imageId} {\n      allow read: if true; // Allow public read access to property images\n      allow write: if request.auth != null && request.auth.token.admin == true; // Only admins can upload/modify images\n    }\n    \n    // User uploads - limit to authenticated users, for their own folders\n    match /users/{userId}/{allPaths=**} {\n      allow read: if request.auth != null && request.auth.uid == userId;\n      allow write: if request.auth != null && request.auth.uid == userId;\n    }\n    \n    // Admins can access everything\n    match /{allPaths=**} {\n      allow read, write: if request.auth != null && request.auth.token.admin == true;\n    }\n  }\n}"
+  }
+} 

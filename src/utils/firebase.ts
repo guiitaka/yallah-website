@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { getAuth, setPersistence, browserSessionPersistence } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, collection } from 'firebase/firestore';
 
 // Configuração do Firebase
 const firebaseConfig = {
@@ -31,6 +31,10 @@ setPersistence(auth, browserSessionPersistence)
         console.error('Erro ao configurar persistência:', error);
     });
 
+// Inicializa o Firestore
 const db = getFirestore(app);
 
-export { app, auth, db }; 
+// Referências de coleções no Firestore
+const propertiesCollection = collection(db, 'properties');
+
+export { app, auth, db, propertiesCollection }; 
