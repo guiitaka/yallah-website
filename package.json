@@ -12,7 +12,7 @@
     "firebase:deploy-rules": "node deploy-firebase-rules.js",
     "firebase:populate": "node scripts/populate-firebase.js",
     "firebase:install-admin": "npm install firebase-admin --save-dev",
-    "cloudinary:test": "node -e \"require('./src/utils/cloudinary').cloudinary.api.ping((error, result) => console.log(error || 'Cloudinary conectado com sucesso!'))\"",
+    "cloudinary:test": "node scripts/test-cloudinary.js",
     "cloudinary:upload-test": "node scripts/test-cloudinary-upload.js"
   },
   "dependencies": {

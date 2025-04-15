@@ -1,11 +1,7 @@
-import { v2 as cloudinary } from 'cloudinary';
+'use client';
 
-// Configurar Cloudinary com suas credenciais
-cloudinary.config({
-    cloud_name: 'dqbytwump',
-    api_key: '269638673457278',
-    api_secret: '_LWJ6dsuG27ID7bSHsRJCuWcCpg',
-});
+// Versão cliente do Cloudinary que não usa módulos exclusivos de servidor
+// Usa a API pública do Cloudinary em vez de SDK no cliente
 
 /**
  * Função para fazer upload de imagem para o Cloudinary
@@ -15,30 +11,23 @@ cloudinary.config({
  */
 export const uploadImage = async (file: File, folder: string = 'properties'): Promise<string> => {
     try {
-        // Converter o arquivo para base64
-        const base64data = await convertFileToBase64(file);
+        // Convertemos para FormData para enviar para nossa API
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('folder', folder);
 
-        // Fazer o upload para o Cloudinary
-        const result = await new Promise<any>((resolve, reject) => {
-            cloudinary.uploader.upload(
-                base64data,
-                {
-                    folder: folder,
-                    resource_type: 'image',
-                    public_id: `${Date.now()}-${file.name.replace(/\.[^/.]+$/, "")}`, // Nome único com timestamp
-                    transformation: [
-                        { quality: 'auto' }, // Otimização automática de qualidade
-                        { fetch_format: 'auto' } // Formato automático baseado no navegador
-                    ]
-                },
-                (error, result) => {
-                    if (error) reject(error);
-                    else resolve(result);
-                }
-            );
+        // Chamamos nossa própria API que usa o SDK do Cloudinary no servidor
+        const response = await fetch('/api/cloudinary/upload', {
+            method: 'POST',
+            body: formData,
         });
 
-        return result.secure_url;
+        if (!response.ok) {
+            throw new Error('Falha ao fazer upload da imagem');
+        }
+
+        const data = await response.json();
+        return data.url;
     } catch (error) {
         console.error('Erro ao fazer upload para o Cloudinary:', error);
         throw new Error('Falha ao fazer upload da imagem');
@@ -51,52 +40,20 @@ export const uploadImage = async (file: File, folder: string = 'properties'): Pr
  */
 export const deleteImage = async (imageUrl: string): Promise<void> => {
     try {
-        // Extrair o public_id da URL
-        const publicId = extractPublicIdFromUrl(imageUrl);
-
-        if (!publicId) {
-            console.error('Não foi possível extrair o public_id da URL:', imageUrl);
-            return;
-        }
-
-        // Excluir a imagem
-        await new Promise<void>((resolve, reject) => {
-            cloudinary.uploader.destroy(
-                publicId,
-                { resource_type: 'image' },
-                (error) => {
-                    if (error) reject(error);
-                    else resolve();
-                }
-            );
+        // Chamamos nossa própria API para excluir
+        const response = await fetch('/api/cloudinary/delete', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ imageUrl }),
         });
+
+        if (!response.ok) {
+            throw new Error('Falha ao excluir a imagem');
+        }
     } catch (error) {
         console.error('Erro ao excluir imagem do Cloudinary:', error);
         throw new Error('Falha ao excluir a imagem');
     }
-};
-
-/**
- * Função auxiliar para converter File para base64
- */
-const convertFileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = (error) => reject(error);
-    });
-};
-
-/**
- * Função auxiliar para extrair o public_id de uma URL do Cloudinary
- */
-const extractPublicIdFromUrl = (url: string): string | null => {
-    // URL example: https://res.cloudinary.com/dqbytwump/image/upload/v1234567890/properties/1234567890-image.jpg
-    const regex = /\/v\d+\/([^/]+\/[^.]+)/;
-    const match = url.match(regex);
-    return match ? match[1] : null;
-};
-
-// Exportar o objeto cloudinary para uso em outros arquivos
-export { cloudinary }; 
+}; 
