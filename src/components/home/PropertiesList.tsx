@@ -8,23 +8,26 @@ import { useProperties } from '@/hooks/useProperties';
 
 // Função para extrair e formatar o bairro do endereço completo
 const formatLocationForPublic = (fullAddress: string): string => {
+    if (!fullAddress) return 'São Paulo';
+
     // Dividir o endereço por vírgulas e remover espaços extras
     const parts = fullAddress.split(',').map(part => part.trim());
 
-    // Se tiver partes suficientes, pegar apenas o bairro (geralmente o segundo elemento)
+    // Se tiver partes suficientes, tentar encontrar o bairro
     if (parts.length >= 2) {
         // Verificar se há um número no primeiro elemento (rua com número)
         const hasStreetNumber = /\d/.test(parts[0]);
 
-        // Se tiver número, pegar apenas o bairro, caso contrário pode ser apenas um bairro/região
-        if (hasStreetNumber) {
-            return parts[1]; // Geralmente o bairro
+        // Se tiver número, o bairro geralmente é a segunda parte
+        if (hasStreetNumber && parts[1]) {
+            return parts[1]; // Retorna o bairro
         } else {
-            return parts[0]; // Se não tiver número, pode ser apenas o bairro
+            // Caso não tenha número ou a segunda parte não exista, retorna a primeira parte
+            return parts[0];
         }
     }
 
-    // Se não conseguir separar, retornar apenas "Localização em São Paulo"
+    // Se não conseguir separar, retornar apenas "São Paulo"
     return 'São Paulo';
 };
 
