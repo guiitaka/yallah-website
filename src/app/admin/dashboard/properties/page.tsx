@@ -1057,8 +1057,8 @@ export default function PropertiesPage() {
             {/* Add Modal - placeholder for now */}
             {showAddModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto p-4">
-                    <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] relative">
-                        <div className="p-6 overflow-y-auto pb-20" style={{ maxHeight: 'calc(90vh - 60px)' }}>
+                    <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] flex flex-col">
+                        <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 120px)' }}>
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-xl font-semibold text-gray-800">Adicionar Novo Imóvel</h2>
                                 <button
@@ -1309,25 +1309,24 @@ export default function PropertiesPage() {
                                     </div>
                                 </div>
                             </div>
-
-                            <div className="border-t border-gray-200 mt-6 pt-6 flex justify-end space-x-4 sticky bottom-0 bg-white pb-6 z-50 px-6 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] w-full left-0 right-0">
-                                <button
-                                    onClick={() => {
-                                        resetForm();
-                                        setShowAddModal(false);
-                                    }}
-                                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                                >
-                                    Cancelar
-                                </button>
-                                <button
-                                    onClick={handleAddProperty}
-                                    className="px-6 py-2 bg-[#8BADA4] text-white rounded-lg hover:bg-opacity-90"
-                                    disabled={!formData.title || !formData.location || formData.price <= 0}
-                                >
-                                    Adicionar Imóvel
-                                </button>
-                            </div>
+                        </div>
+                        <div className="border-t border-gray-200 p-6 flex justify-end space-x-4 bg-white">
+                            <button
+                                onClick={() => {
+                                    resetForm();
+                                    setShowAddModal(false);
+                                }}
+                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleAddProperty}
+                                className="px-6 py-2 bg-[#8BADA4] text-white rounded-lg hover:bg-opacity-90"
+                                disabled={!formData.title || !formData.location || formData.price <= 0}
+                            >
+                                Adicionar Imóvel
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1336,8 +1335,8 @@ export default function PropertiesPage() {
             {/* Import Modal */}
             {showImportModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto p-4">
-                    <div className="bg-white rounded-lg shadow-lg w-full max-w-md max-h-[90vh] relative">
-                        <div className="p-6 overflow-y-auto pb-20" style={{ maxHeight: 'calc(90vh - 60px)' }}>
+                    <div className="bg-white rounded-lg shadow-lg w-full max-w-md max-h-[90vh] flex flex-col">
+                        <div className="p-6 flex-grow overflow-y-auto" style={{ maxHeight: 'calc(90vh - 120px)' }}>
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-xl font-semibold text-gray-800">
                                     {isImporting
@@ -1424,24 +1423,6 @@ export default function PropertiesPage() {
                                             )}
                                         </div>
                                     )}
-
-                                    <div className="flex justify-end mt-6 space-x-4">
-                                        <button
-                                            onClick={() => {
-                                                setImportedData(null);
-                                                setImportUrl('');
-                                            }}
-                                            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                                        >
-                                            Cancelar
-                                        </button>
-                                        <button
-                                            onClick={handleUseImportedData}
-                                            className="px-6 py-2 bg-[#8BADA4] text-white rounded-lg hover:bg-opacity-90"
-                                        >
-                                            Usar Estes Dados
-                                        </button>
-                                    </div>
                                 </div>
                             )}
 
@@ -1470,27 +1451,50 @@ export default function PropertiesPage() {
                                             <p className="text-red-500 text-sm mt-2">{importError}</p>
                                         )}
                                     </div>
+                                </div>
+                            )}
+                        </div>
 
-                                    {/* Buttons */}
-                                    <div className="flex justify-end space-x-4">
+                        {/* Botões fixos no fundo */}
+                        {!isImporting && (
+                            <div className="border-t border-gray-200 p-6 flex justify-end space-x-4 bg-white">
+                                {importedData ? (
+                                    <>
+                                        <button
+                                            onClick={() => {
+                                                setImportedData(null);
+                                                setImportUrl('');
+                                            }}
+                                            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                                        >
+                                            Cancelar
+                                        </button>
+                                        <button
+                                            onClick={handleUseImportedData}
+                                            className="px-6 py-2 bg-[#8BADA4] text-white rounded-lg hover:bg-opacity-90"
+                                        >
+                                            Usar Estes Dados
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
                                         <button
                                             onClick={() => setShowImportModal(false)}
                                             className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
-                                            disabled={isImporting}
                                         >
                                             Cancelar
                                         </button>
                                         <button
                                             onClick={handleImportProperty}
-                                            className={`px-6 py-2 ${isImporting ? 'bg-[#8BADA4]/70' : 'bg-[#8BADA4]'} text-white rounded-lg hover:bg-opacity-90 flex items-center justify-center min-w-[140px]`}
-                                            disabled={isImporting || !importUrl.trim() || !importUrl.includes('airbnb')}
+                                            className="px-6 py-2 bg-[#8BADA4] text-white rounded-lg hover:bg-opacity-90 flex items-center justify-center min-w-[140px]"
+                                            disabled={!importUrl.trim() || !importUrl.includes('airbnb')}
                                         >
-                                            {isImporting ? 'Importando...' : 'Importar Imóvel'}
+                                            Importar Imóvel
                                         </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                                    </>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
