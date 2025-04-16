@@ -23,6 +23,7 @@ import { normalizeAmenities, categorizeAmenities } from '@/utils/amenities-utils
 import AdminHeader from '@/components/admin/Header';
 import { checkScraperStatus } from '@/utils/airbnb-scraper';
 import { ApiStatusIndicator } from '@/components/admin/ApiStatus';
+import MapboxSearch from '@/components/MapboxSearch';
 import {
     saveProperty,
     updateProperty,
@@ -107,6 +108,10 @@ interface FormData {
     description: string;
     type: string;
     location: string;
+    coordinates: {
+        lat: number;
+        lng: number;
+    } | null;
     price: number;
     bedrooms: number;
     bathrooms: number;
@@ -190,6 +195,7 @@ export default function PropertiesPage() {
         description: '',
         type: '',
         location: '',
+        coordinates: null,
         price: 0,
         bedrooms: 0,
         bathrooms: 0,
@@ -219,6 +225,18 @@ export default function PropertiesPage() {
         'Apartamento', 'Casa', 'Cobertura', 'Studio', 'Flat', 'Kitnet', 'Loft'
     ]);
 
+    // Handlers para o MapboxSearch
+    const handleLocationSelect = (locationData: { address: string; coordinates: [number, number] }) => {
+        setFormData(prev => ({
+            ...prev,
+            location: locationData.address,
+            coordinates: {
+                lat: locationData.coordinates[1],
+                lng: locationData.coordinates[0]
+            }
+        }));
+    };
+
     // Form handling functions
     const resetForm = () => {
         setFormData({
@@ -227,6 +245,7 @@ export default function PropertiesPage() {
             description: '',
             type: '',
             location: '',
+            coordinates: null,
             price: 0,
             bedrooms: 0,
             bathrooms: 0,
@@ -261,6 +280,7 @@ export default function PropertiesPage() {
                 description: formData.description,
                 type: formData.type,
                 location: formData.location,
+                coordinates: formData.coordinates,
                 price: formData.price,
                 bedrooms: formData.bedrooms,
                 bathrooms: formData.bathrooms,
@@ -366,6 +386,7 @@ export default function PropertiesPage() {
             description: property.description || '',
             type: property.type,
             location: property.location,
+            coordinates: property.coordinates || null,
             price: property.price,
             bedrooms: property.bedrooms,
             bathrooms: property.bathrooms,
@@ -402,6 +423,7 @@ export default function PropertiesPage() {
                 title: formData.title,
                 price: formData.price,
                 location: formData.location,
+                coordinates: formData.coordinates,
                 type: formData.type,
                 bedrooms: formData.bedrooms,
                 bathrooms: formData.bathrooms,
@@ -766,6 +788,17 @@ export default function PropertiesPage() {
         // Categorize amenities
         const categorizedAmenities = categorizeAmenities(normalizedAmenities);
 
+        // Extract coordinates if available
+        let coordinates = null;
+        if (importedData.coordinates) {
+            coordinates = importedData.coordinates;
+        } else if (importedData.lat && importedData.lng) {
+            coordinates = {
+                lat: importedData.lat,
+                lng: importedData.lng
+            };
+        }
+
         // Update form state with imported data
         setFormData(prev => ({
             ...prev,
@@ -773,6 +806,7 @@ export default function PropertiesPage() {
             description: importedData.description || '',
             type: importedData.type || prev.type,
             location: importedData.address || importedData.location || '',
+            coordinates: coordinates,
             price: importedData.pricePerNight || 0,
             bedrooms: importedData.bedrooms || 1,
             bathrooms: importedData.bathrooms || 1,
@@ -1104,14 +1138,9 @@ export default function PropertiesPage() {
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
                                             Localização *
                                         </label>
-                                        <input
-                                            type="text"
-                                            name="location"
-                                            value={formData.location}
-                                            onChange={handleFormChange}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
-                                            placeholder="Ex: Brooklin, São Paulo"
-                                            required
+                                        <MapboxSearch
+                                            initialValue={formData.location}
+                                            onLocationSelect={handleLocationSelect}
                                         />
                                     </div>
 

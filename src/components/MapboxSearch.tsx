@@ -7,6 +7,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface MapboxSearchProps {
     onLocationSelect: (location: { address: string; coordinates: [number, number] }) => void;
+    initialValue?: string;
 }
 
 // Componente wrapper que só renderiza no cliente
@@ -26,12 +27,12 @@ const ClientSideMapboxSearch: React.FC<MapboxSearchProps> = (props) => {
     return <MapboxSearch {...props} />;
 };
 
-const MapboxSearch: React.FC<MapboxSearchProps> = ({ onLocationSelect }) => {
+const MapboxSearch: React.FC<MapboxSearchProps> = ({ onLocationSelect, initialValue = '' }) => {
     const mapContainer = useRef<HTMLDivElement>(null);
     const map = useRef<mapboxgl.Map | null>(null);
     const marker = useRef<mapboxgl.Marker | null>(null);
     const [mapError, setMapError] = useState<string | null>(null);
-    const [addressInput, setAddressInput] = useState('');
+    const [addressInput, setAddressInput] = useState(initialValue);
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [showResults, setShowResults] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
@@ -39,6 +40,13 @@ const MapboxSearch: React.FC<MapboxSearchProps> = ({ onLocationSelect }) => {
         address: string;
         coordinates: [number, number];
     } | null>(null);
+
+    // Atualiza o addressInput quando o initialValue muda
+    useEffect(() => {
+        if (initialValue && initialValue !== addressInput) {
+            setAddressInput(initialValue);
+        }
+    }, [initialValue]);
 
     useEffect(() => {
         if (!mapContainer.current) return;
@@ -181,7 +189,13 @@ const MapboxSearch: React.FC<MapboxSearchProps> = ({ onLocationSelect }) => {
                         placeholder="Digite o endereço completo"
                         className="mt-4 w-full px-4 py-2 border border-gray-300 rounded-lg"
                         value={addressInput}
-                        onChange={handleManualAddressInput}
+                        onChange={(e) => {
+                            setAddressInput(e.target.value);
+                            onLocationSelect({
+                                address: e.target.value,
+                                coordinates: [-46.6333, -23.5505] // Coordenadas padrão de São Paulo
+                            });
+                        }}
                     />
                 </div>
             </div>
@@ -193,20 +207,20 @@ const MapboxSearch: React.FC<MapboxSearchProps> = ({ onLocationSelect }) => {
             {/* Map container */}
             <div
                 ref={mapContainer}
-                className="absolute inset-0 w-full h-full"
+                className="h-60 w-full rounded-lg overflow-hidden mb-2"
             />
 
             {/* Search overlay */}
-            <div className="absolute inset-x-8 top-8 z-10">
+            <div className="relative w-full z-10">
                 <div className="relative">
                     <form
-                        className="relative w-full bg-white/95 backdrop-blur-sm rounded-full shadow-lg flex items-stretch overflow-hidden border border-white/20"
+                        className="relative w-full bg-white rounded-md shadow-sm flex items-stretch overflow-hidden border border-gray-300"
                         onSubmit={handleAddressSubmit}
                     >
                         <div className="flex-1">
                             <input
-                                placeholder="Digite o endereço"
-                                className="w-full px-6 py-4 bg-transparent text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-0 text-base"
+                                placeholder="Digite o endereço do imóvel"
+                                className="w-full px-3 py-2 bg-transparent text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#8BADA4] text-base"
                                 value={addressInput}
                                 onChange={handleManualAddressInput}
                                 onFocus={() => {
@@ -219,7 +233,7 @@ const MapboxSearch: React.FC<MapboxSearchProps> = ({ onLocationSelect }) => {
                         <div className="flex-none">
                             <button
                                 type="submit"
-                                className="h-full px-5 bg-[#8BADA4] text-white hover:bg-[#7A9B94] transition-colors flex items-center"
+                                className="h-full px-3 bg-[#8BADA4] text-white hover:bg-[#7A9B94] transition-colors flex items-center"
                             >
                                 {isSearching ? (
                                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -232,12 +246,12 @@ const MapboxSearch: React.FC<MapboxSearchProps> = ({ onLocationSelect }) => {
 
                     {/* Search Results Dropdown */}
                     {showResults && searchResults.length > 0 && (
-                        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg max-h-60 overflow-y-auto z-20">
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-md shadow-lg max-h-60 overflow-y-auto z-20">
                             <ul>
                                 {searchResults.map((result) => (
                                     <li
                                         key={result.id}
-                                        className="px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-0"
+                                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-0"
                                         onClick={() => handleAddressSelect(result)}
                                     >
                                         <p className="text-gray-800">{result.place_name}</p>
@@ -249,17 +263,9 @@ const MapboxSearch: React.FC<MapboxSearchProps> = ({ onLocationSelect }) => {
                 </div>
             </div>
 
-            {/* Selected location popup at the bottom */}
-            {selectedLocation && (
-                <div className="absolute inset-x-8 bottom-8 z-10">
-                    <div className="px-4 py-3 bg-black/40 backdrop-blur-sm rounded-xl border border-white/10">
-                        <p className="text-white text-sm">
-                            <span className="text-white/60">Endereço selecionado:</span>{' '}
-                            {selectedLocation.address}
-                        </p>
-                    </div>
-                </div>
-            )}
+            <div className="text-xs text-gray-500 mt-1">
+                Selecione o endereço exato para a listagem. Este será mantido privado até a reserva.
+            </div>
         </div>
     );
 };
