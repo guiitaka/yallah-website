@@ -1057,8 +1057,8 @@ export default function PropertiesPage() {
             {/* Add Modal - placeholder for now */}
             {showAddModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto p-4">
-                    <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh]">
-                        <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 60px)' }}>
+                    <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] relative">
+                        <div className="p-6 overflow-y-auto pb-20" style={{ maxHeight: 'calc(90vh - 60px)' }}>
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-xl font-semibold text-gray-800">Adicionar Novo Imóvel</h2>
                                 <button
@@ -1310,7 +1310,7 @@ export default function PropertiesPage() {
                                 </div>
                             </div>
 
-                            <div className="border-t border-gray-200 mt-6 pt-6 flex justify-end space-x-4 sticky bottom-0 bg-white pb-6 z-10 px-6">
+                            <div className="border-t border-gray-200 mt-6 pt-6 flex justify-end space-x-4 sticky bottom-0 bg-white pb-6 z-50 px-6 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] w-full left-0 right-0">
                                 <button
                                     onClick={() => {
                                         resetForm();
@@ -1336,8 +1336,8 @@ export default function PropertiesPage() {
             {/* Import Modal */}
             {showImportModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto p-4">
-                    <div className="bg-white rounded-lg shadow-lg w-full max-w-md max-h-[90vh]">
-                        <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 60px)' }}>
+                    <div className="bg-white rounded-lg shadow-lg w-full max-w-md max-h-[90vh] relative">
+                        <div className="p-6 overflow-y-auto pb-20" style={{ maxHeight: 'calc(90vh - 60px)' }}>
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-xl font-semibold text-gray-800">
                                     {isImporting
