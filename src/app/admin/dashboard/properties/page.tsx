@@ -1281,7 +1281,7 @@ export default function PropertiesPage() {
                                         </button>
 
                                         {formData.images.length > 0 && (
-                                            <div className="mt-4 grid grid-cols-3 gap-4">
+                                            <div className="mt-4 grid grid-cols-3 gap-4 mb-10">
                                                 {formData.images.map((img, index) => (
                                                     <div key={index} className="relative">
                                                         <div className="h-20 w-full bg-gray-200 rounded-md overflow-hidden">
@@ -1310,7 +1310,7 @@ export default function PropertiesPage() {
                                 </div>
                             </div>
 
-                            <div className="border-t border-gray-200 mt-6 pt-6 flex justify-end space-x-4 sticky bottom-0 bg-white pb-1 z-10">
+                            <div className="border-t border-gray-200 mt-6 pt-6 flex justify-end space-x-4 sticky bottom-0 bg-white pb-6 z-10 px-6">
                                 <button
                                     onClick={() => {
                                         resetForm();

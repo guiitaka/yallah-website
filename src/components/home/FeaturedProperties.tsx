@@ -403,6 +403,28 @@ const calculateNights = (checkIn: Date | null, checkOut: Date | null): number =>
     return diffDays;
 };
 
+// Função para extrair e formatar o bairro do endereço completo
+const formatLocationForPublic = (fullAddress: string): string => {
+    // Dividir o endereço por vírgulas e remover espaços extras
+    const parts = fullAddress.split(',').map(part => part.trim());
+
+    // Se tiver partes suficientes, pegar apenas o bairro (geralmente o segundo elemento)
+    if (parts.length >= 2) {
+        // Verificar se há um número no primeiro elemento (rua com número)
+        const hasStreetNumber = /\d/.test(parts[0]);
+
+        // Se tiver número, pegar apenas o bairro, caso contrário pode ser apenas um bairro/região
+        if (hasStreetNumber) {
+            return parts[1]; // Geralmente o bairro
+        } else {
+            return parts[0]; // Se não tiver número, pode ser apenas o bairro
+        }
+    }
+
+    // Se não conseguir separar, retornar apenas "Localização em São Paulo"
+    return 'São Paulo';
+};
+
 export default function FeaturedProperties() {
     const [currentIndex, setCurrentIndex] = useState(0)
     const [touchStart, setTouchStart] = useState(0)
@@ -840,12 +862,10 @@ export default function FeaturedProperties() {
                                                 {/* Conteúdo do card */}
                                                 <div className="absolute bottom-0 left-0 w-full p-5">
                                                     {/* Localização */}
-                                                    <div className="text-white/80 text-sm mb-1">{property.location}</div>
+                                                    <div className="text-white/80 text-sm mb-1">{formatLocationForPublic(property.location)}, São Paulo</div>
 
                                                     {/* Título */}
-                                                    <h3 className="text-lg md:text-xl text-white font-bold mb-1 line-clamp-2">
-                                                        {property.title}
-                                                    </h3>
+                                                    <h3 className="text-lg text-white font-semibold">{property.title}</h3>
 
                                                     {/* Características */}
                                                     <p className="text-white/80 text-sm mb-2 line-clamp-1">
@@ -1006,8 +1026,7 @@ export default function FeaturedProperties() {
 
                                                     {/* Categorias/Tags */}
                                                     <div className="flex flex-wrap gap-2 mt-3">
-                                                        <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{property.details}</span>
-                                                        <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{property.location}</span>
+                                                        <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{formatLocationForPublic(property.location)}, São Paulo</span>
                                                     </div>
                                                 </div>
 
@@ -1046,8 +1065,7 @@ export default function FeaturedProperties() {
                                                     <div>
                                                         <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Nosso imóvel</h3>
                                                         <p className="text-gray-700 mb-4">
-                                                            Este charmoso imóvel localizado em {property.location} oferece um ambiente aconchegante e moderno.
-                                                            Com {property.features.split('·').join(', ')}, o espaço é perfeito para uma estadia confortável.
+                                                            Este charmoso imóvel localizado em {formatLocationForPublic(property.location)} oferece um ambiente aconchegante e moderno. Com {property.features.split('·').join(', ')}, o espaço é perfeito para uma estadia confortável.
                                                         </p>
                                                         <p className="text-gray-700">
                                                             Próximo a restaurantes, comércio e transporte público. O imóvel conta com Wi-Fi de alta velocidade,
@@ -1129,7 +1147,7 @@ export default function FeaturedProperties() {
                                                     <div>
                                                         <h3 className="text-xl font-semibold mb-4 text-[#8BADA4]">Onde você estará</h3>
                                                         <p className="text-gray-700 mb-4">
-                                                            {property.location}, Brasil
+                                                            {formatLocationForPublic(property.location)}, São Paulo, Brasil
                                                         </p>
                                                         <div className="h-[350px] rounded-xl overflow-hidden relative mb-4">
                                                             <MapComponent

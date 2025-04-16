@@ -448,6 +448,28 @@ const calculateNights = (checkIn: Date | null, checkOut: Date | null): number =>
     return diffDays;
 };
 
+// Função para extrair e formatar o bairro do endereço completo
+const formatLocationForPublic = (fullAddress: string): string => {
+    // Dividir o endereço por vírgulas e remover espaços extras
+    const parts = fullAddress.split(',').map(part => part.trim());
+
+    // Se tiver partes suficientes, pegar apenas o bairro (geralmente o segundo elemento)
+    if (parts.length >= 2) {
+        // Verificar se há um número no primeiro elemento (rua com número)
+        const hasStreetNumber = /\d/.test(parts[0]);
+
+        // Se tiver número, pegar apenas o bairro, caso contrário pode ser apenas um bairro/região
+        if (hasStreetNumber) {
+            return parts[1]; // Geralmente o bairro
+        } else {
+            return parts[0]; // Se não tiver número, pode ser apenas o bairro
+        }
+    }
+
+    // Se não conseguir separar, retornar apenas "Localização em São Paulo"
+    return 'São Paulo';
+};
+
 export default function AllProperties() {
     // Estados para controlar a expansão de cards
     const [expandedCard, setExpandedCard] = useState<number | string | null>(null)
@@ -1155,7 +1177,7 @@ export default function AllProperties() {
                                                 <div>
                                                     <h3 className="text-xl font-semibold mb-4 text-[#8BADA4]">Onde você estará</h3>
                                                     <p className="text-gray-700 mb-4">
-                                                        {property.location}, Brasil
+                                                        {formatLocationForPublic(property.location)}, São Paulo, Brasil
                                                     </p>
                                                     <div className="h-[350px] rounded-xl overflow-hidden relative mb-4">
                                                         <MapComponent
@@ -1171,7 +1193,7 @@ export default function AllProperties() {
                                                     </div>
                                                     <div className="text-gray-700">
                                                         <p className="mb-3">
-                                                            Este imóvel está localizado em uma área privilegiada de {property.location.split(",")[0]}, oferecendo fácil acesso a:
+                                                            Este imóvel está localizado em uma área privilegiada de {formatLocationForPublic(property.location)}, oferecendo fácil acesso a:
                                                         </p>
                                                         <ul className="list-disc pl-5 space-y-1">
                                                             <li>Transporte público a 200m</li>

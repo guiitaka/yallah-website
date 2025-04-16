@@ -6,6 +6,28 @@ import Link from 'next/link';
 import { Star, MapPin } from '@phosphor-icons/react';
 import { useProperties } from '@/hooks/useProperties';
 
+// Função para extrair e formatar o bairro do endereço completo
+const formatLocationForPublic = (fullAddress: string): string => {
+    // Dividir o endereço por vírgulas e remover espaços extras
+    const parts = fullAddress.split(',').map(part => part.trim());
+
+    // Se tiver partes suficientes, pegar apenas o bairro (geralmente o segundo elemento)
+    if (parts.length >= 2) {
+        // Verificar se há um número no primeiro elemento (rua com número)
+        const hasStreetNumber = /\d/.test(parts[0]);
+
+        // Se tiver número, pegar apenas o bairro, caso contrário pode ser apenas um bairro/região
+        if (hasStreetNumber) {
+            return parts[1]; // Geralmente o bairro
+        } else {
+            return parts[0]; // Se não tiver número, pode ser apenas o bairro
+        }
+    }
+
+    // Se não conseguir separar, retornar apenas "Localização em São Paulo"
+    return 'São Paulo';
+};
+
 /**
  * PropertiesList - A simplified component that displays properties from Firebase
  * This can be used to replace or complement existing property listing components
@@ -90,7 +112,7 @@ export default function PropertiesList() {
                             <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
                                 <div className="flex items-center text-white">
                                     <MapPin className="w-4 h-4 mr-1" />
-                                    <p className="text-sm truncate">{property.location}</p>
+                                    <p className="text-sm truncate">{formatLocationForPublic(property.location)}, São Paulo</p>
                                 </div>
                             </div>
                         </div>
