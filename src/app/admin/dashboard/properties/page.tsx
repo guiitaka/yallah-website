@@ -1499,6 +1499,270 @@ export default function PropertiesPage() {
                 </div>
             )}
 
+            {/* Edit Modal */}
+            {showEditModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto p-4">
+                    <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] flex flex-col">
+                        <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 120px)' }}>
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-xl font-semibold text-gray-800">Editar Imóvel</h2>
+                                <button
+                                    onClick={() => setShowEditModal(false)}
+                                    className="text-gray-500 hover:text-gray-700"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 className="font-medium text-gray-700 mb-4">Informações Básicas</h4>
+
+                                    <div className="mb-4">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Título do Imóvel *
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="title"
+                                            value={formData.title}
+                                            onChange={handleFormChange}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                            placeholder="Ex: Apartamento de luxo com vista panorâmica"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="mb-4">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Descrição
+                                        </label>
+                                        <textarea
+                                            name="description"
+                                            value={formData.description}
+                                            onChange={handleFormChange}
+                                            rows={4}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                            placeholder="Descreva o imóvel detalhadamente..."
+                                        ></textarea>
+                                    </div>
+
+                                    <div className="mb-4">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Tipo de Imóvel *
+                                        </label>
+                                        <select
+                                            name="type"
+                                            value={formData.type}
+                                            onChange={handleFormChange}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                        >
+                                            <option value="">Selecione um tipo</option>
+                                            {propertyTypes.map((type) => (
+                                                <option key={type} value={type}>{type}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className="mb-4">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Localização *
+                                        </label>
+                                        <MapboxSearch
+                                            initialValue={formData.location}
+                                            onLocationSelect={handleLocationSelect}
+                                        />
+                                    </div>
+
+                                    <div className="mb-4">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Status *
+                                        </label>
+                                        <select
+                                            name="status"
+                                            value={formData.status}
+                                            onChange={handleFormChange}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                        >
+                                            <option value="available">Disponível</option>
+                                            <option value="rented">Alugado</option>
+                                            <option value="maintenance">Em Manutenção</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h4 className="font-medium text-gray-700 mb-4">Características e Preço</h4>
+
+                                    <div className="mb-4">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Preço por Noite (R$) *
+                                        </label>
+                                        <div className="relative">
+                                            <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                                                R$
+                                            </span>
+                                            <input
+                                                type="number"
+                                                name="price"
+                                                value={formData.price}
+                                                onChange={handleFormChange}
+                                                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                min="0"
+                                                step="0.01"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                Quartos
+                                            </label>
+                                            <div className="relative">
+                                                <BedDouble className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                                                <input
+                                                    type="number"
+                                                    name="bedrooms"
+                                                    value={formData.bedrooms}
+                                                    onChange={handleFormChange}
+                                                    className="pl-10 w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm"
+                                                    min="0"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                Banheiros
+                                            </label>
+                                            <div className="relative">
+                                                <Bath className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                                                <input
+                                                    type="number"
+                                                    name="bathrooms"
+                                                    value={formData.bathrooms}
+                                                    onChange={handleFormChange}
+                                                    className="pl-10 w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm"
+                                                    min="0"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                Camas
+                                            </label>
+                                            <div className="relative">
+                                                <BedDouble className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                                                <input
+                                                    type="number"
+                                                    name="beds"
+                                                    value={formData.beds}
+                                                    onChange={handleFormChange}
+                                                    className="pl-10 w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm"
+                                                    min="0"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                Hóspedes
+                                            </label>
+                                            <div className="relative">
+                                                <UserCircle className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                                                <input
+                                                    type="number"
+                                                    name="guests"
+                                                    value={formData.guests}
+                                                    onChange={handleFormChange}
+                                                    className="pl-10 w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm"
+                                                    min="0"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-6">
+                                        <div className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                id="featured"
+                                                name="featured"
+                                                checked={formData.featured}
+                                                onChange={handleCheckboxChange}
+                                                className="h-4 w-4 text-[#8BADA4] focus:ring-[#8BADA4] border-gray-300 rounded"
+                                            />
+                                            <label htmlFor="featured" className="ml-2 block text-sm text-gray-700">
+                                                Destacar este imóvel na plataforma
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-4">
+                                        <button
+                                            type="button"
+                                            onClick={handleImageUpload}
+                                            className="flex items-center px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
+                                            </svg>
+                                            Adicionar Imagem
+                                        </button>
+
+                                        {formData.images.length > 0 && (
+                                            <div className="mt-4 grid grid-cols-3 gap-4 mb-10">
+                                                {formData.images.map((img, index) => (
+                                                    <div key={index} className="relative">
+                                                        <div className="h-20 w-full bg-gray-200 rounded-md overflow-hidden">
+                                                            <Image
+                                                                src={img || localPlaceholderImages[index % localPlaceholderImages.length]}
+                                                                alt={`Imagem ${index + 1}`}
+                                                                width={100}
+                                                                height={80}
+                                                                className="w-full h-full object-cover"
+                                                                onError={handleImageError}
+                                                                unoptimized={img && !img.startsWith('/') ? true : undefined}
+                                                            />
+                                                        </div>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveImage(index)}
+                                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+                                                        >
+                                                            &times;
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="border-t border-gray-200 p-6 flex justify-end space-x-4 bg-white">
+                            <button
+                                onClick={() => {
+                                    setShowEditModal(false);
+                                }}
+                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                onClick={handleUpdateProperty}
+                                className="px-6 py-2 bg-[#8BADA4] text-white rounded-lg hover:bg-opacity-90"
+                                disabled={!formData.title || !formData.location || formData.price <= 0}
+                            >
+                                Salvar Alterações
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Adicionar indicador de progresso de upload nos modais de adição e edição */}
             {isUploadingImages && (
                 <div className="mb-4">
