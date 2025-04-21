@@ -32,6 +32,20 @@ export interface Property {
     cancellationPolicy?: string;
     coordinates?: { lat: number; lng: number } | null;
     sourceUrl?: string;
+    rating?: {
+        value: number;
+        count: number;
+    };
+    whatWeOffer?: string;
+    whatYouShouldKnow?: string;
+    serviceFee?: number;
+    discountSettings?: {
+        amount: number;
+        type: 'percentage' | 'fixed';
+        minNights?: number;
+        validFrom?: Date;
+        validTo?: Date;
+    };
 }
 
 // Dados de exemplo para as propriedades

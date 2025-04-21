@@ -137,6 +137,21 @@ interface FormData {
         hasCameras: boolean;
     };
     cancellationPolicy: string;
+    // Novos campos adicionados
+    rating: {
+        value: number;
+        count: number;
+    };
+    whatWeOffer: string;
+    whatYouShouldKnow: string;
+    serviceFee: number;
+    discountSettings: {
+        amount: number;
+        type: 'percentage' | 'fixed';
+        minNights: number;
+        validFrom: string;
+        validTo: string;
+    };
 }
 
 interface ImportProgress {
@@ -218,7 +233,22 @@ export default function PropertiesPage() {
             hasSmokeAlarm: false,
             hasCameras: false
         },
-        cancellationPolicy: 'Flexível'
+        cancellationPolicy: '',
+        // Inicialização dos novos campos
+        rating: {
+            value: 0,
+            count: 0
+        },
+        whatWeOffer: '',
+        whatYouShouldKnow: '',
+        serviceFee: 0,
+        discountSettings: {
+            amount: 0,
+            type: 'fixed',
+            minNights: 0,
+            validFrom: '',
+            validTo: ''
+        }
     });
 
     const [propertyTypes, setPropertyTypes] = useState<string[]>([
@@ -258,8 +288,8 @@ export default function PropertiesPage() {
             amenities: [],
             categorizedAmenities: {},
             houseRules: {
-                checkIn: '',
-                checkOut: '',
+                checkIn: '15:00',
+                checkOut: '11:00',
                 maxGuests: 0,
                 additionalRules: []
             },
@@ -268,8 +298,24 @@ export default function PropertiesPage() {
                 hasSmokeAlarm: false,
                 hasCameras: false
             },
-            cancellationPolicy: 'Flexível'
+            cancellationPolicy: '',
+            // Inicialização dos novos campos
+            rating: {
+                value: 0,
+                count: 0
+            },
+            whatWeOffer: '',
+            whatYouShouldKnow: '',
+            serviceFee: 0,
+            discountSettings: {
+                amount: 0,
+                type: 'fixed',
+                minNights: 0,
+                validFrom: '',
+                validTo: ''
+            }
         });
+        setImageUploadProgress(0);
     };
 
     const handleAddProperty = async () => {
@@ -378,8 +424,10 @@ export default function PropertiesPage() {
         }
     };
 
+    // Função para editar uma propriedade
     const handleEditProperty = (property: Property) => {
         setCurrentProperty(property);
+        // Converter propriedade do tipo Property para o tipo FormData
         setFormData({
             id: property.id,
             title: property.title,
@@ -395,22 +443,38 @@ export default function PropertiesPage() {
             area: property.area,
             status: property.status,
             featured: property.featured,
-            images: property.images,
+            images: property.images || [],
             amenities: property.amenities || [],
             categorizedAmenities: property.categorizedAmenities || {},
-            houseRules: property.houseRules || {
-                checkIn: '15:00',
-                checkOut: '11:00',
-                maxGuests: 2,
-                additionalRules: [],
+            houseRules: {
+                checkIn: property.houseRules?.checkIn || '15:00',
+                checkOut: property.houseRules?.checkOut || '12:00',
+                maxGuests: property.houseRules?.maxGuests || property.guests || 2,
+                additionalRules: property.houseRules?.additionalRules || []
             },
-            safety: property.safety || {
-                hasCoAlarm: false,
-                hasSmokeAlarm: false,
-                hasCameras: false,
+            safety: {
+                hasCoAlarm: property.safety?.hasCoAlarm || false,
+                hasSmokeAlarm: property.safety?.hasSmokeAlarm || false,
+                hasCameras: property.safety?.hasCameras || false
             },
-            cancellationPolicy: property.cancellationPolicy || 'Flexível'
+            cancellationPolicy: property.cancellationPolicy || 'Flexível',
+            // Novos campos adicionados
+            rating: {
+                value: property.rating?.value || 4.5,
+                count: property.rating?.count || 0
+            },
+            whatWeOffer: property.whatWeOffer || '',
+            whatYouShouldKnow: property.whatYouShouldKnow || '',
+            serviceFee: property.serviceFee || 35,
+            discountSettings: {
+                amount: property.discountSettings?.amount || 0,
+                type: property.discountSettings?.type || 'fixed',
+                minNights: property.discountSettings?.minNights || 0,
+                validFrom: property.discountSettings?.validFrom ? new Date(property.discountSettings.validFrom).toISOString().split('T')[0] : '',
+                validTo: property.discountSettings?.validTo ? new Date(property.discountSettings.validTo).toISOString().split('T')[0] : ''
+            }
         });
+
         setShowEditModal(true);
     };
 
@@ -800,11 +864,11 @@ export default function PropertiesPage() {
         }
 
         // Update form state with imported data
-        setFormData(prev => ({
-            ...prev,
+        setFormData({
+            id: '',
             title: importedData.title || '',
             description: importedData.description || '',
-            type: importedData.type || prev.type,
+            type: importedData.type || 'Apartamento',
             location: importedData.address || importedData.location || '',
             coordinates: coordinates,
             price: importedData.pricePerNight || 0,
@@ -812,6 +876,9 @@ export default function PropertiesPage() {
             bathrooms: importedData.bathrooms || 1,
             beds: importedData.beds || 1,
             guests: importedData.guests || 2,
+            area: importedData.area || 0,
+            status: 'available',
+            featured: false,
             amenities: normalizedAmenities,
             categorizedAmenities: categorizedAmenities,
             images: processedImages, // Use reliable local images
@@ -825,8 +892,24 @@ export default function PropertiesPage() {
                 hasCoAlarm: normalizedAmenities.includes('Alarme de monóxido de carbono'),
                 hasSmokeAlarm: normalizedAmenities.includes('Detector de fumaça'),
                 hasCameras: normalizedAmenities.includes('Câmeras de segurança')
+            },
+            cancellationPolicy: importedData.cancellationPolicy || 'Flexível',
+            // Novos campos adicionados
+            rating: {
+                value: importedData.rating?.value || 4.5, // Valor padrão ou do Airbnb quando disponível
+                count: importedData.rating?.count || Math.floor(Math.random() * 40) + 10 // Gerar um valor aleatório entre 10 e 50
+            },
+            whatWeOffer: importedData.whatWeOffer || (importedData.description ? `${importedData.description.substring(0, 100)}...` : ''),
+            whatYouShouldKnow: importedData.whatYouShouldKnow || 'Regras de check-in e check-out flexíveis. Entre em contato para mais informações.',
+            serviceFee: importedData.serviceFee || 35, // Taxa de serviço padrão
+            discountSettings: {
+                amount: importedData.discountSettings?.amount || 50,
+                type: importedData.discountSettings?.type || 'fixed',
+                minNights: importedData.discountSettings?.minNights || 3,
+                validFrom: importedData.discountSettings?.validFrom || '',
+                validTo: importedData.discountSettings?.validTo || ''
             }
-        }));
+        });
 
         // Close modal and clear data
         setShowImportModal(false);
@@ -1309,6 +1392,207 @@ export default function PropertiesPage() {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Novos campos para informações do frontend */}
+                            <div className="mt-8 border-t pt-6 border-gray-200">
+                                <h4 className="font-medium text-gray-700 mb-4">Informações do Frontend</h4>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                Avaliação (de 0 a 5)
+                                            </label>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <input
+                                                        type="number"
+                                                        name="rating.value"
+                                                        value={formData.rating.value}
+                                                        onChange={(e) => setFormData({
+                                                            ...formData,
+                                                            rating: {
+                                                                ...formData.rating,
+                                                                value: parseFloat(e.target.value)
+                                                            }
+                                                        })}
+                                                        min="0"
+                                                        max="5"
+                                                        step="0.1"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                        placeholder="Ex: 4.5"
+                                                    />
+                                                    <label className="text-xs text-gray-500 mt-1">Valor (0-5)</label>
+                                                </div>
+                                                <div>
+                                                    <input
+                                                        type="number"
+                                                        name="rating.count"
+                                                        value={formData.rating.count}
+                                                        onChange={(e) => setFormData({
+                                                            ...formData,
+                                                            rating: {
+                                                                ...formData.rating,
+                                                                count: parseInt(e.target.value)
+                                                            }
+                                                        })}
+                                                        min="0"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                        placeholder="Ex: 42"
+                                                    />
+                                                    <label className="text-xs text-gray-500 mt-1">Número de avaliações</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                Taxa de serviço (R$)
+                                            </label>
+                                            <div className="relative">
+                                                <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                                                    R$
+                                                </span>
+                                                <input
+                                                    type="number"
+                                                    name="serviceFee"
+                                                    value={formData.serviceFee}
+                                                    onChange={handleFormChange}
+                                                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                    min="0"
+                                                    step="0.01"
+                                                    placeholder="Ex: 35"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="mb-4">
+                                            <h5 className="text-sm font-medium text-gray-700 mb-2">Configuração de Desconto</h5>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Valor</label>
+                                                    <input
+                                                        type="number"
+                                                        name="discountSettings.amount"
+                                                        value={formData.discountSettings.amount}
+                                                        onChange={(e) => setFormData({
+                                                            ...formData,
+                                                            discountSettings: {
+                                                                ...formData.discountSettings,
+                                                                amount: parseFloat(e.target.value)
+                                                            }
+                                                        })}
+                                                        min="0"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                        placeholder="Ex: 50"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Tipo</label>
+                                                    <select
+                                                        name="discountSettings.type"
+                                                        value={formData.discountSettings.type}
+                                                        onChange={(e) => setFormData({
+                                                            ...formData,
+                                                            discountSettings: {
+                                                                ...formData.discountSettings,
+                                                                type: e.target.value as 'percentage' | 'fixed'
+                                                            }
+                                                        })}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                    >
+                                                        <option value="fixed">Valor fixo (R$)</option>
+                                                        <option value="percentage">Percentual (%)</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-3 gap-4 mt-2">
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Mínimo de noites</label>
+                                                    <input
+                                                        type="number"
+                                                        name="discountSettings.minNights"
+                                                        value={formData.discountSettings.minNights}
+                                                        onChange={(e) => setFormData({
+                                                            ...formData,
+                                                            discountSettings: {
+                                                                ...formData.discountSettings,
+                                                                minNights: parseInt(e.target.value)
+                                                            }
+                                                        })}
+                                                        min="0"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                        placeholder="Ex: 3"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Válido de</label>
+                                                    <input
+                                                        type="date"
+                                                        name="discountSettings.validFrom"
+                                                        value={formData.discountSettings.validFrom}
+                                                        onChange={(e) => setFormData({
+                                                            ...formData,
+                                                            discountSettings: {
+                                                                ...formData.discountSettings,
+                                                                validFrom: e.target.value
+                                                            }
+                                                        })}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Válido até</label>
+                                                    <input
+                                                        type="date"
+                                                        name="discountSettings.validTo"
+                                                        value={formData.discountSettings.validTo}
+                                                        onChange={(e) => setFormData({
+                                                            ...formData,
+                                                            discountSettings: {
+                                                                ...formData.discountSettings,
+                                                                validTo: e.target.value
+                                                            }
+                                                        })}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                O que oferecemos (aba do imóvel)
+                                            </label>
+                                            <textarea
+                                                name="whatWeOffer"
+                                                value={formData.whatWeOffer}
+                                                onChange={handleFormChange}
+                                                rows={4}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                placeholder="Descreva o que seu imóvel oferece aos hóspedes..."
+                                            ></textarea>
+                                        </div>
+
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                O que você deve saber (aba do imóvel)
+                                            </label>
+                                            <textarea
+                                                name="whatYouShouldKnow"
+                                                value={formData.whatYouShouldKnow}
+                                                onChange={handleFormChange}
+                                                rows={4}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                placeholder="Informações importantes que o hóspede deve saber..."
+                                            ></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                         <div className="border-t border-gray-200 p-6 flex justify-end space-x-4 bg-white">
                             <button
@@ -1741,6 +2025,207 @@ export default function PropertiesPage() {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Novos campos para informações do frontend */}
+                            <div className="mt-8 border-t pt-6 border-gray-200">
+                                <h4 className="font-medium text-gray-700 mb-4">Informações do Frontend</h4>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                Avaliação (de 0 a 5)
+                                            </label>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <input
+                                                        type="number"
+                                                        name="rating.value"
+                                                        value={formData.rating.value}
+                                                        onChange={(e) => setFormData({
+                                                            ...formData,
+                                                            rating: {
+                                                                ...formData.rating,
+                                                                value: parseFloat(e.target.value)
+                                                            }
+                                                        })}
+                                                        min="0"
+                                                        max="5"
+                                                        step="0.1"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                        placeholder="Ex: 4.5"
+                                                    />
+                                                    <label className="text-xs text-gray-500 mt-1">Valor (0-5)</label>
+                                                </div>
+                                                <div>
+                                                    <input
+                                                        type="number"
+                                                        name="rating.count"
+                                                        value={formData.rating.count}
+                                                        onChange={(e) => setFormData({
+                                                            ...formData,
+                                                            rating: {
+                                                                ...formData.rating,
+                                                                count: parseInt(e.target.value)
+                                                            }
+                                                        })}
+                                                        min="0"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                        placeholder="Ex: 42"
+                                                    />
+                                                    <label className="text-xs text-gray-500 mt-1">Número de avaliações</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                Taxa de serviço (R$)
+                                            </label>
+                                            <div className="relative">
+                                                <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-500">
+                                                    R$
+                                                </span>
+                                                <input
+                                                    type="number"
+                                                    name="serviceFee"
+                                                    value={formData.serviceFee}
+                                                    onChange={handleFormChange}
+                                                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                    min="0"
+                                                    step="0.01"
+                                                    placeholder="Ex: 35"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="mb-4">
+                                            <h5 className="text-sm font-medium text-gray-700 mb-2">Configuração de Desconto</h5>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Valor</label>
+                                                    <input
+                                                        type="number"
+                                                        name="discountSettings.amount"
+                                                        value={formData.discountSettings.amount}
+                                                        onChange={(e) => setFormData({
+                                                            ...formData,
+                                                            discountSettings: {
+                                                                ...formData.discountSettings,
+                                                                amount: parseFloat(e.target.value)
+                                                            }
+                                                        })}
+                                                        min="0"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                        placeholder="Ex: 50"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Tipo</label>
+                                                    <select
+                                                        name="discountSettings.type"
+                                                        value={formData.discountSettings.type}
+                                                        onChange={(e) => setFormData({
+                                                            ...formData,
+                                                            discountSettings: {
+                                                                ...formData.discountSettings,
+                                                                type: e.target.value as 'percentage' | 'fixed'
+                                                            }
+                                                        })}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                    >
+                                                        <option value="fixed">Valor fixo (R$)</option>
+                                                        <option value="percentage">Percentual (%)</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-3 gap-4 mt-2">
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Mínimo de noites</label>
+                                                    <input
+                                                        type="number"
+                                                        name="discountSettings.minNights"
+                                                        value={formData.discountSettings.minNights}
+                                                        onChange={(e) => setFormData({
+                                                            ...formData,
+                                                            discountSettings: {
+                                                                ...formData.discountSettings,
+                                                                minNights: parseInt(e.target.value)
+                                                            }
+                                                        })}
+                                                        min="0"
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                        placeholder="Ex: 3"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Válido de</label>
+                                                    <input
+                                                        type="date"
+                                                        name="discountSettings.validFrom"
+                                                        value={formData.discountSettings.validFrom}
+                                                        onChange={(e) => setFormData({
+                                                            ...formData,
+                                                            discountSettings: {
+                                                                ...formData.discountSettings,
+                                                                validFrom: e.target.value
+                                                            }
+                                                        })}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Válido até</label>
+                                                    <input
+                                                        type="date"
+                                                        name="discountSettings.validTo"
+                                                        value={formData.discountSettings.validTo}
+                                                        onChange={(e) => setFormData({
+                                                            ...formData,
+                                                            discountSettings: {
+                                                                ...formData.discountSettings,
+                                                                validTo: e.target.value
+                                                            }
+                                                        })}
+                                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                O que oferecemos (aba do imóvel)
+                                            </label>
+                                            <textarea
+                                                name="whatWeOffer"
+                                                value={formData.whatWeOffer}
+                                                onChange={handleFormChange}
+                                                rows={4}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                placeholder="Descreva o que seu imóvel oferece aos hóspedes..."
+                                            ></textarea>
+                                        </div>
+
+                                        <div className="mb-4">
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                O que você deve saber (aba do imóvel)
+                                            </label>
+                                            <textarea
+                                                name="whatYouShouldKnow"
+                                                value={formData.whatYouShouldKnow}
+                                                onChange={handleFormChange}
+                                                rows={4}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
+                                                placeholder="Informações importantes que o hóspede deve saber..."
+                                            ></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                         <div className="border-t border-gray-200 p-6 flex justify-end space-x-4 bg-white">
                             <button

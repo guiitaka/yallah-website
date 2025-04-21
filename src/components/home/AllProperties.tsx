@@ -6,7 +6,8 @@ import Link from 'next/link'
 import {
     ArrowRight, Star, Heart,
     CaretLeft, CaretRight, Buildings, MapPin, Lock, Waves, CookingPot,
-    WifiHigh, Desktop, Television, Dog, House, Lightning, Fire, Calendar as CalendarIcon, CaretDown
+    WifiHigh, Desktop, Television, Dog, House, Lightning, Fire, Calendar as CalendarIcon, CaretDown,
+    Clock, X, CookingPot as Coffee, Snowflake
 } from '@phosphor-icons/react'
 import DatePicker from 'react-datepicker'
 import { format, addDays, differenceInDays } from 'date-fns'
@@ -80,6 +81,11 @@ interface PropertyCard {
     link?: string;
     host?: string;
     coordinates?: [number, number];
+    description?: string;
+    whatWeOffer?: string;
+    whatYouShouldKnow?: string;
+    serviceFee?: number;
+    discountAmount?: number;
 }
 
 // Static property data as fallback
@@ -1067,67 +1073,26 @@ export default function AllProperties() {
                                             {/* Conteúdo do que oferecemos */}
                                             {activeTab === 'oferecemos' && (
                                                 <div>
-                                                    <h3 className="text-xl font-semibold mb-4 text-[#8BADA4]">O que esse lugar oferece</h3>
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="w-10 h-10 flex items-center justify-center">
-                                                                <Lock className="w-6 h-6 text-gray-700" />
-                                                            </div>
-                                                            <span className="text-gray-700">Tranca na porta do quarto</span>
+                                                    <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">O que oferecemos</h3>
+                                                    <p className="text-gray-700 mb-4">
+                                                        {(property as any).whatWeOffer || `Nosso imóvel em ${formatLocationForPublic(property.location)} oferece as seguintes comodidades:`}
+                                                    </p>
+                                                    <div className="grid grid-cols-2 gap-4 mb-4">
+                                                        <div className="flex items-center space-x-2">
+                                                            <WifiHigh className="h-5 w-5 text-gray-600" />
+                                                            <span className="text-gray-700">Wi-Fi de alta velocidade</span>
                                                         </div>
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="w-10 h-10 flex items-center justify-center">
-                                                                <Waves className="w-6 h-6 text-gray-700" />
-                                                            </div>
-                                                            <span className="text-gray-700">Vista para a praia</span>
+                                                        <div className="flex items-center space-x-2">
+                                                            <Television className="h-5 w-5 text-gray-600" />
+                                                            <span className="text-gray-700">TV com canais a cabo</span>
                                                         </div>
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="w-10 h-10 flex items-center justify-center">
-                                                                <CookingPot className="w-6 h-6 text-gray-700" />
-                                                            </div>
-                                                            <span className="text-gray-700">Cozinha</span>
+                                                        <div className="flex items-center space-x-2">
+                                                            <Coffee className="h-5 w-5 text-gray-600" />
+                                                            <span className="text-gray-700">Cafeteira</span>
                                                         </div>
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="w-10 h-10 flex items-center justify-center">
-                                                                <WifiHigh className="w-6 h-6 text-gray-700" />
-                                                            </div>
-                                                            <span className="text-gray-700">Wi-Fi</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="w-10 h-10 flex items-center justify-center">
-                                                                <Desktop className="w-6 h-6 text-gray-700" />
-                                                            </div>
-                                                            <span className="text-gray-700">Espaço de trabalho exclusivo</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="w-10 h-10 flex items-center justify-center">
-                                                                <Television className="w-6 h-6 text-gray-700" />
-                                                            </div>
-                                                            <span className="text-gray-700">TV</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="w-10 h-10 flex items-center justify-center">
-                                                                <Dog className="w-6 h-6 text-gray-700" />
-                                                            </div>
-                                                            <span className="text-gray-700">Permitido animais</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="w-10 h-10 flex items-center justify-center">
-                                                                <House className="w-6 h-6 text-gray-700" />
-                                                            </div>
-                                                            <span className="text-gray-700">Pátio ou varanda</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="w-10 h-10 flex items-center justify-center">
-                                                                <Lightning className="w-6 h-6 text-gray-400 line-through" />
-                                                            </div>
-                                                            <span className="text-gray-400 line-through">Alarme de monóxido de carbono</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-4">
-                                                            <div className="w-10 h-10 flex items-center justify-center">
-                                                                <Fire className="w-6 h-6 text-gray-400 line-through" />
-                                                            </div>
-                                                            <span className="text-gray-400 line-through">Detector de fumaça</span>
+                                                        <div className="flex items-center space-x-2">
+                                                            <Snowflake className="h-5 w-5 text-gray-600" />
+                                                            <span className="text-gray-700">Ar-condicionado</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1135,42 +1100,46 @@ export default function AllProperties() {
 
                                             {/* Conteúdo do que você deve saber */}
                                             {activeTab === 'saber' && (
-                                                <div className="space-y-8">
-                                                    <div>
-                                                        <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Regras da Casa</h3>
-                                                        <p className="text-gray-700 mb-3">
-                                                            Check-in: após as 15:00h<br />
-                                                            Check-out: até as 11:00h<br />
-                                                            Máximo de 4 hóspedes<br />
-                                                            Não é permitido festas ou eventos<br />
-                                                            Proibido fumar dentro do imóvel
-                                                        </p>
-                                                        <p className="text-gray-700">
-                                                            Os hóspedes devem manter o silêncio após as 22:00h, respeitando o condomínio e vizinhos. Animais de estimação são permitidos mediante consulta prévia e sob responsabilidade do proprietário.
-                                                        </p>
-                                                    </div>
-
-                                                    <div>
-                                                        <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Segurança e propriedade</h3>
-                                                        <p className="text-gray-700 mb-3">
-                                                            Evite surpresas ao conferir estas informações importantes sobre a propriedade do seu anfitrião.
-                                                        </p>
-                                                        <p className="text-gray-700 mb-3">
-                                                            O anfitrião não informou que a propriedade tem um detector de monóxido de carbono. Sugerimos levar um detector portátil para sua viagem.
-                                                        </p>
-                                                        <p className="text-gray-700">
-                                                            O anfitrião não informou que a propriedade tem um detector de fumaça. Sugerimos levar um detector portátil para sua viagem.
-                                                        </p>
-                                                    </div>
-
-                                                    <div>
-                                                        <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Política de cancelamento</h3>
-                                                        <p className="text-gray-700 mb-3">
-                                                            Cancelamento gratuito até 48 horas antes do check-in. Após esse período, será cobrada uma taxa equivalente a 50% do valor total da reserva.
-                                                        </p>
-                                                        <p className="text-gray-700">
-                                                            Em caso de cancelamento no dia do check-in ou no-show, não haverá reembolso. Recomendamos a contratação de um seguro viagem para imprevistos.
-                                                        </p>
+                                                <div>
+                                                    <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">O que você deve saber</h3>
+                                                    <p className="text-gray-700 mb-4">
+                                                        {(property as any).whatYouShouldKnow || 'Informações importantes sobre o imóvel e as regras da estadia:'}
+                                                    </p>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                                        <div className="bg-gray-50 p-4 rounded-lg">
+                                                            <h4 className="font-medium text-gray-800 mb-2">Regras da casa</h4>
+                                                            <ul className="text-gray-600 space-y-2">
+                                                                <li className="flex items-start">
+                                                                    <Clock className="h-5 w-5 text-gray-500 mr-2 flex-shrink-0 mt-0.5" />
+                                                                    <div>
+                                                                        <span className="block font-medium">Check-in: </span>
+                                                                        <span>A partir das 15:00h</span>
+                                                                    </div>
+                                                                </li>
+                                                                <li className="flex items-start">
+                                                                    <Clock className="h-5 w-5 text-gray-500 mr-2 flex-shrink-0 mt-0.5" />
+                                                                    <div>
+                                                                        <span className="block font-medium">Check-out: </span>
+                                                                        <span>Até 12:00h</span>
+                                                                    </div>
+                                                                </li>
+                                                                <li className="flex items-start">
+                                                                    <X className="h-5 w-5 text-gray-500 mr-2 flex-shrink-0 mt-0.5" />
+                                                                    <span>Não é permitido fumar</span>
+                                                                </li>
+                                                                <li className="flex items-start">
+                                                                    <X className="h-5 w-5 text-gray-500 mr-2 flex-shrink-0 mt-0.5" />
+                                                                    <span>Não são permitidas festas</span>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <div className="bg-gray-50 p-4 rounded-lg">
+                                                            <h4 className="font-medium text-gray-800 mb-2">Cancelamento</h4>
+                                                            <p className="text-gray-600">
+                                                                Cancelamento gratuito até 5 dias antes do check-in. Após este período,
+                                                                a primeira noite não é reembolsável.
+                                                            </p>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             )}
@@ -1215,13 +1184,24 @@ export default function AllProperties() {
                                                 {/* Preço e avaliação */}
                                                 <div className="flex justify-between items-start mb-4">
                                                     <div>
-                                                        <span className="text-2xl font-bold text-gray-900">R$ {property.pricePerNight}</span>
-                                                        <span className="text-gray-600 ml-1">/ noite</span>
+                                                        <h3 className="font-bold text-xl mb-1">R$ {property.pricePerNight} <span className="text-gray-500 text-base font-normal">/ noite</span></h3>
+                                                        <div className="flex items-center">
+                                                            <Star className="h-4 w-4 text-[#8BADA4] mr-1" />
+                                                            <span className="text-sm">{property.rating} ({property.reviewCount} avaliações)</span>
+                                                        </div>
                                                     </div>
-                                                    <div className="inline-flex items-center gap-1 bg-white px-2 py-1 rounded-full shadow-sm">
-                                                        <Star weight="fill" className="w-4 h-4 text-yellow-500" />
-                                                        <span className="text-sm font-medium text-black">{property.rating}</span>
-                                                        <span className="text-xs text-gray-500">({property.reviewCount})</span>
+                                                    <div className="text-right">
+                                                        <p className="text-sm text-gray-500">Preço para 3 noites</p>
+                                                        <div className="font-medium">R$ {property.pricePerNight * 3}</div>
+                                                        {(property as any).discountAmount && (
+                                                            <div className="text-green-600 text-sm">-R$ {(property as any).discountAmount}</div>
+                                                        )}
+                                                        {(property as any).serviceFee && (
+                                                            <div className="text-sm text-gray-500">Taxa de serviço: R$ {(property as any).serviceFee}</div>
+                                                        )}
+                                                        <div className="font-bold mt-1">
+                                                            Total: R$ {property.pricePerNight * 3 - ((property as any).discountAmount || 0) + ((property as any).serviceFee || 0)}
+                                                        </div>
                                                     </div>
                                                 </div>
 

@@ -181,4 +181,72 @@ Esta implementação permite que:
 - O frontend se mantenha sincronizado em tempo real com as alterações feitas no backend
 - O sistema seja escalável para lidar com um número crescente de propriedades
 
-A integração foi projetada para manter a estrutura visual atual e minimizar alterações na experiência do usuário, focando apenas na camada de dados e comunicação com o Firebase. 
+A integração foi projetada para manter a estrutura visual atual e minimizar alterações na experiência do usuário, focando apenas na camada de dados e comunicação com o Firebase.
+
+## DE-PARA: Mapeamento de Campos Backend → Frontend
+
+Este documento detalha o mapeamento dos campos do formulário de administração para os componentes do frontend, garantindo que os dados inseridos no painel administrativo sejam corretamente exibidos no catálogo de imóveis.
+
+### Campos Básicos
+
+| Backend (Admin) | Frontend (Cliente) | Status | Descrição |
+|----------------|-------------------|--------|-----------|
+| `title` | Título principal do imóvel | ✅ | Ex: "Estúdio com decoração vintage" |
+| `description` | Seção "Nosso imóvel" | ✅ | Descrição completa do imóvel |
+| `type` | Exibido como parte das especificações | ✅ | Ex: "Studio", "Apartamento", etc. |
+| `location` | Endereço formatado | ✅ | Formato: "Vila Madalena, São Paulo" |
+| `coordinates` | Posição no mapa | ✅ | Usado para exibir localização no mapa |
+| `price` | Preço por noite | ✅ | Exibido como "R$ X / noite" |
+| `bedrooms` | Parte das especificações | ✅ | Exibido como "X quartos" |
+| `bathrooms` | Parte das especificações | ✅ | Exibido como "X banheiros" |
+| `beds` | Parte das especificações | ✅ | Exibido como "X camas" |
+| `guests` | Parte das especificações | ✅ | Exibido como "X hóspedes" |
+| `area` | Parte das especificações | ✅ | Exibido como "X m²" |
+| `status` | Indicador de disponibilidade | ✅ | Controla se o imóvel aparece como disponível |
+| `featured` | Badge de "Destaque" | ✅ | Exibe badge verde no card quando ativado |
+| `images` | Galeria de fotos | ✅ | Carrossel de imagens na visualização do imóvel |
+
+### Campos Adicionados
+
+| Backend (Admin) | Frontend (Cliente) | Status | Descrição |
+|----------------|-------------------|--------|-----------|
+| `rating.value` | Avaliação (estrelas) | ✅ | Valor numérico de 0 a 5 |
+| `rating.count` | Contagem de avaliações | ✅ | Exibido como "(X)" junto à avaliação |
+| `whatWeOffer` | Aba "O que oferecemos" | ✅ | Conteúdo da aba específica no detalhe do imóvel |
+| `whatYouShouldKnow` | Aba "O que você deve saber" | ✅ | Conteúdo da aba específica no detalhe do imóvel |
+| `serviceFee` | Taxa de serviço | ✅ | Exibido como "Taxa de serviço: R$ X" no resumo de preços |
+| `discountSettings.amount` | Desconto | ✅ | Exibido como "-R$ X" no resumo de preços |
+| `discountSettings.type` | Tipo de desconto | ✅ | Determina se o desconto é fixo ou percentual |
+| `discountSettings.minNights` | Mínimo de noites | ✅ | Controla quando o desconto é aplicável |
+| `discountSettings.validFrom` | Início da validade | ✅ | Data de início da promoção |
+| `discountSettings.validTo` | Fim da validade | ✅ | Data de término da promoção |
+
+### Outras Propriedades
+
+| Backend (Admin) | Frontend (Cliente) | Status | Descrição |
+|----------------|-------------------|--------|-----------|
+| `amenities` | Lista de comodidades | ✅ | Ícones e textos na seção "O que oferecemos" |
+| `houseRules` | Regras da casa | ✅ | Exibido na aba "O que você deve saber" |
+| `safety` | Informações de segurança | ✅ | Exibido na aba "O que você deve saber" |
+| `cancellationPolicy` | Política de cancelamento | ✅ | Exibido na aba "O que você deve saber" |
+
+## Processo de Sincronização
+
+1. Ao adicionar/editar um imóvel no painel administrativo, todos os campos do formulário são salvos no banco de dados Firebase
+2. O frontend busca esses dados e os exibe nos componentes apropriados
+3. Os campos específicos do frontend (`whatWeOffer`, `whatYouShouldKnow`, etc.) garantem que o conteúdo seja exibido nas abas corretas
+4. O sistema de preços usa `price`, `serviceFee` e `discountSettings` para calcular o valor total
+
+## Notas de Implementação
+
+- Certifique-se de que todos os campos obrigatórios estejam preenchidos antes de salvar um imóvel
+- Os campos de avaliação (`rating`) devem ser preenchidos manualmente, pois não há sistema de avaliação automática implementado ainda
+- Para imagens, recomenda-se upload de imagens com proporção 16:9 e resolução mínima de 1200×800px
+- O campo `status` controla a visibilidade do imóvel no frontend - apenas imóveis com status "available" são exibidos na busca
+
+## Validações
+
+- `price`, `bedrooms`, `bathrooms`, `guests` e `area` devem ser valores numéricos positivos
+- `rating.value` deve estar entre 0 e 5
+- `discountSettings.amount` deve ser um valor numérico positivo
+- Datas em `discountSettings.validFrom` e `discountSettings.validTo` devem seguir o formato YYYY-MM-DD 
