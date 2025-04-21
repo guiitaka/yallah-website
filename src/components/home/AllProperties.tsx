@@ -7,7 +7,7 @@ import {
     ArrowRight, Star, Heart,
     CaretLeft, CaretRight, Buildings, MapPin, Lock, Waves, CookingPot,
     WifiHigh, Desktop, Television, Dog, House, Lightning, Fire, Calendar as CalendarIcon, CaretDown,
-    Clock, X, CookingPot as Coffee, Snowflake
+    Clock, X, CookingPot as Coffee, Snowflake, Users, Bed
 } from '@phosphor-icons/react'
 import DatePicker from 'react-datepicker'
 import { format, addDays, differenceInDays } from 'date-fns'
@@ -88,6 +88,10 @@ interface PropertyCard {
     discountAmount?: number;
     type?: string;
     images?: string[];
+    rooms?: number;      // Adicionar campo para quartos
+    bathrooms?: number;  // Adicionar campo para banheiros
+    beds?: number;       // Adicionar campo para camas
+    guests?: number;     // Adicionar campo para hóspedes
 }
 
 // Static property data as fallback
@@ -484,7 +488,12 @@ const formatLocationForPublic = (fullAddress: string): string => {
 };
 
 // Função auxiliar para extrair números de uma string com verificação segura de null
-const extractNumberFromFeature = (featureText: string, pattern: string): string => {
+const extractNumberFromFeature = (featureText: string, pattern: string, propertyValue?: number): string => {
+    // Se um valor específico da propriedade for fornecido, use-o diretamente
+    if (propertyValue !== undefined) {
+        return propertyValue.toString();
+    }
+
     if (!featureText) return '1';
 
     const regex = new RegExp(`\\d+\\s*${pattern}`);
@@ -499,7 +508,12 @@ const extractNumberFromFeature = (featureText: string, pattern: string): string 
 };
 
 // Adicionar uma função para extrair o número de hóspedes com valor padrão diferente
-const extractGuestsFromFeature = (featureText: string): string => {
+const extractGuestsFromFeature = (featureText: string, guestsValue?: number): string => {
+    // Se um valor específico de hóspedes for fornecido, use-o diretamente
+    if (guestsValue !== undefined) {
+        return guestsValue.toString();
+    }
+
     if (!featureText) return '2';
 
     const regex = /\d+\s*hóspede/;
@@ -540,7 +554,11 @@ const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
             whatWeOffer: property.whatWeOffer || "",
             whatYouShouldKnow: property.whatYouShouldKnow || "",
             type: property.type || "",
-            images: property.images || [] // Garantir que images está sendo transferido corretamente
+            images: property.images || [], // Garantir que images está sendo transferido corretamente
+            rooms: property.bedrooms || property.rooms || 5,
+            bathrooms: property.bathrooms || 5,
+            beds: property.beds || 5,
+            guests: property.maxGuests || property.guests || 5
         };
     });
 };
@@ -847,39 +865,31 @@ export default function AllProperties() {
                                                                     </h3>
 
                                                                     {/* Características */}
-                                                                    <div className="flex gap-4 items-center text-gray-700 mt-2">
+                                                                    <div className="flex gap-4 items-center text-white/80 mt-2">
                                                                         {property.features ? (
                                                                             <div className="grid grid-cols-4 gap-4 w-full">
                                                                                 <div className="flex items-center gap-2">
-                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                                                                    </svg>
+                                                                                    <Buildings className="w-4 h-4 text-white/70" />
                                                                                     <span>
-                                                                                        <strong>Quartos:</strong> {extractNumberFromFeature(property.features, 'quarto')}
+                                                                                        <strong>Quartos:</strong> {extractNumberFromFeature(property.features, 'quarto', property.rooms)}
                                                                                     </span>
                                                                                 </div>
                                                                                 <div className="flex items-center gap-2">
-                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-                                                                                    </svg>
+                                                                                    <Waves className="w-4 h-4 text-white/70" />
                                                                                     <span>
-                                                                                        <strong>Banheiros:</strong> {extractNumberFromFeature(property.features, 'banheiro')}
+                                                                                        <strong>Banheiros:</strong> {extractNumberFromFeature(property.features, 'banheiro', property.bathrooms)}
                                                                                     </span>
                                                                                 </div>
                                                                                 <div className="flex items-center gap-2">
-                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                                                    </svg>
+                                                                                    <Bed className="w-4 h-4 text-white/70" />
                                                                                     <span>
-                                                                                        <strong>Camas:</strong> {extractNumberFromFeature(property.features, 'cama')}
+                                                                                        <strong>Camas:</strong> {extractNumberFromFeature(property.features, 'cama', property.beds)}
                                                                                     </span>
                                                                                 </div>
                                                                                 <div className="flex items-center gap-2">
-                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                                                                                    </svg>
+                                                                                    <Users className="w-4 h-4 text-white/70" />
                                                                                     <span>
-                                                                                        <strong>Hóspedes:</strong> {extractGuestsFromFeature(property.features)}
+                                                                                        <strong>Hóspedes:</strong> {extractGuestsFromFeature(property.features, property.guests)}
                                                                                     </span>
                                                                                 </div>
                                                                             </div>
@@ -958,39 +968,31 @@ export default function AllProperties() {
                                                                     </h3>
 
                                                                     {/* Características */}
-                                                                    <div className="flex gap-4 items-center text-gray-700 mt-2">
+                                                                    <div className="flex gap-4 items-center text-white/80 mt-2">
                                                                         {property.features ? (
                                                                             <div className="grid grid-cols-4 gap-4 w-full">
                                                                                 <div className="flex items-center gap-2">
-                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                                                                    </svg>
+                                                                                    <Buildings className="w-4 h-4 text-white/70" />
                                                                                     <span>
-                                                                                        <strong>Quartos:</strong> {extractNumberFromFeature(property.features, 'quarto')}
+                                                                                        <strong>Quartos:</strong> {extractNumberFromFeature(property.features, 'quarto', property.rooms)}
                                                                                     </span>
                                                                                 </div>
                                                                                 <div className="flex items-center gap-2">
-                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-                                                                                    </svg>
+                                                                                    <Waves className="w-4 h-4 text-white/70" />
                                                                                     <span>
-                                                                                        <strong>Banheiros:</strong> {extractNumberFromFeature(property.features, 'banheiro')}
+                                                                                        <strong>Banheiros:</strong> {extractNumberFromFeature(property.features, 'banheiro', property.bathrooms)}
                                                                                     </span>
                                                                                 </div>
                                                                                 <div className="flex items-center gap-2">
-                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                                                    </svg>
+                                                                                    <Bed className="w-4 h-4 text-white/70" />
                                                                                     <span>
-                                                                                        <strong>Camas:</strong> {extractNumberFromFeature(property.features, 'cama')}
+                                                                                        <strong>Camas:</strong> {extractNumberFromFeature(property.features, 'cama', property.beds)}
                                                                                     </span>
                                                                                 </div>
                                                                                 <div className="flex items-center gap-2">
-                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                                                                                    </svg>
+                                                                                    <Users className="w-4 h-4 text-white/70" />
                                                                                     <span>
-                                                                                        <strong>Hóspedes:</strong> {extractGuestsFromFeature(property.features)}
+                                                                                        <strong>Hóspedes:</strong> {extractGuestsFromFeature(property.features, property.guests)}
                                                                                     </span>
                                                                                 </div>
                                                                             </div>
@@ -1192,39 +1194,31 @@ export default function AllProperties() {
                                                 </div>
 
                                                 {/* Informações básicas */}
-                                                <div className="flex gap-4 items-center text-gray-700 mt-2">
+                                                <div className="flex gap-4 items-center text-white/80 mt-2">
                                                     {property.features ? (
                                                         <div className="grid grid-cols-4 gap-4 w-full">
                                                             <div className="flex items-center gap-2">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                                                </svg>
+                                                                <Buildings className="w-4 h-4 text-white/70" />
                                                                 <span>
-                                                                    <strong>Quartos:</strong> {extractNumberFromFeature(property.features, 'quarto')}
+                                                                    <strong>Quartos:</strong> {extractNumberFromFeature(property.features, 'quarto', property.rooms)}
                                                                 </span>
                                                             </div>
                                                             <div className="flex items-center gap-2">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-                                                                </svg>
+                                                                <Waves className="w-4 h-4 text-white/70" />
                                                                 <span>
-                                                                    <strong>Banheiros:</strong> {extractNumberFromFeature(property.features, 'banheiro')}
+                                                                    <strong>Banheiros:</strong> {extractNumberFromFeature(property.features, 'banheiro', property.bathrooms)}
                                                                 </span>
                                                             </div>
                                                             <div className="flex items-center gap-2">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                                </svg>
+                                                                <Bed className="w-4 h-4 text-white/70" />
                                                                 <span>
-                                                                    <strong>Camas:</strong> {extractNumberFromFeature(property.features, 'cama')}
+                                                                    <strong>Camas:</strong> {extractNumberFromFeature(property.features, 'cama', property.beds)}
                                                                 </span>
                                                             </div>
                                                             <div className="flex items-center gap-2">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                                                                </svg>
+                                                                <Users className="w-4 h-4 text-white/70" />
                                                                 <span>
-                                                                    <strong>Hóspedes:</strong> {extractGuestsFromFeature(property.features)}
+                                                                    <strong>Hóspedes:</strong> {extractGuestsFromFeature(property.features, property.guests)}
                                                                 </span>
                                                             </div>
                                                         </div>
