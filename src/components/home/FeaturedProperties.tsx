@@ -923,7 +923,9 @@ export default function FeaturedProperties() {
                                         {/* Imagem principal (maior) */}
                                         <div className="col-span-6 relative h-[300px] rounded-l-xl overflow-hidden">
                                             <Image
-                                                src={property.image}
+                                                src={(property as any).images && (property as any).images.length > 0
+                                                    ? (property as any).images[0]
+                                                    : property.image}
                                                 alt={property.title}
                                                 fill
                                                 className="object-cover"
@@ -935,7 +937,9 @@ export default function FeaturedProperties() {
                                             {/* Imagem superior direita */}
                                             <div className="relative h-[146px] rounded-tr-xl overflow-hidden">
                                                 <Image
-                                                    src={property.image}
+                                                    src={(property as any).images && (property as any).images.length > 1
+                                                        ? (property as any).images[1]
+                                                        : property.image}
                                                     alt={property.title}
                                                     fill
                                                     className="object-cover"
@@ -946,7 +950,9 @@ export default function FeaturedProperties() {
                                             <div className="grid grid-cols-2 gap-2">
                                                 <div className="relative h-[146px] overflow-hidden">
                                                     <Image
-                                                        src={property.image}
+                                                        src={(property as any).images && (property as any).images.length > 2
+                                                            ? (property as any).images[2]
+                                                            : property.image}
                                                         alt={property.title}
                                                         fill
                                                         className="object-cover"
@@ -1029,6 +1035,10 @@ export default function FeaturedProperties() {
 
                                                     {/* Categorias/Tags */}
                                                     <div className="flex flex-wrap gap-2 mt-3">
+                                                        {(property as any).type && (
+                                                            <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{(property as any).type}</span>
+                                                        )}
+                                                        <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{property.details}</span>
                                                         <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{formatLocationForPublic(property.location)}, São Paulo</span>
                                                     </div>
                                                 </div>
