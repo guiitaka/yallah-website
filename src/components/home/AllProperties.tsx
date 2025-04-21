@@ -539,12 +539,37 @@ const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
         // Verificar qual campo de preço está disponível
         const price = property.price || property.pricePerNight || 0;
 
+        // Generate features string from property details
+        const rooms = property.bedrooms || property.rooms || 0;
+        const bathrooms = property.bathrooms || 0;
+        const beds = property.beds || 0;
+        const guests = property.maxGuests || property.guests || 0;
+
+        // Format features string in the format: "X hóspedes · Y quartos · Z camas · W banheiros"
+        let featuresString = "";
+        if (guests > 0) featuresString += `${guests} ${guests === 1 ? 'hóspede' : 'hóspedes'}`;
+
+        // If it's a studio, use "Studio" instead of "0 quartos"
+        if (property.type === 'Studio' || property.type === 'Estúdio' || !rooms) {
+            featuresString += featuresString ? ' · Studio' : 'Studio';
+        } else {
+            featuresString += featuresString ? ` · ${rooms} ${rooms === 1 ? 'quarto' : 'quartos'}` : `${rooms} ${rooms === 1 ? 'quarto' : 'quartos'}`;
+        }
+
+        if (beds > 0) featuresString += featuresString ? ` · ${beds} ${beds === 1 ? 'cama' : 'camas'}` : `${beds} ${beds === 1 ? 'cama' : 'camas'}`;
+        if (bathrooms > 0) featuresString += featuresString ? ` · ${bathrooms} ${bathrooms === 1 ? 'banheiro' : 'banheiros'}` : `${bathrooms} ${bathrooms === 1 ? 'banheiro' : 'banheiros'}`;
+
+        // If no details are available, use a default string
+        if (!featuresString) {
+            featuresString = property.features || "Detalhes não disponíveis";
+        }
+
         return {
             id: property.id,
             title: property.title || "Sem título",
             location: property.location || "Localização não especificada",
             details: property.details || "",
-            features: property.features || "Detalhes não disponíveis",
+            features: featuresString,
             pricePerNight: price,
             rating: property.rating || 4.5,
             reviewCount: property.reviewCount || 0,
@@ -555,10 +580,10 @@ const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
             whatYouShouldKnow: property.whatYouShouldKnow || "",
             type: property.type || "",
             images: property.images || [], // Garantir que images está sendo transferido corretamente
-            rooms: property.bedrooms || property.rooms || 5,
-            bathrooms: property.bathrooms || 5,
-            beds: property.beds || 5,
-            guests: property.maxGuests || property.guests || 5
+            rooms: rooms,
+            bathrooms: bathrooms,
+            beds: beds,
+            guests: guests
         };
     });
 };
