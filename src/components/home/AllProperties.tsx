@@ -517,7 +517,7 @@ export default function AllProperties() {
         id: Number(prop.id) || prop.id, // Convert to number if possible for compatibility
         title: prop.title,
         location: prop.location,
-        details: "Espaço inteiro", // Generic detail that won't duplicate the type
+        details: "", // Empty string instead of generic "Espaço inteiro"
         description: prop.description, // Properly map the description field
         features: `${prop.guests || 2} hóspedes · ${prop.bedrooms} ${prop.bedrooms === 1 ? 'quarto' : 'quartos'} · ${prop.beds || prop.bedrooms} ${(prop.beds || prop.bedrooms) === 1 ? 'cama' : 'camas'} · ${prop.bathrooms} ${prop.bathrooms === 1 ? 'banheiro' : 'banheiros'}`,
         pricePerNight: prop.price,
