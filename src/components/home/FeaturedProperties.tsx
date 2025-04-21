@@ -1038,7 +1038,7 @@ export default function FeaturedProperties() {
                                                         {(property as any).type && (
                                                             <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{(property as any).type}</span>
                                                         )}
-                                                        {property.details && property.details !== (property as any).description && (
+                                                        {property.details && property.details !== (property as any).type && (
                                                             <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{property.details}</span>
                                                         )}
                                                         <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{formatLocationForPublic(property.location)}, São Paulo</span>
@@ -1079,10 +1079,11 @@ export default function FeaturedProperties() {
                                                 {activeTab === 'descricao' && (
                                                     <div>
                                                         <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Nosso imóvel</h3>
-                                                        <p className="text-gray-700 mb-4">
-                                                            {(property as any).description}
-                                                        </p>
-                                                        {!(property as any).description && (
+                                                        {(property as any).description ? (
+                                                            <p className="text-gray-700 mb-4">
+                                                                {(property as any).description}
+                                                            </p>
+                                                        ) : (
                                                             <>
                                                                 <p className="text-gray-700 mb-4">
                                                                     Este charmoso imóvel localizado em {formatLocationForPublic(property.location)} oferece um ambiente aconchegante e moderno. Com {property.features.split('·').join(', ')}, o espaço é perfeito para uma estadia confortável.

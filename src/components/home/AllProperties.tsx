@@ -517,7 +517,7 @@ export default function AllProperties() {
         id: Number(prop.id) || prop.id, // Convert to number if possible for compatibility
         title: prop.title,
         location: prop.location,
-        details: prop.type || "Espaço inteiro",  // Use type as details instead of description
+        details: "Espaço inteiro", // Generic detail that won't duplicate the type
         description: prop.description, // Properly map the description field
         features: `${prop.guests || 2} hóspedes · ${prop.bedrooms} ${prop.bedrooms === 1 ? 'quarto' : 'quartos'} · ${prop.beds || prop.bedrooms} ${(prop.beds || prop.bedrooms) === 1 ? 'cama' : 'camas'} · ${prop.bathrooms} ${prop.bathrooms === 1 ? 'banheiro' : 'banheiros'}`,
         pricePerNight: prop.price,
@@ -527,7 +527,7 @@ export default function AllProperties() {
         link: `/imoveis/${prop.id}`,
         host: "Anfitrião",
         coordinates: [-46.6554, -23.5646], // Default coordinates
-        type: prop.type // Also map the type field for tag display
+        type: prop.type // Map the type field for tag display
     }));
 
     // Use Firebase properties if available, otherwise use static data
@@ -1079,10 +1079,11 @@ export default function AllProperties() {
                                             {activeTab === 'descricao' && (
                                                 <div>
                                                     <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Nosso imóvel</h3>
-                                                    <p className="text-gray-700 mb-4">
-                                                        {(property as any).description}
-                                                    </p>
-                                                    {!(property as any).description && (
+                                                    {(property as any).description ? (
+                                                        <p className="text-gray-700 mb-4">
+                                                            {(property as any).description}
+                                                        </p>
+                                                    ) : (
                                                         <>
                                                             <p className="text-gray-700 mb-4">
                                                                 Este charmoso imóvel localizado em {formatLocationForPublic(property.location)} oferece um ambiente aconchegante e moderno.
