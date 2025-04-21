@@ -483,6 +483,36 @@ const formatLocationForPublic = (fullAddress: string): string => {
     return 'São Paulo';
 };
 
+// Função auxiliar para extrair números de uma string com verificação segura de null
+const extractNumberFromFeature = (featureText: string, pattern: string): string => {
+    if (!featureText) return '1';
+
+    const regex = new RegExp(`\\d+\\s*${pattern}`);
+    const match = featureText.match(regex);
+
+    if (match && match[0]) {
+        const numberMatch = match[0].match(/\d+/);
+        return numberMatch && numberMatch[0] ? numberMatch[0] : '1';
+    }
+
+    return '1';
+};
+
+// Adicionar uma função para extrair o número de hóspedes com valor padrão diferente
+const extractGuestsFromFeature = (featureText: string): string => {
+    if (!featureText) return '2';
+
+    const regex = /\d+\s*hóspede/;
+    const match = featureText.match(regex);
+
+    if (match && match[0]) {
+        const numberMatch = match[0].match(/\d+/);
+        return numberMatch && numberMatch[0] ? numberMatch[0] : '2';
+    }
+
+    return '2';
+};
+
 // Adicionar uma função para mapear as propriedades reais a partir do Firebase para o formato PropertyCard usado pelo frontend
 const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
     if (!properties || properties.length === 0) return staticAllProperties;
@@ -825,10 +855,7 @@ export default function AllProperties() {
                                                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                                                                     </svg>
                                                                                     <span>
-                                                                                        <strong>Quartos:</strong> {property.features.includes('quarto') ?
-                                                                                            property.features.match(/\d+\s*quarto/) ?
-                                                                                                property.features.match(/\d+\s*quarto/)[0].match(/\d+/)[0] :
-                                                                                                '1' : '1'}
+                                                                                        <strong>Quartos:</strong> {extractNumberFromFeature(property.features, 'quarto')}
                                                                                     </span>
                                                                                 </div>
                                                                                 <div className="flex items-center gap-2">
@@ -836,10 +863,7 @@ export default function AllProperties() {
                                                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
                                                                                     </svg>
                                                                                     <span>
-                                                                                        <strong>Banheiros:</strong> {property.features.includes('banheiro') ?
-                                                                                            property.features.match(/\d+\s*banheiro/) ?
-                                                                                                property.features.match(/\d+\s*banheiro/)[0].match(/\d+/)[0] :
-                                                                                                '1' : '1'}
+                                                                                        <strong>Banheiros:</strong> {extractNumberFromFeature(property.features, 'banheiro')}
                                                                                     </span>
                                                                                 </div>
                                                                                 <div className="flex items-center gap-2">
@@ -847,10 +871,7 @@ export default function AllProperties() {
                                                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                                                     </svg>
                                                                                     <span>
-                                                                                        <strong>Camas:</strong> {property.features.includes('cama') ?
-                                                                                            property.features.match(/\d+\s*cama/) ?
-                                                                                                property.features.match(/\d+\s*cama/)[0].match(/\d+/)[0] :
-                                                                                                '1' : '1'}
+                                                                                        <strong>Camas:</strong> {extractNumberFromFeature(property.features, 'cama')}
                                                                                     </span>
                                                                                 </div>
                                                                                 <div className="flex items-center gap-2">
@@ -858,10 +879,7 @@ export default function AllProperties() {
                                                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                                                                                     </svg>
                                                                                     <span>
-                                                                                        <strong>Hóspedes:</strong> {property.features.includes('hóspede') ?
-                                                                                            property.features.match(/\d+\s*hóspede/) ?
-                                                                                                property.features.match(/\d+\s*hóspede/)[0].match(/\d+/)[0] :
-                                                                                                '2' : '2'}
+                                                                                        <strong>Hóspedes:</strong> {extractGuestsFromFeature(property.features)}
                                                                                     </span>
                                                                                 </div>
                                                                             </div>
@@ -948,10 +966,7 @@ export default function AllProperties() {
                                                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                                                                     </svg>
                                                                                     <span>
-                                                                                        <strong>Quartos:</strong> {property.features.includes('quarto') ?
-                                                                                            property.features.match(/\d+\s*quarto/) ?
-                                                                                                property.features.match(/\d+\s*quarto/)[0].match(/\d+/)[0] :
-                                                                                                '1' : '1'}
+                                                                                        <strong>Quartos:</strong> {extractNumberFromFeature(property.features, 'quarto')}
                                                                                     </span>
                                                                                 </div>
                                                                                 <div className="flex items-center gap-2">
@@ -959,10 +974,7 @@ export default function AllProperties() {
                                                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
                                                                                     </svg>
                                                                                     <span>
-                                                                                        <strong>Banheiros:</strong> {property.features.includes('banheiro') ?
-                                                                                            property.features.match(/\d+\s*banheiro/) ?
-                                                                                                property.features.match(/\d+\s*banheiro/)[0].match(/\d+/)[0] :
-                                                                                                '1' : '1'}
+                                                                                        <strong>Banheiros:</strong> {extractNumberFromFeature(property.features, 'banheiro')}
                                                                                     </span>
                                                                                 </div>
                                                                                 <div className="flex items-center gap-2">
@@ -970,10 +982,7 @@ export default function AllProperties() {
                                                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                                                     </svg>
                                                                                     <span>
-                                                                                        <strong>Camas:</strong> {property.features.includes('cama') ?
-                                                                                            property.features.match(/\d+\s*cama/) ?
-                                                                                                property.features.match(/\d+\s*cama/)[0].match(/\d+/)[0] :
-                                                                                                '1' : '1'}
+                                                                                        <strong>Camas:</strong> {extractNumberFromFeature(property.features, 'cama')}
                                                                                     </span>
                                                                                 </div>
                                                                                 <div className="flex items-center gap-2">
@@ -981,10 +990,7 @@ export default function AllProperties() {
                                                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                                                                                     </svg>
                                                                                     <span>
-                                                                                        <strong>Hóspedes:</strong> {property.features.includes('hóspede') ?
-                                                                                            property.features.match(/\d+\s*hóspede/) ?
-                                                                                                property.features.match(/\d+\s*hóspede/)[0].match(/\d+/)[0] :
-                                                                                                '2' : '2'}
+                                                                                        <strong>Hóspedes:</strong> {extractGuestsFromFeature(property.features)}
                                                                                     </span>
                                                                                 </div>
                                                                             </div>
@@ -1194,10 +1200,7 @@ export default function AllProperties() {
                                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                                                 </svg>
                                                                 <span>
-                                                                    <strong>Quartos:</strong> {property.features.includes('quarto') ?
-                                                                        property.features.match(/\d+\s*quarto/) ?
-                                                                            property.features.match(/\d+\s*quarto/)[0].match(/\d+/)[0] :
-                                                                            '1' : '1'}
+                                                                    <strong>Quartos:</strong> {extractNumberFromFeature(property.features, 'quarto')}
                                                                 </span>
                                                             </div>
                                                             <div className="flex items-center gap-2">
@@ -1205,10 +1208,7 @@ export default function AllProperties() {
                                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
                                                                 </svg>
                                                                 <span>
-                                                                    <strong>Banheiros:</strong> {property.features.includes('banheiro') ?
-                                                                        property.features.match(/\d+\s*banheiro/) ?
-                                                                            property.features.match(/\d+\s*banheiro/)[0].match(/\d+/)[0] :
-                                                                            '1' : '1'}
+                                                                    <strong>Banheiros:</strong> {extractNumberFromFeature(property.features, 'banheiro')}
                                                                 </span>
                                                             </div>
                                                             <div className="flex items-center gap-2">
@@ -1216,10 +1216,7 @@ export default function AllProperties() {
                                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                                 </svg>
                                                                 <span>
-                                                                    <strong>Camas:</strong> {property.features.includes('cama') ?
-                                                                        property.features.match(/\d+\s*cama/) ?
-                                                                            property.features.match(/\d+\s*cama/)[0].match(/\d+/)[0] :
-                                                                            '1' : '1'}
+                                                                    <strong>Camas:</strong> {extractNumberFromFeature(property.features, 'cama')}
                                                                 </span>
                                                             </div>
                                                             <div className="flex items-center gap-2">
@@ -1227,10 +1224,7 @@ export default function AllProperties() {
                                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                                                                 </svg>
                                                                 <span>
-                                                                    <strong>Hóspedes:</strong> {property.features.includes('hóspede') ?
-                                                                        property.features.match(/\d+\s*hóspede/) ?
-                                                                            property.features.match(/\d+\s*hóspede/)[0].match(/\d+/)[0] :
-                                                                            '2' : '2'}
+                                                                    <strong>Hóspedes:</strong> {extractGuestsFromFeature(property.features)}
                                                                 </span>
                                                             </div>
                                                         </div>
