@@ -1174,13 +1174,11 @@ export default function FeaturedProperties() {
                                                     {/* Preço e avaliação */}
                                                     <div className="flex justify-between items-start mb-4">
                                                         <div>
-                                                            <span className="text-2xl font-bold text-gray-900">R$ {property.pricePerNight}</span>
-                                                            <span className="text-gray-600 ml-1">/ noite</span>
-                                                        </div>
-                                                        <div className="inline-flex items-center gap-1 bg-white px-2 py-1 rounded-full shadow-sm">
-                                                            <Star weight="fill" className="w-4 h-4 text-yellow-500" />
-                                                            <span className="text-sm font-medium text-black">{property.rating}</span>
-                                                            <span className="text-xs text-gray-500">({property.reviewCount})</span>
+                                                            <h3 className="font-bold text-xl mb-1 text-gray-900">R$ {property.pricePerNight} <span className="text-gray-500 text-base font-normal">/ noite</span></h3>
+                                                            <div className="flex items-center">
+                                                                <Star className="h-4 w-4 text-[#8BADA4] mr-1" />
+                                                                <span className="text-sm text-gray-700">{property.rating} ({property.reviewCount} avaliações)</span>
+                                                            </div>
                                                         </div>
                                                     </div>
 
@@ -1272,7 +1270,7 @@ export default function FeaturedProperties() {
                                                     <div className="border-t border-gray-200 py-4 space-y-2">
                                                         <div className="flex justify-between">
                                                             <span className="text-gray-600">R$ {property.pricePerNight} x {calculateNights(startDate, endDate)} noites</span>
-                                                            <span className="text-black">R$ {property.pricePerNight * calculateNights(startDate, endDate)}</span>
+                                                            <span className="text-gray-900">R$ {property.pricePerNight * calculateNights(startDate, endDate)}</span>
                                                         </div>
                                                         <div className="flex justify-between">
                                                             <span className="text-gray-600">Desconto</span>
@@ -1280,15 +1278,15 @@ export default function FeaturedProperties() {
                                                         </div>
                                                         <div className="flex justify-between">
                                                             <span className="text-gray-600">Taxa de serviço</span>
-                                                            <span className="text-black">R$ 35</span>
+                                                            <span className="text-gray-900">R$ 35</span>
                                                         </div>
                                                     </div>
 
                                                     {/* Total */}
                                                     <div className="border-t border-gray-200 pt-4 mb-4">
                                                         <div className="flex justify-between font-bold">
-                                                            <span>Total</span>
-                                                            <span className="text-black">R$ {(property.pricePerNight * calculateNights(startDate, endDate)) - 50 + 35}</span>
+                                                            <span className="text-gray-900">Total</span>
+                                                            <span className="text-gray-900">R$ {(property.pricePerNight * calculateNights(startDate, endDate)) - 50 + 35}</span>
                                                         </div>
                                                     </div>
 

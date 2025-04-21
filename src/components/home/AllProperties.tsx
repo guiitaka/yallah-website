@@ -1184,22 +1184,22 @@ export default function AllProperties() {
                                                 {/* Preço e avaliação */}
                                                 <div className="flex justify-between items-start mb-4">
                                                     <div>
-                                                        <h3 className="font-bold text-xl mb-1">R$ {property.pricePerNight} <span className="text-gray-500 text-base font-normal">/ noite</span></h3>
+                                                        <h3 className="font-bold text-xl mb-1 text-gray-900">R$ {property.pricePerNight} <span className="text-gray-500 text-base font-normal">/ noite</span></h3>
                                                         <div className="flex items-center">
                                                             <Star className="h-4 w-4 text-[#8BADA4] mr-1" />
-                                                            <span className="text-sm">{property.rating} ({property.reviewCount} avaliações)</span>
+                                                            <span className="text-sm text-gray-700">{property.rating} ({property.reviewCount} avaliações)</span>
                                                         </div>
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="text-sm text-gray-500">Preço para 3 noites</p>
-                                                        <div className="font-medium">R$ {property.pricePerNight * 3}</div>
+                                                        <div className="font-medium text-gray-900">R$ {property.pricePerNight * 3}</div>
                                                         {(property as any).discountAmount && (
                                                             <div className="text-green-600 text-sm">-R$ {(property as any).discountAmount}</div>
                                                         )}
                                                         {(property as any).serviceFee && (
                                                             <div className="text-sm text-gray-500">Taxa de serviço: R$ {(property as any).serviceFee}</div>
                                                         )}
-                                                        <div className="font-bold mt-1">
+                                                        <div className="font-bold mt-1 text-gray-900">
                                                             Total: R$ {property.pricePerNight * 3 - ((property as any).discountAmount || 0) + ((property as any).serviceFee || 0)}
                                                         </div>
                                                     </div>
@@ -1293,7 +1293,7 @@ export default function AllProperties() {
                                                 <div className="border-t border-gray-200 py-4 space-y-2">
                                                     <div className="flex justify-between">
                                                         <span className="text-gray-600">R$ {property.pricePerNight} x {calculateNights(startDate, endDate)} noites</span>
-                                                        <span className="text-black">R$ {property.pricePerNight * calculateNights(startDate, endDate)}</span>
+                                                        <span className="text-gray-900">R$ {property.pricePerNight * calculateNights(startDate, endDate)}</span>
                                                     </div>
                                                     <div className="flex justify-between">
                                                         <span className="text-gray-600">Desconto</span>
@@ -1301,15 +1301,15 @@ export default function AllProperties() {
                                                     </div>
                                                     <div className="flex justify-between">
                                                         <span className="text-gray-600">Taxa de serviço</span>
-                                                        <span className="text-black">R$ 35</span>
+                                                        <span className="text-gray-900">R$ 35</span>
                                                     </div>
                                                 </div>
 
                                                 {/* Total */}
                                                 <div className="border-t border-gray-200 pt-4 mb-4">
                                                     <div className="flex justify-between font-bold">
-                                                        <span>Total</span>
-                                                        <span className="text-black">R$ {(property.pricePerNight * calculateNights(startDate, endDate)) - 50 + 35}</span>
+                                                        <span className="text-gray-900">Total</span>
+                                                        <span className="text-gray-900">R$ {(property.pricePerNight * calculateNights(startDate, endDate)) - 50 + 35}</span>
                                                     </div>
                                                 </div>
 
