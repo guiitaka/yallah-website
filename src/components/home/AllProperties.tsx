@@ -499,8 +499,7 @@ export default function AllProperties() {
     const totalSlides = Math.ceil(staticAllProperties.length / itemsPerPage);
 
     // Função para atualizar o intervalo de datas
-    const setDateRange = (update: [Date | null, Date | null]) => {
-        const [start, end] = update;
+    const updateDateRange = (update: [Date | null, Date | null]) => {
         setDateRange(update);
     };
 
@@ -560,7 +559,7 @@ export default function AllProperties() {
                 setIsTransitioning(false);
                 setIsClosing(false);
                 // Resetar campos de formulário
-                setDateRange([null, null]);
+                updateDateRange([null, null]);
                 setConsultationMessage('');
             }, 300);
         } else {
@@ -587,7 +586,7 @@ export default function AllProperties() {
                 setIsTransitioning(false);
                 setIsClosing(false);
                 // Resetar campos de formulário
-                setDateRange([null, null]);
+                updateDateRange([null, null]);
                 setConsultationMessage('');
             }, 300);
         }
@@ -604,7 +603,7 @@ export default function AllProperties() {
                     setIsTransitioning(false);
                     setIsClosing(false);
                     // Resetar campos de formulário
-                    setDateRange([null, null]);
+                    updateDateRange([null, null]);
                     setConsultationMessage('');
                 }, 300);
             }
@@ -661,7 +660,7 @@ export default function AllProperties() {
 
         // Limpar as datas após alguns segundos
         setTimeout(() => {
-            setDateRange([null, null]);
+            updateDateRange([null, null]);
         }, 5000);
     };
 
@@ -1287,7 +1286,7 @@ export default function AllProperties() {
                                                             startDate={startDate}
                                                             endDate={endDate}
                                                             onChange={(update) => {
-                                                                setDateRange(update);
+                                                                updateDateRange(update);
                                                             }}
                                                             isClearable={false}
                                                             placeholderText="dd/mm/yyyy"
