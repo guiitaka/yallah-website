@@ -970,30 +970,12 @@ export default function AllProperties() {
                                                                     {/* Características */}
                                                                     <div className="flex gap-4 items-center text-white/80 mt-2">
                                                                         {property.features ? (
-                                                                            <div className="grid grid-cols-4 gap-4 w-full">
-                                                                                <div className="flex items-center gap-2">
-                                                                                    <Buildings className="w-4 h-4 text-white/70" />
-                                                                                    <span>
-                                                                                        <strong>Quartos:</strong> {extractNumberFromFeature(property.features, 'quarto', property.rooms)}
-                                                                                    </span>
-                                                                                </div>
-                                                                                <div className="flex items-center gap-2">
-                                                                                    <Waves className="w-4 h-4 text-white/70" />
-                                                                                    <span>
-                                                                                        <strong>Banheiros:</strong> {extractNumberFromFeature(property.features, 'banheiro', property.bathrooms)}
-                                                                                    </span>
-                                                                                </div>
-                                                                                <div className="flex items-center gap-2">
-                                                                                    <Bed className="w-4 h-4 text-white/70" />
-                                                                                    <span>
-                                                                                        <strong>Camas:</strong> {extractNumberFromFeature(property.features, 'cama', property.beds)}
-                                                                                    </span>
-                                                                                </div>
+                                                                            <div className="flex items-center w-full">
                                                                                 <div className="flex items-center gap-2">
                                                                                     <Users className="w-4 h-4 text-white/70" />
-                                                                                    <span>
-                                                                                        <strong>Hóspedes:</strong> {extractGuestsFromFeature(property.features, property.guests)}
-                                                                                    </span>
+                                                                                    <p className="text-white/80">
+                                                                                        {extractGuestsFromFeature(property.features, property.guests)} hóspedes · {property.type || 'Studio'} · {extractNumberFromFeature(property.features, 'cama', property.beds)} cama{property.beds && property.beds > 1 ? 's' : ''} · {extractNumberFromFeature(property.features, 'banheiro', property.bathrooms)} banheiro{property.bathrooms && property.bathrooms > 1 ? 's' : ''}
+                                                                                    </p>
                                                                                 </div>
                                                                             </div>
                                                                         ) : (
@@ -1194,32 +1176,14 @@ export default function AllProperties() {
                                                 </div>
 
                                                 {/* Informações básicas */}
-                                                <div className="flex gap-4 items-center text-white/80 mt-2">
+                                                <div className="flex gap-4 items-center text-gray-700 mt-2">
                                                     {property.features ? (
-                                                        <div className="grid grid-cols-4 gap-4 w-full">
+                                                        <div className="flex items-center w-full">
                                                             <div className="flex items-center gap-2">
-                                                                <Buildings className="w-4 h-4 text-white/70" />
-                                                                <span>
-                                                                    <strong>Quartos:</strong> {extractNumberFromFeature(property.features, 'quarto', property.rooms)}
-                                                                </span>
-                                                            </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <Waves className="w-4 h-4 text-white/70" />
-                                                                <span>
-                                                                    <strong>Banheiros:</strong> {extractNumberFromFeature(property.features, 'banheiro', property.bathrooms)}
-                                                                </span>
-                                                            </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <Bed className="w-4 h-4 text-white/70" />
-                                                                <span>
-                                                                    <strong>Camas:</strong> {extractNumberFromFeature(property.features, 'cama', property.beds)}
-                                                                </span>
-                                                            </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <Users className="w-4 h-4 text-white/70" />
-                                                                <span>
-                                                                    <strong>Hóspedes:</strong> {extractGuestsFromFeature(property.features, property.guests)}
-                                                                </span>
+                                                                <Users className="w-4 h-4 text-gray-600" />
+                                                                <p className="text-gray-700">
+                                                                    {extractGuestsFromFeature(property.features, property.guests)} hóspedes · {property.type || 'Studio'} · {extractNumberFromFeature(property.features, 'cama', property.beds)} cama{property.beds && property.beds > 1 ? 's' : ''} · {extractNumberFromFeature(property.features, 'banheiro', property.bathrooms)} banheiro{property.bathrooms && property.bathrooms > 1 ? 's' : ''}
+                                                                </p>
                                                             </div>
                                                         </div>
                                                     ) : (
