@@ -488,8 +488,8 @@ export default function AllProperties() {
     const [isTransitioning, setIsTransitioning] = useState(false)
     const [isClosing, setIsClosing] = useState(false)
     // Estados para inputs de data
-    const [startDate, setStartDate] = useState<Date | null>(null);
-    const [endDate, setEndDate] = useState<Date | null>(null);
+    const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+    const [startDate, endDate] = dateRange;
     const [consultationMessage, setConsultationMessage] = useState('');
     // Estado para controlar a aba ativa
     const [activeTab, setActiveTab] = useState('descricao');
@@ -501,8 +501,7 @@ export default function AllProperties() {
     // Função para atualizar o intervalo de datas
     const setDateRange = (update: [Date | null, Date | null]) => {
         const [start, end] = update;
-        setStartDate(start);
-        setEndDate(end);
+        setDateRange(update);
     };
 
     // Use the hook to fetch properties from Firebase
@@ -561,8 +560,7 @@ export default function AllProperties() {
                 setIsTransitioning(false);
                 setIsClosing(false);
                 // Resetar campos de formulário
-                setStartDate(null);
-                setEndDate(null);
+                setDateRange([null, null]);
                 setConsultationMessage('');
             }, 300);
         } else {
@@ -589,8 +587,7 @@ export default function AllProperties() {
                 setIsTransitioning(false);
                 setIsClosing(false);
                 // Resetar campos de formulário
-                setStartDate(null);
-                setEndDate(null);
+                setDateRange([null, null]);
                 setConsultationMessage('');
             }, 300);
         }
@@ -607,8 +604,7 @@ export default function AllProperties() {
                     setIsTransitioning(false);
                     setIsClosing(false);
                     // Resetar campos de formulário
-                    setStartDate(null);
-                    setEndDate(null);
+                    setDateRange([null, null]);
                     setConsultationMessage('');
                 }, 300);
             }
@@ -635,6 +631,18 @@ export default function AllProperties() {
         };
     }, [expandedCard]);
 
+    // Debug das propriedades expandidas
+    useEffect(() => {
+        if (expandedCard !== null) {
+            const expandedProperty = allProperties.find(p => p.id === expandedCard);
+            if (expandedProperty) {
+                console.log("Dados da propriedade expandida:", expandedProperty);
+                console.log("Imagens:", (expandedProperty as any).images);
+                console.log("Número de imagens:", (expandedProperty as any).images?.length || 0);
+            }
+        }
+    }, [expandedCard, allProperties]);
+
     // Handler para consulta de disponibilidade
     const handleAvailabilityConsultation = (property: any) => {
         if (!startDate || !endDate) {
@@ -653,8 +661,7 @@ export default function AllProperties() {
 
         // Limpar as datas após alguns segundos
         setTimeout(() => {
-            setStartDate(null);
-            setEndDate(null);
+            setDateRange([null, null]);
         }, 5000);
     };
 
