@@ -905,12 +905,10 @@ export default function AllProperties() {
 
                                                                     {/* Botão de ação */}
                                                                     <button
-                                                                        className="w-full py-3 px-4 bg-[#8BADA4] hover:bg-[#7A9D94] text-white font-medium rounded-full transition-colors flex items-center justify-center gap-2 text-sm whitespace-nowrap"
-                                                                        onClick={(e) => {
+                                                                        className="w-full py-3 px-4 bg-[#8BADA4] hover:bg-[#7A9D94] text-white font-medium rounded-full transition-colors flex items-center justify-center gap-2 text-sm whitespace-nowrap" onClick={(e) => {
                                                                             e.stopPropagation();
                                                                             expandCard(property.id);
-                                                                        }}
-                                                                    >
+                                                                        }}>
                                                                         Consultar disponibilidade <ArrowRight weight="bold" className="min-w-4 min-h-4" />
                                                                     </button>
                                                                 </div>
@@ -1169,58 +1167,23 @@ export default function AllProperties() {
                                             {activeTab === 'fotos' && (
                                                 <div>
                                                     <h3 className="text-xl font-semibold mb-4 text-[#8BADA4]">Fotos do imóvel</h3>
-                                                    <div className="space-y-6">
-                                                        {/* Grid compacto com as primeiras 4 fotos */}
-                                                        <div className="grid grid-cols-2 gap-2">
-                                                            {(property.images && property.images.length > 0) ? (
-                                                                // Primeiras 4 fotos (ou menos se não houver tantas)
-                                                                property.images.slice(0, 4).map((image: string, index: number) => (
-                                                                    <div
-                                                                        key={`thumb-${index}`}
-                                                                        className={`relative overflow-hidden rounded-lg cursor-pointer 
-                                                                            ${index === 0 ? 'col-span-2 aspect-[16/9]' : 'aspect-square'}`}
-                                                                        onClick={() => openFullGallery(property as PropertyCard)}
-                                                                    >
-                                                                        <Image
-                                                                            src={image}
-                                                                            alt={`${property.title} - Imagem ${index + 1}`}
-                                                                            fill
-                                                                            className="object-cover hover:scale-105 transition-transform duration-500"
-                                                                        />
-
-                                                                        {/* Mostrar número de fotos restantes na última miniatura */}
-                                                                        {index === 3 && property.images && property.images.length > 4 && (
-                                                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                                                                                <span className="text-white text-xl font-semibold">+{property.images.length - 4} fotos</span>
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                ))
-                                                            ) : (
-                                                                // Fallback: se não houver imagens no array 'images', use a imagem padrão
-                                                                <div className="col-span-2 relative aspect-[16/9] rounded-lg overflow-hidden">
-                                                                    <Image
-                                                                        src={property.image}
-                                                                        alt={property.title}
-                                                                        fill
-                                                                        className="object-cover"
-                                                                    />
-                                                                </div>
-                                                            )}
-                                                        </div>
+                                                    <div className="space-y-2">
+                                                        {/* Remover o grid de fotos e manter apenas o botão */}
+                                                        <p className="text-gray-600 mb-4">
+                                                            Este imóvel possui {property.images && property.images.length > 0 ? property.images.length : '1'}
+                                                            {property.images && property.images.length > 1 ? ' fotos' : ' foto'} disponíveis para visualização.
+                                                        </p>
 
                                                         {/* Botão para ver todas as fotos */}
-                                                        {property.images && property.images.length > 0 && (
-                                                            <button
-                                                                onClick={() => openFullGallery(property as PropertyCard)}
-                                                                className="w-full py-3 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg flex items-center justify-center gap-2 transition-colors"
-                                                            >
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                                </svg>
-                                                                <span className="font-medium">Ver todas as fotos</span>
-                                                            </button>
-                                                        )}
+                                                        <button
+                                                            onClick={() => openFullGallery(property as PropertyCard)}
+                                                            className="w-full py-4 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg flex items-center justify-center gap-3 transition-colors"
+                                                        >
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                            </svg>
+                                                            <span className="font-medium">Ver todas as fotos</span>
+                                                        </button>
                                                     </div>
                                                 </div>
                                             )}
