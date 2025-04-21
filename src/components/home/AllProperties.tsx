@@ -817,9 +817,58 @@ export default function AllProperties() {
                                                                     </h3>
 
                                                                     {/* Características */}
-                                                                    <p className="text-white/80 text-sm mb-2 line-clamp-1">
-                                                                        {property.features}
-                                                                    </p>
+                                                                    <div className="flex gap-4 items-center text-gray-700 mt-2">
+                                                                        {property.features ? (
+                                                                            <div className="grid grid-cols-4 gap-4 w-full">
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                                                                    </svg>
+                                                                                    <span>
+                                                                                        <strong>Quartos:</strong> {property.features.includes('quarto') ?
+                                                                                            property.features.match(/\d+\s*quarto/) ?
+                                                                                                property.features.match(/\d+\s*quarto/)[0].match(/\d+/)[0] :
+                                                                                                '1' : '1'}
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                                                                                    </svg>
+                                                                                    <span>
+                                                                                        <strong>Banheiros:</strong> {property.features.includes('banheiro') ?
+                                                                                            property.features.match(/\d+\s*banheiro/) ?
+                                                                                                property.features.match(/\d+\s*banheiro/)[0].match(/\d+/)[0] :
+                                                                                                '1' : '1'}
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                                    </svg>
+                                                                                    <span>
+                                                                                        <strong>Camas:</strong> {property.features.includes('cama') ?
+                                                                                            property.features.match(/\d+\s*cama/) ?
+                                                                                                property.features.match(/\d+\s*cama/)[0].match(/\d+/)[0] :
+                                                                                                '1' : '1'}
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                                                                    </svg>
+                                                                                    <span>
+                                                                                        <strong>Hóspedes:</strong> {property.features.includes('hóspede') ?
+                                                                                            property.features.match(/\d+\s*hóspede/) ?
+                                                                                                property.features.match(/\d+\s*hóspede/)[0].match(/\d+/)[0] :
+                                                                                                '2' : '2'}
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        ) : (
+                                                                            <span>Acomodações disponíveis mediante consulta</span>
+                                                                        )}
+                                                                    </div>
 
                                                                     {/* Avaliações */}
                                                                     <div className="flex items-center mb-2">
@@ -891,9 +940,58 @@ export default function AllProperties() {
                                                                     </h3>
 
                                                                     {/* Características */}
-                                                                    <p className="text-white/80 text-sm mb-2 line-clamp-1">
-                                                                        {property.features}
-                                                                    </p>
+                                                                    <div className="flex gap-4 items-center text-gray-700 mt-2">
+                                                                        {property.features ? (
+                                                                            <div className="grid grid-cols-4 gap-4 w-full">
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                                                                    </svg>
+                                                                                    <span>
+                                                                                        <strong>Quartos:</strong> {property.features.includes('quarto') ?
+                                                                                            property.features.match(/\d+\s*quarto/) ?
+                                                                                                property.features.match(/\d+\s*quarto/)[0].match(/\d+/)[0] :
+                                                                                                '1' : '1'}
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                                                                                    </svg>
+                                                                                    <span>
+                                                                                        <strong>Banheiros:</strong> {property.features.includes('banheiro') ?
+                                                                                            property.features.match(/\d+\s*banheiro/) ?
+                                                                                                property.features.match(/\d+\s*banheiro/)[0].match(/\d+/)[0] :
+                                                                                                '1' : '1'}
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                                    </svg>
+                                                                                    <span>
+                                                                                        <strong>Camas:</strong> {property.features.includes('cama') ?
+                                                                                            property.features.match(/\d+\s*cama/) ?
+                                                                                                property.features.match(/\d+\s*cama/)[0].match(/\d+/)[0] :
+                                                                                                '1' : '1'}
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                                                                    </svg>
+                                                                                    <span>
+                                                                                        <strong>Hóspedes:</strong> {property.features.includes('hóspede') ?
+                                                                                            property.features.match(/\d+\s*hóspede/) ?
+                                                                                                property.features.match(/\d+\s*hóspede/)[0].match(/\d+/)[0] :
+                                                                                                '2' : '2'}
+                                                                                    </span>
+                                                                                </div>
+                                                                            </div>
+                                                                        ) : (
+                                                                            <span>Acomodações disponíveis mediante consulta</span>
+                                                                        )}
+                                                                    </div>
 
                                                                     {/* Avaliações */}
                                                                     <div className="flex items-center mb-2">
@@ -1088,8 +1186,57 @@ export default function AllProperties() {
                                                 </div>
 
                                                 {/* Informações básicas */}
-                                                <div className="flex gap-2 items-center text-gray-700 mt-2">
-                                                    <span>{property.features}</span>
+                                                <div className="flex gap-4 items-center text-gray-700 mt-2">
+                                                    {property.features ? (
+                                                        <div className="grid grid-cols-4 gap-4 w-full">
+                                                            <div className="flex items-center gap-2">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                                                </svg>
+                                                                <span>
+                                                                    <strong>Quartos:</strong> {property.features.includes('quarto') ?
+                                                                        property.features.match(/\d+\s*quarto/) ?
+                                                                            property.features.match(/\d+\s*quarto/)[0].match(/\d+/)[0] :
+                                                                            '1' : '1'}
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                                                                </svg>
+                                                                <span>
+                                                                    <strong>Banheiros:</strong> {property.features.includes('banheiro') ?
+                                                                        property.features.match(/\d+\s*banheiro/) ?
+                                                                            property.features.match(/\d+\s*banheiro/)[0].match(/\d+/)[0] :
+                                                                            '1' : '1'}
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                                <span>
+                                                                    <strong>Camas:</strong> {property.features.includes('cama') ?
+                                                                        property.features.match(/\d+\s*cama/) ?
+                                                                            property.features.match(/\d+\s*cama/)[0].match(/\d+/)[0] :
+                                                                            '1' : '1'}
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                                                </svg>
+                                                                <span>
+                                                                    <strong>Hóspedes:</strong> {property.features.includes('hóspede') ?
+                                                                        property.features.match(/\d+\s*hóspede/) ?
+                                                                            property.features.match(/\d+\s*hóspede/)[0].match(/\d+/)[0] :
+                                                                            '2' : '2'}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <span>Acomodações disponíveis mediante consulta</span>
+                                                    )}
                                                 </div>
 
                                                 {/* Categorias/Tags */}
@@ -1174,10 +1321,10 @@ export default function AllProperties() {
                                                             {property.images && property.images.length > 1 ? ' fotos' : ' foto'} disponíveis para visualização.
                                                         </p>
 
-                                                        {/* Botão para ver todas as fotos */}
+                                                        {/* Botão para ver todas as fotos - Mudar a cor do texto para preto */}
                                                         <button
                                                             onClick={() => openFullGallery(property as PropertyCard)}
-                                                            className="w-full py-4 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg flex items-center justify-center gap-3 transition-colors"
+                                                            className="w-full py-4 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg flex items-center justify-center gap-3 transition-colors text-gray-800"
                                                         >
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
