@@ -1055,6 +1055,12 @@ export default function FeaturedProperties() {
                                                             Descrição
                                                         </button>
                                                         <button
+                                                            className={`py-2 whitespace-nowrap ${activeTab === 'fotos' ? 'border-b-2 border-[#8BADA4] text-[#8BADA4] font-medium' : 'text-gray-500 hover:text-gray-700'}`}
+                                                            onClick={() => setActiveTab('fotos')}
+                                                        >
+                                                            Fotos
+                                                        </button>
+                                                        <button
                                                             className={`py-2 whitespace-nowrap ${activeTab === 'oferecemos' ? 'border-b-2 border-[#8BADA4] text-[#8BADA4] font-medium' : 'text-gray-500 hover:text-gray-700'}`}
                                                             onClick={() => setActiveTab('oferecemos')}
                                                         >
@@ -1094,6 +1100,38 @@ export default function FeaturedProperties() {
                                                                 </p>
                                                             </>
                                                         )}
+                                                    </div>
+                                                )}
+
+                                                {/* Conteúdo da galeria de fotos */}
+                                                {activeTab === 'fotos' && (
+                                                    <div>
+                                                        <h3 className="text-xl font-semibold mb-4 text-[#8BADA4]">Fotos do imóvel</h3>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            {(property as any).images && (property as any).images.length > 0 ? (
+                                                                // Se o imóvel tem múltiplas imagens, exiba todas
+                                                                (property as any).images.map((image: string, index: number) => (
+                                                                    <div key={`image-${index}`} className="relative aspect-video rounded-lg overflow-hidden">
+                                                                        <Image
+                                                                            src={image}
+                                                                            alt={`${property.title} - Imagem ${index + 1}`}
+                                                                            fill
+                                                                            className="object-cover hover:scale-105 transition-transform duration-300"
+                                                                        />
+                                                                    </div>
+                                                                ))
+                                                            ) : (
+                                                                // Fallback: se não houver imagens no array 'images', use a imagem padrão
+                                                                <div className="relative aspect-video rounded-lg overflow-hidden">
+                                                                    <Image
+                                                                        src={property.image}
+                                                                        alt={property.title}
+                                                                        fill
+                                                                        className="object-cover"
+                                                                    />
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 )}
 
