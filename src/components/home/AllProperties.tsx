@@ -530,6 +530,10 @@ export default function AllProperties() {
     const [currentSlide, setCurrentSlide] = useState(0);
     const itemsPerPage = 10; // 5 cards por linha, 2 linhas
     const totalSlides = Math.ceil(staticAllProperties.length / itemsPerPage);
+    // Adicionar novos estados para o controle da galeria
+    const [showFullGallery, setShowFullGallery] = useState(false);
+    const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
+    const [selectedProperty, setSelectedProperty] = useState<PropertyCard | null>(null);
 
     // Função para atualizar o intervalo de datas
     const updateDateRange = (update: [Date | null, Date | null]) => {
@@ -677,6 +681,42 @@ export default function AllProperties() {
         setTimeout(() => {
             updateDateRange([null, null]);
         }, 5000);
+    };
+
+    // Função para abrir a galeria
+    const openFullGallery = (property: PropertyCard) => {
+        setSelectedProperty(property);
+        setCurrentGalleryIndex(0);
+        setShowFullGallery(true);
+        // Prevenir o scroll da página quando a galeria estiver aberta
+        document.body.style.overflow = 'hidden';
+    };
+
+    // Função para fechar a galeria
+    const closeFullGallery = () => {
+        setShowFullGallery(false);
+        setSelectedProperty(null);
+        // Restaurar o scroll da página
+        document.body.style.overflow = '';
+    };
+
+    // Funções de navegação da galeria
+    const nextImage = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!selectedProperty?.images || selectedProperty.images.length === 0) return;
+
+        setCurrentGalleryIndex(prev =>
+            prev === selectedProperty.images!.length - 1 ? 0 : prev + 1
+        );
+    };
+
+    const prevImage = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!selectedProperty?.images || selectedProperty.images.length === 0) return;
+
+        setCurrentGalleryIndex(prev =>
+            prev === 0 ? selectedProperty.images!.length - 1 : prev - 1
+        );
     };
 
     // Add a loading state if necessary
@@ -1129,29 +1169,57 @@ export default function AllProperties() {
                                             {activeTab === 'fotos' && (
                                                 <div>
                                                     <h3 className="text-xl font-semibold mb-4 text-[#8BADA4]">Fotos do imóvel</h3>
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                        {(property as any).images && (property as any).images.length > 0 ? (
-                                                            // Se o imóvel tem múltiplas imagens, exiba todas
-                                                            (property as any).images.map((image: string, index: number) => (
-                                                                <div key={`image-${index}`} className="relative aspect-video rounded-lg overflow-hidden">
+                                                    <div className="space-y-6">
+                                                        {/* Grid compacto com as primeiras 4 fotos */}
+                                                        <div className="grid grid-cols-2 gap-2">
+                                                            {(property.images && property.images.length > 0) ? (
+                                                                // Primeiras 4 fotos (ou menos se não houver tantas)
+                                                                property.images.slice(0, 4).map((image: string, index: number) => (
+                                                                    <div
+                                                                        key={`thumb-${index}`}
+                                                                        className={`relative overflow-hidden rounded-lg cursor-pointer 
+                                                                            ${index === 0 ? 'col-span-2 aspect-[16/9]' : 'aspect-square'}`}
+                                                                        onClick={() => openFullGallery(property as PropertyCard)}
+                                                                    >
+                                                                        <Image
+                                                                            src={image}
+                                                                            alt={`${property.title} - Imagem ${index + 1}`}
+                                                                            fill
+                                                                            className="object-cover hover:scale-105 transition-transform duration-500"
+                                                                        />
+
+                                                                        {/* Mostrar número de fotos restantes na última miniatura */}
+                                                                        {index === 3 && property.images && property.images.length > 4 && (
+                                                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                                                                <span className="text-white text-xl font-semibold">+{property.images.length - 4} fotos</span>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                ))
+                                                            ) : (
+                                                                // Fallback: se não houver imagens no array 'images', use a imagem padrão
+                                                                <div className="col-span-2 relative aspect-[16/9] rounded-lg overflow-hidden">
                                                                     <Image
-                                                                        src={image}
-                                                                        alt={`${property.title} - Imagem ${index + 1}`}
+                                                                        src={property.image}
+                                                                        alt={property.title}
                                                                         fill
-                                                                        className="object-cover hover:scale-105 transition-transform duration-300"
+                                                                        className="object-cover"
                                                                     />
                                                                 </div>
-                                                            ))
-                                                        ) : (
-                                                            // Fallback: se não houver imagens no array 'images', use a imagem padrão
-                                                            <div className="relative aspect-video rounded-lg overflow-hidden">
-                                                                <Image
-                                                                    src={property.image}
-                                                                    alt={property.title}
-                                                                    fill
-                                                                    className="object-cover"
-                                                                />
-                                                            </div>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Botão para ver todas as fotos */}
+                                                        {property.images && property.images.length > 0 && (
+                                                            <button
+                                                                onClick={() => openFullGallery(property as PropertyCard)}
+                                                                className="w-full py-3 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                                                            >
+                                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                </svg>
+                                                                <span className="font-medium">Ver todas as fotos</span>
+                                                            </button>
                                                         )}
                                                     </div>
                                                 </div>
@@ -1420,6 +1488,77 @@ export default function AllProperties() {
                     </div>
                 )}
             </div>
+
+            {/* Modal de galeria em tela cheia */}
+            {showFullGallery && selectedProperty && (
+                <div
+                    className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center"
+                    onClick={closeFullGallery}
+                >
+                    {/* Botão de fechar */}
+                    <button
+                        className="absolute top-6 right-6 p-2 bg-white/20 hover:bg-white/30 rounded-full text-white z-10 transition-colors"
+                        onClick={closeFullGallery}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+
+                    {/* Contador de imagens */}
+                    <div className="absolute top-6 left-6 bg-black/40 text-white px-4 py-2 rounded-full">
+                        {currentGalleryIndex + 1} / {selectedProperty.images?.length || 1}
+                    </div>
+
+                    {/* Imagem atual */}
+                    <div
+                        className="relative w-full h-full flex items-center justify-center p-10 md:p-16 lg:p-20"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="relative w-full h-full">
+                            {selectedProperty.images && selectedProperty.images.length > 0 ? (
+                                <Image
+                                    src={selectedProperty.images[currentGalleryIndex]}
+                                    alt={`${selectedProperty.title} - Imagem ${currentGalleryIndex + 1}`}
+                                    fill
+                                    className="object-contain"
+                                    sizes="(max-width: 768px) 90vw, 80vw"
+                                />
+                            ) : (
+                                <Image
+                                    src={selectedProperty.image}
+                                    alt={selectedProperty.title}
+                                    fill
+                                    className="object-contain"
+                                    sizes="(max-width: 768px) 90vw, 80vw"
+                                />
+                            )}
+                        </div>
+
+                        {/* Botões de navegação */}
+                        {selectedProperty.images && selectedProperty.images.length > 1 && (
+                            <>
+                                <button
+                                    className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/20 hover:bg-white/30 rounded-full text-white transition-colors"
+                                    onClick={prevImage}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </button>
+                                <button
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/20 hover:bg-white/30 rounded-full text-white transition-colors"
+                                    onClick={nextImage}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </button>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     )
 } 
