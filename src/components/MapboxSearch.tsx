@@ -119,7 +119,7 @@ const MapboxSearch: React.FC<MapboxSearchProps> = ({ onLocationSelect, initialVa
             const searchQuery = `${query}, São Paulo, Brasil`;
 
             const response = await fetch(
-                `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?access_token=${token}&country=br&types=address&language=pt`
+                `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(searchQuery)}.json?access_token=${token}&country=br&types=address,neighborhood&language=pt&autocomplete=true&limit=5`
             );
 
             if (!response.ok) {
@@ -155,14 +155,42 @@ const MapboxSearch: React.FC<MapboxSearchProps> = ({ onLocationSelect, initialVa
                 zoom: 15
             });
 
+            // Extract neighborhood from context if available
+            let neighborhood = '';
+            if (result.context) {
+                const neighborhoodContext = result.context.find((ctx: any) =>
+                    ctx.id.startsWith('neighborhood')
+                );
+                if (neighborhoodContext) {
+                    neighborhood = neighborhoodContext.text;
+                }
+            }
+
+            // Format address to include neighborhood if available
+            let formattedAddress = result.place_name;
+
+            // If neighborhood is found but not already in the address, add it
+            if (neighborhood && !formattedAddress.includes(neighborhood)) {
+                // Try to insert neighborhood before the city
+                const parts = formattedAddress.split(',');
+                if (parts.length >= 2) {
+                    // Insert neighborhood after street address, before city
+                    parts.splice(1, 0, ` ${neighborhood}`);
+                    formattedAddress = parts.join(',');
+                } else {
+                    // Just append neighborhood if can't determine proper position
+                    formattedAddress = `${formattedAddress}, ${neighborhood}`;
+                }
+            }
+
             const locationData = {
-                address: result.place_name,
+                address: formattedAddress,
                 coordinates
             };
 
             setSelectedLocation(locationData);
             onLocationSelect(locationData);
-            setAddressInput(result.place_name);
+            setAddressInput(formattedAddress);
             setShowResults(false);
         } catch (error) {
             console.error('Error selecting address:', error);
@@ -248,15 +276,33 @@ const MapboxSearch: React.FC<MapboxSearchProps> = ({ onLocationSelect, initialVa
                     {showResults && searchResults.length > 0 && (
                         <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-md shadow-lg max-h-60 overflow-y-auto z-20">
                             <ul>
-                                {searchResults.map((result) => (
-                                    <li
-                                        key={result.id}
-                                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-0"
-                                        onClick={() => handleAddressSelect(result)}
-                                    >
-                                        <p className="text-gray-800">{result.place_name}</p>
-                                    </li>
-                                ))}
+                                {searchResults.map((result) => {
+                                    // Extract neighborhood from context if available
+                                    let neighborhood = '';
+                                    if (result.context) {
+                                        const neighborhoodContext = result.context.find((ctx: any) =>
+                                            ctx.id.startsWith('neighborhood')
+                                        );
+                                        if (neighborhoodContext) {
+                                            neighborhood = neighborhoodContext.text;
+                                        }
+                                    }
+
+                                    return (
+                                        <li
+                                            key={result.id}
+                                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-0"
+                                            onClick={() => handleAddressSelect(result)}
+                                        >
+                                            <p className="text-gray-800">{result.place_name}</p>
+                                            {neighborhood && !result.place_name.includes(neighborhood) && (
+                                                <p className="text-gray-500 text-xs mt-1">
+                                                    Bairro: {neighborhood}
+                                                </p>
+                                            )}
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         </div>
                     )}
