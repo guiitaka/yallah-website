@@ -487,23 +487,32 @@ const formatLocationForPublic = (fullAddress: string): string => {
 const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
     if (!properties || properties.length === 0) return staticAllProperties;
 
-    return properties.map(property => ({
-        id: property.id,
-        title: property.title || "Sem título",
-        location: property.location || "Localização não especificada",
-        details: property.details || "",
-        features: property.features || "Detalhes não disponíveis",
-        pricePerNight: property.pricePerNight || 0,
-        rating: property.rating || 4.5,
-        reviewCount: property.reviewCount || 0,
-        image: property.image || "/card1.jpg",
-        coordinates: property.coordinates || [-46.6333, -23.5505],
-        description: property.description || "",
-        whatWeOffer: property.whatWeOffer || "",
-        whatYouShouldKnow: property.whatYouShouldKnow || "",
-        type: property.type || "",
-        images: property.images || [] // Garantir que images está sendo transferido corretamente
-    }));
+    return properties.map(property => {
+        // Debug para verificar estrutura dos dados
+        console.log("Dados originais da propriedade:", property);
+        console.log("Preço da propriedade:", property.price, property.pricePerNight);
+
+        // Verificar qual campo de preço está disponível
+        const price = property.price || property.pricePerNight || 0;
+
+        return {
+            id: property.id,
+            title: property.title || "Sem título",
+            location: property.location || "Localização não especificada",
+            details: property.details || "",
+            features: property.features || "Detalhes não disponíveis",
+            pricePerNight: price,
+            rating: property.rating || 4.5,
+            reviewCount: property.reviewCount || 0,
+            image: property.image || "/card1.jpg",
+            coordinates: property.coordinates || [-46.6333, -23.5505],
+            description: property.description || "",
+            whatWeOffer: property.whatWeOffer || "",
+            whatYouShouldKnow: property.whatYouShouldKnow || "",
+            type: property.type || "",
+            images: property.images || [] // Garantir que images está sendo transferido corretamente
+        };
+    });
 };
 
 export default function AllProperties() {
