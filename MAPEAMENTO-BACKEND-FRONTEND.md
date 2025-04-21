@@ -1,30 +1,64 @@
 # Mapeamento DE-PARA entre Backend e Frontend
 
-## Aba Descrição
+Este documento descreve o mapeamento entre os campos do formulário de cadastro de imóveis no painel administrativo (backend) e os campos exibidos no frontend para os visitantes do site.
 
-| Campo Backend | Campo Frontend | Observações |
-|---------------|----------------|-------------|
-| `description` | Texto principal em "Nosso imóvel" | O texto detalhado inserido no campo descrição vai diretamente para o conteúdo principal da aba Descrição |
-| `type` | Tag de tipo de imóvel | Exibido como uma tag/badge no frontend junto com a localização |
-| `location` | Localização formatada | Exibido como tag/badge, apenas o bairro e cidade |
-| `images` | Galeria de imagens | As várias imagens do imóvel devem ser exibidas em diferentes posições na galeria, não repetidas |
+## Campos do Formulário Backend
 
-## Problemas corrigidos:
+### Informações Básicas
+- **Título do Imóvel** (`title`): Nome/título principal do imóvel
+- **Descrição** (`description`): Descrição detalhada do imóvel
+- **Tipo de Imóvel** (`type`): Categoria do imóvel (Apartamento, Casa, Cobertura, etc.)
+- **Localização** (`location`): Endereço completo do imóvel
+- **Status** (`status`): Estado atual do imóvel (Disponível, Alugado, Em Manutenção)
 
-1. **Texto Descritivo**: O campo `description` do backend agora alimenta corretamente o texto detalhado que aparece abaixo do título "Nosso imóvel", removendo o texto de placeholder.
+### Características e Preço
+- **Preço por Noite** (`price`): Valor cobrado por noite
+- **Quartos** (`bedrooms`): Número de quartos
+- **Banheiros** (`bathrooms`): Número de banheiros
+- **Camas** (`beds`): Número de camas
+- **Hóspedes** (`guests`): Número máximo de hóspedes
+- **Área** (`area`): Tamanho do imóvel em m²
+- **Destacar na plataforma** (`featured`): Se o imóvel deve ser exibido como destaque
 
-2. **Tag de Tipo de Imóvel**: O campo `type` (Casa, Apartamento, etc.) do backend é exibido como uma tag no frontend.
+### Campos Adicionais
+- **O que oferecemos** (`whatWeOffer`): Descrição das comodidades e diferenciais
+- **O que você deve saber** (`whatYouShouldKnow`): Informações importantes sobre regras e restrições
+- **Taxa de serviço** (`serviceFee`): Taxa de serviço cobrada
+- **Configurações de Desconto** (`discountSettings`): Detalhes sobre descontos aplicáveis
 
-3. **Problemas com Tags**: Removida a exibição do texto de "testando descrição" como tag no frontend.
+## Mapeamento DE-PARA
 
-4. **Renderização de Imagens**: Corrigido o problema em que apenas a primeira imagem era exibida e repetida. Agora o sistema usa todas as imagens disponíveis no array `images`.
+| Campo Backend | Campo Frontend | Localização no Frontend | Observações |
+|---------------|----------------|------------------------|------------|
+| `title` | Título do imóvel | Topo do card e página de detalhes | - |
+| `description` | Texto em "Nosso imóvel" | Aba "Descrição" na página de detalhes | Anteriormente estava aparecendo como uma tag. CORRIGIDO. |
+| `type` | Tag de tipo | Tags abaixo do título | Estava faltando e não era exibido. ADICIONADO. |
+| `location` | Localização do imóvel | Tags e seção de localização | Apenas parte do endereço é exibida por segurança |
+| `price` | Preço por noite | Card e detalhes do imóvel | - |
+| `bedrooms` | Número de quartos | Card e detalhes do imóvel | - |
+| `bathrooms` | Número de banheiros | Card e detalhes do imóvel | - |
+| `beds` | Número de camas | Card e features do imóvel | - |
+| `guests` | Número de hóspedes | Card e features do imóvel | - |
+| `featured` | Tag de destaque | Tag "Destaque" no card | - |
+| `whatWeOffer` | Texto em "O que oferecemos" | Aba "O que oferecemos" | - |
+| `whatYouShouldKnow` | Texto em "O que você deve saber" | Aba "O que você deve saber" | - |
+| `serviceFee` | Taxa de serviço | Seção de preços no detalhe | - |
 
-## Implementação:
+## Principais Problemas Corrigidos
 
-1. Foi adicionado o campo `type` à interface `PropertyCard` no frontend
+1. **Descrição do Imóvel**: A descrição detalhada inserida no backend não estava sendo corretamente exibida na seção "Nosso imóvel" no frontend. Em vez disso, um texto genérico era exibido.
+   - **Solução**: Modificamos os componentes `AllProperties.tsx` e `FeaturedProperties.tsx` para exibir o campo `description` se existir, e mostrar o texto padrão apenas como fallback.
 
-2. As tags agora verificam a existência do campo `type` antes de exibi-lo
+2. **Tipo do Imóvel como Tag**: O tipo de imóvel definido no backend (como "Cobertura") não estava sendo exibido como uma tag no frontend.
+   - **Solução**: Garantimos que a tag de tipo seja exibida nos componentes `AllProperties.tsx` e `FeaturedProperties.tsx`.
 
-3. A galeria de imagens agora verifica se há múltiplas imagens e usa o array `images` corretamente
+3. **Descrição exibida como Tag**: A descrição estava sendo incorretamente exibida como uma tag.
+   - **Solução**: Adicionamos uma verificação para evitar exibir a descrição como tag quando ela for igual ao campo `details`.
 
-4. O texto principal abaixo de "Nosso imóvel" agora usa o valor de `description` do backend 
+## Recomendações Adicionais
+
+1. Ao preencher o formulário no backend, certifique-se de usar o campo descrição para informações detalhadas sobre o imóvel, que serão exibidas na seção "Nosso imóvel".
+
+2. O campo tipo de imóvel é importante para a categorização e deve ser sempre preenchido, pois agora é exibido como tag no frontend.
+
+3. A localização completa não é exibida no frontend por motivos de segurança, apenas o bairro e a cidade são mostrados. O endereço completo só é disponibilizado após a reserva. 

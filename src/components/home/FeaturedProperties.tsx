@@ -1038,7 +1038,9 @@ export default function FeaturedProperties() {
                                                         {(property as any).type && (
                                                             <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{(property as any).type}</span>
                                                         )}
-                                                        <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{property.details}</span>
+                                                        {property.details && property.details !== (property as any).description && (
+                                                            <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{property.details}</span>
+                                                        )}
                                                         <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{formatLocationForPublic(property.location)}, São Paulo</span>
                                                     </div>
                                                 </div>
@@ -1078,12 +1080,19 @@ export default function FeaturedProperties() {
                                                     <div>
                                                         <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Nosso imóvel</h3>
                                                         <p className="text-gray-700 mb-4">
-                                                            {(property as any).description || `Este charmoso imóvel localizado em ${formatLocationForPublic(property.location)} oferece um ambiente aconchegante e moderno. Com ${property.features.split('·').join(', ')}, o espaço é perfeito para uma estadia confortável.`}
+                                                            {(property as any).description}
                                                         </p>
-                                                        <p className="text-gray-700">
-                                                            Próximo a restaurantes, comércio e transporte público. O imóvel conta com Wi-Fi de alta velocidade,
-                                                            ar-condicionado e todas as comodidades para uma estadia perfeita.
-                                                        </p>
+                                                        {!(property as any).description && (
+                                                            <>
+                                                                <p className="text-gray-700 mb-4">
+                                                                    Este charmoso imóvel localizado em {formatLocationForPublic(property.location)} oferece um ambiente aconchegante e moderno. Com {property.features.split('·').join(', ')}, o espaço é perfeito para uma estadia confortável.
+                                                                </p>
+                                                                <p className="text-gray-700">
+                                                                    Próximo a restaurantes, comércio e transporte público. O imóvel conta com Wi-Fi de alta velocidade,
+                                                                    ar-condicionado e todas as comodidades para uma estadia perfeita.
+                                                                </p>
+                                                            </>
+                                                        )}
                                                     </div>
                                                 )}
 
