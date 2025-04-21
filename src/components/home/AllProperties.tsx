@@ -517,7 +517,8 @@ export default function AllProperties() {
         id: Number(prop.id) || prop.id, // Convert to number if possible for compatibility
         title: prop.title,
         location: prop.location,
-        details: prop.description || "Espaço inteiro",
+        details: prop.type || "Espaço inteiro",  // Use type as details instead of description
+        description: prop.description, // Properly map the description field
         features: `${prop.guests || 2} hóspedes · ${prop.bedrooms} ${prop.bedrooms === 1 ? 'quarto' : 'quartos'} · ${prop.beds || prop.bedrooms} ${(prop.beds || prop.bedrooms) === 1 ? 'cama' : 'camas'} · ${prop.bathrooms} ${prop.bathrooms === 1 ? 'banheiro' : 'banheiros'}`,
         pricePerNight: prop.price,
         rating: 4.7, // Default rating
@@ -525,7 +526,8 @@ export default function AllProperties() {
         image: prop.images && prop.images.length > 0 ? prop.images[0] : '/card1.jpg',
         link: `/imoveis/${prop.id}`,
         host: "Anfitrião",
-        coordinates: [-46.6554, -23.5646] // Default coordinates
+        coordinates: [-46.6554, -23.5646], // Default coordinates
+        type: prop.type // Also map the type field for tag display
     }));
 
     // Use Firebase properties if available, otherwise use static data
