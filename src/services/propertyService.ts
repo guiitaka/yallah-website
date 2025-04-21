@@ -180,6 +180,14 @@ export const listenToProperties = (callback: (properties: Property[]) => void): 
             id: doc.id,
             ...doc.data() as Omit<Property, 'id'>
         }));
+
+        // Debug das propriedades e suas imagens
+        properties.forEach(property => {
+            console.log(`Propriedade ID: ${property.id}, Título: ${property.title}`);
+            console.log(`Imagens: ${JSON.stringify(property.images)}`);
+            console.log(`Número de imagens: ${property.images?.length || 0}`);
+        });
+
         callback(properties);
     }, (error) => {
         console.error('Erro na escuta de propriedades:', error);
