@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -87,6 +87,7 @@ interface PropertyCard {
     serviceFee?: number;
     discountAmount?: number;
     type?: string;
+    images?: string[];
 }
 
 // Static property data as fallback
@@ -482,6 +483,29 @@ const formatLocationForPublic = (fullAddress: string): string => {
     return 'São Paulo';
 };
 
+// Adicionar uma função para mapear as propriedades reais a partir do Firebase para o formato PropertyCard usado pelo frontend
+const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
+    if (!properties || properties.length === 0) return staticAllProperties;
+
+    return properties.map(property => ({
+        id: property.id,
+        title: property.title || "Sem título",
+        location: property.location || "Localização não especificada",
+        details: property.details || "",
+        features: property.features || "Detalhes não disponíveis",
+        pricePerNight: property.pricePerNight || 0,
+        rating: property.rating || 4.5,
+        reviewCount: property.reviewCount || 0,
+        image: property.image || "/card1.jpg",
+        coordinates: property.coordinates || [-46.6333, -23.5505],
+        description: property.description || "",
+        whatWeOffer: property.whatWeOffer || "",
+        whatYouShouldKnow: property.whatYouShouldKnow || "",
+        type: property.type || "",
+        images: property.images || [] // Garantir que images está sendo transferido corretamente
+    }));
+};
+
 export default function AllProperties() {
     // Estados para controlar a expansão de cards
     const [expandedCard, setExpandedCard] = useState<number | string | null>(null)
@@ -503,35 +527,17 @@ export default function AllProperties() {
         setDateRange(update);
     };
 
-    // Use the hook to fetch properties from Firebase
-    const { properties: firebaseProperties, loading: loadingProperties } = useProperties({
-        realtime: true, // Real-time updates
-        sortBy: 'featured', // Sort by featured first
+    // Usar o hook useProperties e mapear os resultados
+    const { properties, loading, error } = useProperties({
+        realtime: true,
+        sortBy: 'updatedAt',
         sortDirection: 'desc'
     });
 
-    // Map Firebase properties to the format expected by the component
-    const firebaseMappedProperties = firebaseProperties.map((prop) => ({
-        id: Number(prop.id) || prop.id, // Convert to number if possible for compatibility
-        title: prop.title,
-        location: prop.location,
-        details: "", // Empty string instead of generic "Espaço inteiro"
-        description: prop.description, // Properly map the description field
-        features: `${prop.guests || 2} hóspedes · ${prop.bedrooms} ${prop.bedrooms === 1 ? 'quarto' : 'quartos'} · ${prop.beds || prop.bedrooms} ${(prop.beds || prop.bedrooms) === 1 ? 'cama' : 'camas'} · ${prop.bathrooms} ${prop.bathrooms === 1 ? 'banheiro' : 'banheiros'}`,
-        pricePerNight: prop.price,
-        rating: 4.7, // Default rating
-        reviewCount: 30, // Default review count
-        image: prop.images && prop.images.length > 0 ? prop.images[0] : '/card1.jpg',
-        link: `/imoveis/${prop.id}`,
-        host: "Anfitrião",
-        coordinates: [-46.6554, -23.5646], // Default coordinates
-        type: prop.type // Map the type field for tag display
-    }));
-
-    // Use Firebase properties if available, otherwise use static data
-    const allProperties = firebaseMappedProperties.length > 0
-        ? firebaseMappedProperties
-        : staticAllProperties; // Keep original reference as fallback
+    // Mapear propriedades do Firebase para o formato do frontend
+    const allProperties = useMemo(() =>
+        mapFirebaseToPropertyCard(properties),
+        [properties]);
 
     // Função para navegar para o próximo slide
     const nextSlide = () => {
@@ -665,7 +671,7 @@ export default function AllProperties() {
     };
 
     // Add a loading state if necessary
-    if (loadingProperties) {
+    if (loading) {
         return (
             <div className="container mx-auto py-10">
                 <div className="text-center py-20">
