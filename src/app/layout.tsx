@@ -74,17 +74,35 @@ export default function RootLayout({
               textNodes.forEach(node => {
                 if (node.textContent) {
                   const parent = node.parentNode;
-                  // Apenas processa nós visíveis nos cards, não em áreas de detalhes expandidas
+                  // Só oculta se todos esses critérios forem verdadeiros:
+                  // 1. O nó pai existe
+                  // 2. O nó está visível
+                  // 3. Não está dentro de um modal nem botão de fechar
+                  // 4. Não está dentro de resultados de busca
+                  // 5. Não está dentro de formulário ou campo de entrada
                   if (parent && 
                       window.getComputedStyle(parent).display !== 'none' && 
                       !parent.closest('.overlay-backdrop') && 
-                      !parent.closest('[aria-label="Fechar"]')) {
+                      !parent.closest('[aria-label="Fechar"]') &&
+                      !parent.closest('.max-h-60') && // Classe do dropdown de resultados
+                      !parent.closest('form') && // Não afeta formulários
+                      !parent.closest('input') && // Não afeta campos de entrada
+                      !parent.closest('select') && // Não afeta selects
+                      !parent.closest('[role="listbox"]') && // Não afeta listas de opções
+                      !parent.closest('[role="option"]') && // Não afeta opções
+                      !parent.closest('[role="combobox"]') && // Não afeta comboboxes
+                      !parent.closest('li') && // Não afeta itens de lista (dropdown)
+                      !parent.closest('.dropdown') && // Classe comum de dropdowns
+                      !parent.closest('[id*="mapbox"]') && // Elementos relacionados ao mapbox
+                      !parent.closest('[class*="mapbox"]')) { // Classes relacionadas ao mapbox
                     
                     // Verifica cada padrão de endereço
                     for (const pattern of addressPatterns) {
                       if (pattern.test(node.textContent)) {
                         // Se o nó estiver dentro de um card e não dentro de um modal/detalhe expandido
-                        if (!parent.closest('[id^="expanded-"]')) {
+                        if (!parent.closest('[id^="expanded-"]') && 
+                            !parent.closest('[class*="search"]') && // Não afeta resultados de busca
+                            !parent.closest('[class*="dropdown"]')) { // Não afeta dropdowns genéricos
                           // Oculta o texto que contém o endereço
                           let current = parent;
                           while (current && 
