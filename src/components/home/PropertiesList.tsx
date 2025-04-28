@@ -10,18 +10,27 @@ import { useProperties } from '@/hooks/useProperties';
 const formatLocationForPublic = (fullAddress: string): string => {
     if (!fullAddress) return 'São Paulo';
 
-    // Dividir o endereço por vírgulas e remover espaços extras
-    const parts = fullAddress.split(',').map(part => part.trim());
+    // Remove país e CEP se existirem
+    let address = fullAddress.replace(/,?\s*Brasil/i, '').replace(/,?\s*\d{5}-\d{3}/, '');
 
-    // Se tiver pelo menos duas partes, retorna as duas últimas (bairro e cidade)
-    if (parts.length >= 2) {
-        const bairro = parts[parts.length - 2];
-        const cidade = parts[parts.length - 1];
-        return `${bairro}, ${cidade}`;
+    // Divide por vírgula
+    const parts = address.split(',').map(part => part.trim());
+
+    // Procura por um padrão de bairro e cidade
+    for (let i = 0; i < parts.length; i++) {
+        // Se encontrar um termo com " - ", provavelmente é "bairro - cidade"
+        if (parts[i].includes(' - ')) {
+            return parts[i];
+        }
     }
 
-    // Se não houver vírgula, retorna apenas a última palavra (cidade)
-    const words = fullAddress.split(' ').map(w => w.trim()).filter(Boolean);
+    // Se não encontrar, tenta pegar os dois últimos termos (bairro, cidade)
+    if (parts.length >= 2) {
+        return `${parts[parts.length - 2]}, ${parts[parts.length - 1]}`;
+    }
+
+    // Se não houver vírgula, retorna a última palavra (cidade)
+    const words = address.split(' ').map(w => w.trim()).filter(Boolean);
     if (words.length > 0) {
         return words[words.length - 1];
     }
