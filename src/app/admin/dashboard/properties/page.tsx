@@ -32,6 +32,7 @@ import {
     fetchFilteredProperties,
     uploadMultiplePropertyImages
 } from '@/services/propertyService';
+import { formatCurrency } from '@/utils/format';
 
 // Componente para renderizar amenities com ícones
 const PropertyAmenityItem = ({ amenity }: { amenity: { text: string; svgIcon?: string; category?: string } }) => {
@@ -1094,7 +1095,7 @@ export default function PropertiesPage() {
                                         <div className="flex items-center justify-between mt-4">
                                             <div className="flex items-center text-white/80">
                                                 <DollarSign className="h-4 w-4" />
-                                                <span className="text-lg font-bold text-white">R$ {property.price}</span>
+                                                <span className="text-lg font-bold text-white">{formatCurrency(property.price)}</span>
                                                 <span className="text-xs ml-1">/noite</span>
                                             </div>
                                             <div className="flex space-x-3">
