@@ -121,8 +121,7 @@ export default function PropertiesList() {
                             )}
                             <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
                                 <div className="flex items-center text-white">
-                                    <MapPin className="w-4 h-4 mr-1" />
-                                    <p className="text-sm truncate">{formatLocationForPublic(property.location)}, São Paulo</p>
+                                    {/* Removido endereço/localização */}
                                 </div>
                             </div>
                         </div>

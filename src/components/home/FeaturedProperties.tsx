@@ -871,9 +871,6 @@ export default function FeaturedProperties() {
 
                                                 {/* Conteúdo do card */}
                                                 <div className="absolute bottom-0 left-0 w-full p-5">
-                                                    {/* Localização */}
-                                                    <div className="text-white/80 text-sm mb-1">{formatLocationForPublic(property.location)}, São Paulo</div>
-
                                                     {/* Título */}
                                                     <h3 className="text-lg text-white font-semibold">{property.title}</h3>
 
@@ -1048,7 +1045,6 @@ export default function FeaturedProperties() {
                                                         {property.details && property.details !== (property as any).type && (
                                                             <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{property.details}</span>
                                                         )}
-                                                        <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{formatLocationForPublic(property.location)}, São Paulo</span>
                                                     </div>
                                                 </div>
 
