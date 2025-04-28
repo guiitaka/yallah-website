@@ -20,48 +20,55 @@ export async function POST(request: NextRequest) {
     try {
         // Obter o FormData da requisição
         const formData = await request.formData();
-        const file = formData.get('file') as File;
+        // Suporte a múltiplos arquivos
+        const files = formData.getAll('files') as File[];
         const folder = formData.get('folder') as string || 'properties';
 
-        if (!file) {
+        if (!files || files.length === 0) {
             return NextResponse.json(
                 { error: 'Nenhum arquivo enviado' },
                 { status: 400 }
             );
         }
 
-        // Ler o arquivo como ArrayBuffer
-        const bytes = await file.arrayBuffer();
-        const base64data = await bufferToBase64(bytes);
+        // Processar todos os arquivos
+        const uploadResults = await Promise.all(files.map(async (file) => {
+            // Ler o arquivo como ArrayBuffer
+            const bytes = await file.arrayBuffer();
+            const base64data = await bufferToBase64(bytes);
 
-        // Gerar um nome único para a imagem
-        const fileName = file.name.replace(/\.[^/.]+$/, "");
-        const publicId = `${folder}/${Date.now()}-${fileName}`;
+            // Gerar um nome único para a imagem
+            const fileName = file.name.replace(/\.[^/.]+$/, "");
+            const publicId = `${folder}/${Date.now()}-${fileName}`;
 
-        // Fazer upload para o Cloudinary
-        const uploadResult = await new Promise<any>((resolve, reject) => {
-            cloudinary.uploader.upload(
-                base64data,
-                {
-                    public_id: publicId,
-                    folder: '', // Já incluído no publicId
-                    resource_type: 'image',
-                    transformation: [
-                        { quality: 'auto' },
-                        { fetch_format: 'auto' }
-                    ]
-                },
-                (error, result) => {
-                    if (error) reject(error);
-                    else resolve(result);
-                }
-            );
-        });
+            // Fazer upload para o Cloudinary
+            const uploadResult = await new Promise<any>((resolve, reject) => {
+                cloudinary.uploader.upload(
+                    base64data,
+                    {
+                        public_id: publicId,
+                        folder: '', // Já incluído no publicId
+                        resource_type: 'image',
+                        transformation: [
+                            { quality: 'auto' },
+                            { fetch_format: 'auto' }
+                        ]
+                    },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                );
+            });
+            return {
+                url: uploadResult.secure_url,
+                public_id: uploadResult.public_id
+            };
+        }));
 
-        // Retornar a URL da imagem carregada
+        // Retornar array de URLs/public_ids
         return NextResponse.json({
-            url: uploadResult.secure_url,
-            public_id: uploadResult.public_id
+            images: uploadResults
         });
     } catch (error) {
         console.error('Erro no servidor ao fazer upload para Cloudinary:', error);
