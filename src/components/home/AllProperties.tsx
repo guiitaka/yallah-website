@@ -469,21 +469,19 @@ const formatLocationForPublic = (fullAddress: string): string => {
     // Dividir o endereço por vírgulas e remover espaços extras
     const parts = fullAddress.split(',').map(part => part.trim());
 
-    // Se tiver partes suficientes, tentar encontrar o bairro
+    // Se tiver pelo menos duas partes, retorna as duas últimas (bairro e cidade)
     if (parts.length >= 2) {
-        // Verificar se há um número no primeiro elemento (rua com número)
-        const hasStreetNumber = /\d/.test(parts[0]);
-
-        // Se tiver número, o bairro geralmente é a segunda parte
-        if (hasStreetNumber && parts[1]) {
-            return parts[1]; // Retorna o bairro
-        } else {
-            // Caso não tenha número ou a segunda parte não exista, retorna a primeira parte
-            return parts[0];
-        }
+        const bairro = parts[parts.length - 2];
+        const cidade = parts[parts.length - 1];
+        return `${bairro}, ${cidade}`;
     }
 
-    // Se não conseguir separar, retornar apenas "São Paulo"
+    // Se não houver vírgula, retorna apenas a última palavra (cidade)
+    const words = fullAddress.split(' ').map(w => w.trim()).filter(Boolean);
+    if (words.length > 0) {
+        return words[words.length - 1];
+    }
+
     return 'São Paulo';
 };
 
