@@ -2,7 +2,7 @@ import { initializeApp, getApps } from 'firebase/app';
 import { getAuth, setPersistence, browserSessionPersistence } from 'firebase/auth';
 import { getFirestore, collection } from 'firebase/firestore';
 
-// Configuração do Firebase
+// Firebase configuration
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
     authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -12,29 +12,19 @@ const firebaseConfig = {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
-// Para debug - verificar se a configuração está sendo carregada corretamente
-console.log('Firebase Config carregada:', {
-    apiKey: firebaseConfig.apiKey?.substring(0, 5) + '...',
-    projectId: firebaseConfig.projectId
-});
-
-// Inicializa o Firebase apenas se não houver uma instância
+// Initialize Firebase only if no instance exists
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 const auth = getAuth(app);
 
-// Configura a persistência de sessão para expirar quando o navegador for fechado
-setPersistence(auth, browserSessionPersistence)
-    .then(() => {
-        console.log('Firebase Auth: Persistência de sessão temporária configurada');
-    })
-    .catch((error) => {
-        console.error('Erro ao configurar persistência:', error);
-    });
+// Configure session persistence to expire when browser is closed
+setPersistence(auth, browserSessionPersistence).catch((error) => {
+    console.error('Error setting auth persistence:', error);
+});
 
-// Inicializa o Firestore
+// Initialize Firestore
 const db = getFirestore(app);
 
-// Referências de coleções no Firestore
+// Collection references
 const propertiesCollection = collection(db, 'properties');
 
 export { app, auth, db, propertiesCollection }; 

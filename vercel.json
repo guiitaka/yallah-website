@@ -1,5 +1,9 @@
 {
   "version": 2,
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "devCommand": "npm run dev",
   "functions": {
     "src/app/api/scrape-airbnb/route.ts": {
       "memory": 1024,
@@ -12,6 +16,7 @@
     }
   },
   "env": {
+    "NODE_ENV": "production",
     "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true",
     "CHROME_EXECUTABLES_PATH": "/tmp"
   }

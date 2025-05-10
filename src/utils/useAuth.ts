@@ -1,104 +1,43 @@
-import { useState, useEffect } from 'react';
-import {
-    signInWithEmailAndPassword,
-    createUserWithEmailAndPassword,
-    signOut as firebaseSignOut,
-    onAuthStateChanged,
-    User
-} from 'firebase/auth';
-import { auth, db } from './firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { useState } from 'react';
+import { User, signInWithCustomToken, signOut as firebaseSignOut } from 'firebase/auth';
+import { auth } from './firebase';
 
-// Interface para representar um usuário local
-interface LocalUser {
-    email: string;
-    uid: string;
-    getIdToken: () => Promise<string>;
-}
-
-export const useAuth = () => {
+export function useAuth() {
     const [user, setUser] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user);
-            setLoading(false);
-        });
-
-        return () => unsubscribe();
-    }, []);
-
-    const signIn = async (email: string, password: string) => {
+    const signIn = async (username: string, password: string) => {
         setError(null);
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            setUser(userCredential.user);
-            return userCredential.user;
-        } catch (error: any) {
-            setError(error.message);
-            throw error;
-        }
-    };
-
-    const createAdminUser = async (email: string, password: string) => {
-        try {
-            // Criar um usuário no Firebase Auth
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-
-            // Adicionar dados ao Firestore
-            await setDoc(doc(db, "admins", user.uid), {
-                email: user.email,
-                role: "admin",
-                createdAt: new Date()
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: `${username}@yallah.com.br`,
+                    password,
+                }),
             });
 
-            return user;
-        } catch (error: any) {
-            setError(error.message);
-            throw error;
-        }
-    };
-
-    const checkCredentials = async (username: string, password: string) => {
-        setError(null);
-        try {
-            console.log('Username entered:', username);
-            console.log('Expected username:', process.env.NEXT_PUBLIC_ADMIN_USERNAME);
-            console.log('Password entered:', password);
-            console.log('Expected password:', process.env.NEXT_PUBLIC_ADMIN_PASSWORD);
-
-            // Verificar se as credenciais correspondem às variáveis de ambiente
-            if (
-                username === 'yallah' &&
-                password === '123456'
-            ) {
-                // Criar um email padrão a partir do username
-                const email = `${username}@yallah.com.br`;
-
-                try {
-                    // Forçar a criação de um novo usuário primeiro
-                    try {
-                        return await createAdminUser(email, password);
-                    } catch (createError: any) {
-                        // Se o usuário já existir, tente fazer login
-                        if (createError.code === 'auth/email-already-in-use') {
-                            return await signIn(email, password);
-                        }
-                        throw createError;
-                    }
-                } catch (error: any) {
-                    console.error('Erro ao autenticar:', error);
-                    throw error;
-                }
-            } else {
-                setError('Credenciais inválidas');
-                throw new Error('Credenciais inválidas');
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Authentication failed');
             }
-        } catch (error: any) {
-            setError(error.message);
+
+            // After successful server authentication, sign in to Firebase
+            const { user } = await signInWithCustomToken(
+                auth,
+                document.cookie
+                    .split('; ')
+                    .find(row => row.startsWith('admin_session='))
+                    ?.split('=')[1] || ''
+            );
+
+            setUser(user);
+            return user;
+        } catch (error) {
+            setError(error instanceof Error ? error.message : 'Authentication failed');
             throw error;
         }
     };
@@ -107,18 +46,18 @@ export const useAuth = () => {
         try {
             await firebaseSignOut(auth);
             setUser(null);
-        } catch (error: any) {
-            setError(error.message);
+            // Clear the session cookie
+            document.cookie = 'admin_session=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        } catch (error) {
+            console.error('Error signing out:', error);
             throw error;
         }
     };
 
     return {
         user,
-        loading,
         error,
         signIn,
         signOut,
-        checkCredentials
     };
-}; 
+} 
