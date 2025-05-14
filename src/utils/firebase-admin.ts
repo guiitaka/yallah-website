@@ -2,8 +2,24 @@ import * as admin from 'firebase-admin';
 
 function formatPrivateKey(key: string | undefined): string {
     if (!key) throw new Error('FIREBASE_PRIVATE_KEY is not set in environment variables');
-    // Handle both formats: raw private key or already properly formatted
-    return key.includes('PRIVATE KEY') ? key.replace(/\\n/g, '\n') : key;
+
+    // Remover aspas extras se existirem
+    let formattedKey = key;
+    if (formattedKey.startsWith('"') && formattedKey.endsWith('"')) {
+        formattedKey = formattedKey.slice(1, -1);
+    }
+
+    // Garantir que a chave contenha as quebras de linha corretas
+    if (formattedKey.includes('\\n')) {
+        formattedKey = formattedKey.replace(/\\n/g, '\n');
+    }
+
+    // Verificar se a chave tem o formato correto de PEM
+    if (!formattedKey.includes('-----BEGIN PRIVATE KEY-----')) {
+        throw new Error('FIREBASE_PRIVATE_KEY não está no formato PEM válido');
+    }
+
+    return formattedKey;
 }
 
 function getFirebaseAdminConfig() {
