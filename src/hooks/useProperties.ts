@@ -56,8 +56,14 @@ export const useProperties = (options: UsePropertiesOptions = {}) => {
                 setLoading(false);
             } catch (err) {
                 console.error('Erro detalhado ao carregar propriedades:', JSON.stringify(err));
-                console.error('Mensagem do erro:', err.message);
-                console.error('Código do erro:', err.code);
+
+                // Verificar tipo do erro antes de acessar propriedades
+                if (err && typeof err === 'object') {
+                    const errorObj = err as any;
+                    if ('message' in errorObj) console.error('Mensagem do erro:', errorObj.message);
+                    if ('code' in errorObj) console.error('Código do erro:', errorObj.code);
+                }
+
                 setError(err instanceof Error ? err : new Error('Erro desconhecido'));
                 setLoading(false);
             }
@@ -94,6 +100,14 @@ export const useProperties = (options: UsePropertiesOptions = {}) => {
                 });
             } catch (err) {
                 console.error('Erro ao configurar escuta em tempo real:', err);
+
+                // Verificar tipo do erro antes de logar detalhes
+                if (err && typeof err === 'object') {
+                    const errorObj = err as any;
+                    if ('message' in errorObj) console.error('Mensagem do erro:', errorObj.message);
+                    if ('code' in errorObj) console.error('Código do erro:', errorObj.code);
+                }
+
                 setError(err instanceof Error ? err : new Error('Erro ao configurar escuta em tempo real'));
             }
         }
@@ -117,6 +131,12 @@ export const useProperties = (options: UsePropertiesOptions = {}) => {
                 setProperties(freshData);
                 setError(null);
             } catch (err) {
+                // Verificar tipo do erro antes de tratar
+                if (err && typeof err === 'object') {
+                    const errorObj = err as any;
+                    if ('message' in errorObj) console.error('Mensagem do erro ao atualizar:', errorObj.message);
+                }
+
                 setError(err instanceof Error ? err : new Error('Erro ao atualizar propriedades'));
             } finally {
                 setLoading(false);
