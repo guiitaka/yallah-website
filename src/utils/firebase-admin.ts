@@ -2,38 +2,27 @@ import * as admin from 'firebase-admin';
 
 function getFirebaseAdminConfig() {
     try {
-        // Verificar se temos um JSON completo de service account
-        const serviceAccountStr = process.env.FIREBASE_SERVICE_ACCOUNT;
-        if (serviceAccountStr) {
-            try {
-                // Tentar usar o JSON completo do service account
-                const serviceAccount = JSON.parse(serviceAccountStr);
-                return {
-                    credential: admin.credential.cert(serviceAccount)
-                };
-            } catch (error) {
-                console.error('Erro ao parsear FIREBASE_SERVICE_ACCOUNT:', error);
-                // Continuar para o método alternativo se este falhar
-            }
-        }
-
-        // Método alternativo usando as variáveis separadas
+        // Obter as variáveis de configuração
         const projectId = process.env.FIREBASE_PROJECT_ID;
         const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-        let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+        let privateKey = process.env.FIREBASE_PRIVATE_KEY || '';
 
-        if (!projectId || !clientEmail || !privateKey) {
-            throw new Error('Variáveis de ambiente do Firebase não configuradas corretamente');
+        if (!projectId || !clientEmail) {
+            throw new Error('Variáveis FIREBASE_PROJECT_ID e FIREBASE_CLIENT_EMAIL são obrigatórias');
         }
 
-        // Tratar a private key
+        // Processar a chave privada
         if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
+            // Remover aspas extras se estiverem presentes
             privateKey = privateKey.slice(1, -1);
         }
 
         if (privateKey.includes('\\n')) {
+            // Substituir literais \n por quebras de linha reais
             privateKey = privateKey.replace(/\\n/g, '\n');
         }
+
+        console.log('Iniciando Firebase Admin com:', { projectId, clientEmail, privateKeyLength: privateKey.length });
 
         return {
             credential: admin.credential.cert({
@@ -43,8 +32,8 @@ function getFirebaseAdminConfig() {
             })
         };
     } catch (error: any) {
-        console.error('Erro ao configurar Firebase Admin:', error);
-        throw new Error(`Não foi possível inicializar o Firebase Admin: ${error.message}`);
+        console.error('Erro de configuração Firebase Admin:', error);
+        throw error;
     }
 }
 
@@ -52,9 +41,10 @@ function getFirebaseAdminConfig() {
 if (!admin.apps.length) {
     try {
         admin.initializeApp(getFirebaseAdminConfig());
+        console.log('Firebase Admin inicializado com sucesso');
     } catch (error) {
-        console.error('Error initializing Firebase Admin:', error);
-        throw error; // Re-throw to prevent app from starting with invalid Firebase config
+        console.error('Erro ao inicializar Firebase Admin:', error);
+        throw error;
     }
 }
 
