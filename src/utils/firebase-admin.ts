@@ -1,44 +1,51 @@
 import * as admin from 'firebase-admin';
 
-function formatPrivateKey(key: string | undefined): string {
-    if (!key) throw new Error('FIREBASE_PRIVATE_KEY is not set in environment variables');
-
-    // Remover aspas extras se existirem
-    let formattedKey = key;
-    if (formattedKey.startsWith('"') && formattedKey.endsWith('"')) {
-        formattedKey = formattedKey.slice(1, -1);
-    }
-
-    // Garantir que a chave contenha as quebras de linha corretas
-    if (formattedKey.includes('\\n')) {
-        formattedKey = formattedKey.replace(/\\n/g, '\n');
-    }
-
-    // Verificar se a chave tem o formato correto de PEM
-    if (!formattedKey.includes('-----BEGIN PRIVATE KEY-----')) {
-        throw new Error('FIREBASE_PRIVATE_KEY não está no formato PEM válido');
-    }
-
-    return formattedKey;
-}
-
 function getFirebaseAdminConfig() {
-    const privateKey = formatPrivateKey(process.env.FIREBASE_PRIVATE_KEY);
-    const projectId = process.env.FIREBASE_PROJECT_ID;
-    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+    try {
+        // Verificar se temos um JSON completo de service account
+        const serviceAccountStr = process.env.FIREBASE_SERVICE_ACCOUNT;
+        if (serviceAccountStr) {
+            try {
+                // Tentar usar o JSON completo do service account
+                const serviceAccount = JSON.parse(serviceAccountStr);
+                return {
+                    credential: admin.credential.cert(serviceAccount)
+                };
+            } catch (error) {
+                console.error('Erro ao parsear FIREBASE_SERVICE_ACCOUNT:', error);
+                // Continuar para o método alternativo se este falhar
+            }
+        }
 
-    if (!projectId || !clientEmail) {
-        throw new Error('FIREBASE_PROJECT_ID and FIREBASE_CLIENT_EMAIL must be set in environment variables');
+        // Método alternativo usando as variáveis separadas
+        const projectId = process.env.FIREBASE_PROJECT_ID;
+        const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+        let privateKey = process.env.FIREBASE_PRIVATE_KEY;
+
+        if (!projectId || !clientEmail || !privateKey) {
+            throw new Error('Variáveis de ambiente do Firebase não configuradas corretamente');
+        }
+
+        // Tratar a private key
+        if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
+            privateKey = privateKey.slice(1, -1);
+        }
+
+        if (privateKey.includes('\\n')) {
+            privateKey = privateKey.replace(/\\n/g, '\n');
+        }
+
+        return {
+            credential: admin.credential.cert({
+                projectId,
+                clientEmail,
+                privateKey,
+            })
+        };
+    } catch (error: any) {
+        console.error('Erro ao configurar Firebase Admin:', error);
+        throw new Error(`Não foi possível inicializar o Firebase Admin: ${error.message}`);
     }
-
-    return {
-        credential: admin.credential.cert({
-            projectId,
-            clientEmail,
-            privateKey,
-        }),
-        // Add any additional config options here if needed
-    };
 }
 
 // Initialize Firebase Admin
