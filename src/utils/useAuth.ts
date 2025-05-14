@@ -111,7 +111,6 @@ export function useAuth() {
             }
 
             console.log('Logout realizado com sucesso');
-            return true;
         } catch (error) {
             console.error('Error signing out:', error);
             throw error;
