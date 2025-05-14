@@ -39,11 +39,41 @@ export default function AdminHeader() {
 
     const handleSignOut = async () => {
         try {
-            await signOut();
+            // Primeiro desconectar do Firebase
+            if (typeof signOut === 'function') {
+                await signOut();
+            }
+
+            // Chamar a API de logout para limpar sessão no servidor
+            await fetch('/api/auth/logout', {
+                method: 'POST'
+            });
+
+            // Limpar cookies no cliente
             deleteCookie('admin_session');
-            router.push('/admin');
+
+            // Limpar armazenamento local
+            if (typeof window !== 'undefined') {
+                // Limpar Firebase Auth do localStorage
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith('firebase:')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+
+                // Limpar sessionStorage
+                sessionStorage.clear();
+
+                // Esperar um momento para garantir que tudo seja limpo
+                setTimeout(() => {
+                    // Forçar redirecionamento completo para a página de login
+                    window.location.replace('/admin');
+                }, 100);
+            }
         } catch (error) {
             console.error('Erro ao fazer logout:', error);
+            // Em caso de falha, forçar redirecionamento
+            window.location.replace('/admin');
         }
     };
 
@@ -134,12 +164,21 @@ export default function AdminHeader() {
                                 <div
                                     className={`${isProfileMenuOpen ? 'block' : 'hidden'} absolute right-0 top-full mt-2 w-48 bg-white/90 backdrop-blur-lg rounded-md shadow-lg py-1 z-10 border border-white/20`}
                                 >
-                                    <button
-                                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-white/50 transition-colors"
-                                        onClick={handleSignOut}
+                                    <a
+                                        href="/admin"
+                                        className="w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-white/80 transition-colors flex items-center justify-between"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            handleSignOut();
+                                        }}
                                     >
-                                        Sair
-                                    </button>
+                                        <span>Sair</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                            <polyline points="16 17 21 12 16 7"></polyline>
+                                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                                        </svg>
+                                    </a>
                                 </div>
                             </div>
                         </div>

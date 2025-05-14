@@ -1,27 +1,29 @@
+'use client'
+
+import { useEffect } from 'react'
 import Banner from '@/components/home/Banner'
 import Recommended from '@/components/home/Recommended'
 import Footer from '@/components/layout/Footer'
 import FeaturedProperties from '@/components/home/FeaturedProperties'
 import AllProperties from '@/components/home/AllProperties'
 import InstitutionalHero from '@/components/home/InstitutionalHero'
-import type { Metadata, Viewport } from 'next'
 
-export const metadata: Metadata = {
-  title: 'Yallah - Área do Locatário',
-  description: 'Encontre o lugar perfeito para sua estadia'
-}
+// Componente de depuração (remova após resolver o problema)
+const FirebaseDebug = () => {
+  useEffect(() => {
+    console.log('Firebase env vars:', {
+      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    });
+  }, []);
 
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  viewportFit: 'cover'
-}
+  return null;
+};
 
 export default function TenantPage() {
   return (
     <main className="pt-0">
+      <FirebaseDebug />
       <Banner userType="tenant" />
       <Recommended />
       <FeaturedProperties />

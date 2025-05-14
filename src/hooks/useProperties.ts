@@ -55,8 +55,10 @@ export const useProperties = (options: UsePropertiesOptions = {}) => {
                 setProperties(propertiesData);
                 setLoading(false);
             } catch (err) {
-                console.error('Erro ao carregar propriedades:', err);
-                setError(err instanceof Error ? err : new Error('Erro desconhecido ao carregar propriedades'));
+                console.error('Erro detalhado ao carregar propriedades:', JSON.stringify(err));
+                console.error('Mensagem do erro:', err.message);
+                console.error('Código do erro:', err.code);
+                setError(err instanceof Error ? err : new Error('Erro desconhecido'));
                 setLoading(false);
             }
         };

@@ -34,7 +34,11 @@ export async function POST(request: Request) {
             path: '/',
         });
 
-        return NextResponse.json({ success: true });
+        // Return the token in the response as well
+        return NextResponse.json({
+            success: true,
+            token: customToken
+        });
     } catch (error) {
         console.error('Authentication error:', error);
         return NextResponse.json(
