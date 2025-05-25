@@ -1649,31 +1649,50 @@ export default function PropertiesPage() {
             // loadPropertiesFromFirebase(); // Comentado ou removido
             fetchProperties().then(data => {
                 // Aplicar o mesmo processamento que existia em loadPropertiesFromFirebase
-                const processedProperties = data.map(property => {
-                    // @ts-ignore
-                    if (property.what_you_should_know_sections) {
+                const processedProperties = data.map(propertyDataFromDb => {
+                    const propertyForFrontend: any = { ...propertyDataFromDb };
+
+                    // @ts-ignore // Manter ts-ignore existente se necessário para a lógica antiga
+                    if (propertyForFrontend.what_you_should_know_sections) {
                         // @ts-ignore
-                        property.whatYouShouldKnowSections = property.what_you_should_know_sections;
+                        propertyForFrontend.whatYouShouldKnowSections = propertyForFrontend.what_you_should_know_sections;
                         // @ts-ignore
-                        delete property.what_you_should_know_sections;
+                        delete propertyForFrontend.what_you_should_know_sections;
                     }
-                    if (!property.whatYouShouldKnowSections) {
-                        property.whatYouShouldKnowSections = {
+                    if (!propertyForFrontend.whatYouShouldKnowSections) {
+                        propertyForFrontend.whatYouShouldKnowSections = {
                             houseRules: [],
                             safetyProperty: [],
                             cancellationPolicy: []
                         };
                     }
-                    if (!Array.isArray(property.whatYouShouldKnowSections.houseRules)) {
-                        property.whatYouShouldKnowSections.houseRules = [];
+                    if (!Array.isArray(propertyForFrontend.whatYouShouldKnowSections.houseRules)) {
+                        propertyForFrontend.whatYouShouldKnowSections.houseRules = [];
                     }
-                    if (!Array.isArray(property.whatYouShouldKnowSections.safetyProperty)) {
-                        property.whatYouShouldKnowSections.safetyProperty = [];
+                    if (!Array.isArray(propertyForFrontend.whatYouShouldKnowSections.safetyProperty)) {
+                        propertyForFrontend.whatYouShouldKnowSections.safetyProperty = [];
                     }
-                    if (!Array.isArray(property.whatYouShouldKnowSections.cancellationPolicy)) {
-                        property.whatYouShouldKnowSections.cancellationPolicy = [];
+                    if (!Array.isArray(propertyForFrontend.whatYouShouldKnowSections.cancellationPolicy)) {
+                        propertyForFrontend.whatYouShouldKnowSections.cancellationPolicy = [];
                     }
-                    return property;
+
+                    // NOVO MAPEAMENTO: points_of_interest para pointsOfInterest
+                    if (propertyForFrontend.points_of_interest) {
+                        propertyForFrontend.pointsOfInterest = propertyForFrontend.points_of_interest;
+                        delete propertyForFrontend.points_of_interest; // Remove o campo antigo com snake_case
+                    } else {
+                        propertyForFrontend.pointsOfInterest = []; // Garante que o campo exista como array vazio
+                    }
+
+                    // Mapear what_you_should_know_rich_text (existente, mas pode precisar de ajuste)
+                    if (propertyForFrontend.what_you_should_know_rich_text) {
+                        propertyForFrontend.whatYouShouldKnowRichText = propertyForFrontend.what_you_should_know_rich_text;
+                        delete propertyForFrontend.what_you_should_know_rich_text; // Consistência ao remover snake_case
+                    } else {
+                        propertyForFrontend.whatYouShouldKnowRichText = '';
+                    }
+
+                    return propertyForFrontend as Property; // Cast de volta para o tipo Property
                 });
                 setProperties(processedProperties);
                 setLoadingProperties(false);
