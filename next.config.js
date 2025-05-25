@@ -17,13 +17,13 @@ const nextConfig = {
             }
         ]
     },
-    webpack: (config, { isServer }) => {
-        if (isServer) {
-            // Adiciona pacotes que só devem ser bundled no servidor
-            config.externals = [...config.externals, 'puppeteer-core', '@sparticuz/chromium'];
-        }
-        return config;
-    }
+    // webpack: (config, { isServer }) => {
+    //     if (isServer) {
+    //         // Adiciona pacotes que só devem ser bundled no servidor
+    //         config.externals = [...config.externals, 'puppeteer-core', '@sparticuz/chromium'];
+    //     }
+    //     return config;
+    // }
 }
 
 module.exports = nextConfig 
