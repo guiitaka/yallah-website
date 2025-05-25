@@ -62,6 +62,7 @@ interface FormData {
         maxGuests?: number;
         quietHours?: string;
     };
+    pointsOfInterest: string[]; // Novo campo para pontos de interesse
 }
 
 interface NewPropertyStepperModalProps {
@@ -249,7 +250,7 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
                 );
             case 2:
                 return (
-                    <div className="space-y-6 flex flex-col h-[500px]">
+                    <div className="space-y-6 flex flex-col h-[550px]">
                         <div className="flex-shrink-0">
                             <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Localização *</label>
                             <MapboxSearch
@@ -262,6 +263,49 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
                                 Latitude: {formData.coordinates.lat.toFixed(6)}, Longitude: {formData.coordinates.lng.toFixed(6)}
                             </p>
                         )}
+
+                        {/* Seção de Pontos de Interesse */}
+                        <div className="mt-6 pt-6 border-t border-gray-200 flex-shrink-0">
+                            <h4 className="text-md font-semibold text-gray-800 mb-3">Pontos de Interesse Próximos</h4>
+                            <div className="space-y-3 max-h-[200px] overflow-y-auto pr-2">
+                                {formData.pointsOfInterest.map((point, index) => (
+                                    <div key={index} className="flex items-center space-x-2">
+                                        <Input
+                                            type="text"
+                                            placeholder={`Ponto de interesse ${index + 1}`}
+                                            value={point}
+                                            onChange={(e) => {
+                                                const newPoints = [...formData.pointsOfInterest];
+                                                newPoints[index] = e.target.value;
+                                                setFormData(prev => ({ ...prev, pointsOfInterest: newPoints }));
+                                            }}
+                                            className="flex-grow"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const newPoints = formData.pointsOfInterest.filter((_, i) => i !== index);
+                                                setFormData(prev => ({ ...prev, pointsOfInterest: newPoints }));
+                                            }}
+                                            className="p-2 text-red-500 hover:text-red-700"
+                                            title="Remover Ponto de Interesse"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setFormData(prev => ({ ...prev, pointsOfInterest: [...prev.pointsOfInterest, ''] }));
+                                }}
+                                className="mt-3 px-4 py-2 text-sm font-medium text-white bg-[#8BADA4] rounded-md hover:bg-[#7a998f] flex items-center"
+                            >
+                                <Home size={16} className="mr-2" />
+                                Adicionar Ponto de Interesse
+                            </button>
+                        </div>
                     </div>
                 );
             case 3:

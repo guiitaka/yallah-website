@@ -59,6 +59,7 @@ export interface Property {
         maxGuests?: number;
         quietHours?: string;
     };
+    pointsOfInterest?: string[];
 }
 
 // Dados de exemplo para as propriedades

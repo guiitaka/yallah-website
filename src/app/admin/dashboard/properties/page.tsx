@@ -215,7 +215,59 @@ interface FormData {
         maxGuests?: number;
         quietHours?: string;
     };
+    pointsOfInterest: string[]; // Adicionado para pontos de interesse
 }
+
+// Define os valores iniciais para o formulário
+const initialFormData: FormData = {
+    id: '',
+    title: '',
+    description: '',
+    type: '',
+    location: '',
+    coordinates: null,
+    price: 0,
+    bedrooms: 0,
+    bathrooms: 0,
+    beds: 1,
+    guests: 2,
+    area: 0,
+    status: 'available',
+    featured: false,
+    images: [],
+    amenities: [],
+    categorizedAmenities: {},
+    houseRules: {
+        checkIn: '15:00',
+        checkOut: '11:00',
+        maxGuests: 0, // Será atualizado se beds/guests for preenchido
+        additionalRules: []
+    },
+    safety: {
+        hasCoAlarm: false,
+        hasSmokeAlarm: false,
+        hasCameras: false
+    },
+    cancellationPolicy: '', // Pode ser 'Flexível', 'Moderada', 'Rigorosa'
+    rating: { value: 0, count: 0 },
+    whatWeOffer: '',
+    whatYouShouldKnowRichText: '',
+    serviceFee: 0,
+    discountSettings: {
+        amount: 0,
+        type: 'percentage',
+        minNights: 0,
+        validFrom: '',
+        validTo: ''
+    },
+    whatYouShouldKnowSections: {
+        houseRules: [],
+        safetyProperty: [],
+        cancellationPolicy: []
+    },
+    whatYouShouldKnowDynamic: {},
+    pointsOfInterest: [], // Adicionado para pontos de interesse
+};
 
 // Itens para "O que você deve saber" (aba do imóvel)
 // Estes são os itens que aparecem como checkboxes no painel admin
@@ -396,6 +448,7 @@ export default function PropertiesPage() {
             cancellationPolicy: []
         },
         whatYouShouldKnowDynamic: {},
+        pointsOfInterest: [], // Adicionado para pontos de interesse
     });
 
     const [dynamicInputValues, setDynamicInputValues] = useState<Record<string, string>>({});
@@ -627,6 +680,7 @@ export default function PropertiesPage() {
                 maxGuests: 3,
                 quietHours: '22:00 - 08:00'
             },
+            pointsOfInterest: [], // Adicionado para pontos de interesse
         });
         setLocalImages([]);
         setImageUploadProgress(0);
@@ -695,6 +749,7 @@ export default function PropertiesPage() {
                     maxGuests: formData.whatYouShouldKnowDynamic?.maxGuests,
                     quietHours: formData.whatYouShouldKnowDynamic?.quietHours
                 },
+                points_of_interest: formData.pointsOfInterest, // Adicionado para pontos de interesse
             };
 
             // Salvar a propriedade no Firebase
@@ -944,7 +999,8 @@ export default function PropertiesPage() {
                 validTo: property.discountSettings?.validTo
                     ? new Date(property.discountSettings.validTo).toISOString().split('T')[0]
                     : '',
-            }
+            },
+            pointsOfInterest: property.points_of_interest || [], // Adicionado e mapeado de points_of_interest
         });
 
         setLocalImages(normalizeImages(property.images || [])); // Isso é para o modal antigo, pode não ser necessário para o novo se ele usar formData.images
@@ -1041,7 +1097,8 @@ export default function PropertiesPage() {
                     minNights: formData.discountSettings.minNights,
                     validFrom: formData.discountSettings.validFrom ? new Date(formData.discountSettings.validFrom) : undefined,
                     validTo: formData.discountSettings.validTo ? new Date(formData.discountSettings.validTo) : undefined
-                }
+                },
+                pointsOfInterest: formData.pointsOfInterest, // Adicionado para pontos de interesse
             };
 
             // Log para debug do objeto final que será enviado
@@ -1092,24 +1149,20 @@ export default function PropertiesPage() {
                         }
                     );
 
-                    // Construir o array final de imagens na ordem correta de formData.images
+                    // Construir o array final de imagens na ordem correta de localImages
                     let newImageUploadIndex = 0;
-                    propertyData.images = formData.images.map(img => {
-                        if (img.url.startsWith('blob:') || img.url.startsWith('data:')) {
-                            // Esta é uma nova imagem que foi carregada
-                            // Pega a próxima URL da lista de URLs carregadas
-                            if (newImageUploadIndex < uploadedUrls.length) {
-                                return uploadedUrls[newImageUploadIndex++];
-                            }
-                            // Fallback, embora não devesse acontecer se tudo estiver correto
-                            return img.url;
+                    propertyData.images = localImages.map(img => {
+                        if (img.url.startsWith('blob:')) {
+                            const uploadedUrl = uploadedUrls[newImageUploadIndex++];
+                            return { id: uuidv4(), url: uploadedUrl }; // Usar o ID do Supabase se disponível, ou gerar um novo
                         }
-                        // Esta é uma imagem existente (URL remota), mantém a URL
-                        return img.url;
-                    });
+                        return img; // Manter imagem existente (com seu ID e URL originais)
+                    }).filter(img => img.url); // Remover quaisquer imagens com URLs vazias (caso de falha no upload)
+
+
                 } else {
-                    // Se não houver novos uploads, usa as URLs na ordem definida em formData.images
-                    propertyData.images = formData.images.map(img => img.url);
+                    // Se não houver novas imagens, usar localImages que reflete a ordem atual e as remoções
+                    propertyData.images = localImages.map(img => ({ id: img.id, url: img.url }));
                 }
 
                 setIsUploadingImages(false);
@@ -1577,6 +1630,7 @@ export default function PropertiesPage() {
                 cancellationPolicy: importedData.cancellationPolicy ? CANCELLATION_POLICY_ITEMS.filter(policy => policy.toLowerCase().includes(importedData.cancellationPolicy.toLowerCase())) : []
             },
             whatYouShouldKnowDynamic: {},
+            pointsOfInterest: importedData.points_of_interest || [], // Adicionado e mapeado de points_of_interest
         });
 
         // Close modal and clear data
