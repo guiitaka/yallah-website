@@ -344,11 +344,15 @@ const getLocalPlaceholderImage = (propertyId: string) => {
 };
 
 // Função utilitária para garantir que só exibe placeholder se não houver imagem válida
-function getValidImage(images: string[] | undefined, fallback: string, idx?: number) {
+function getValidImage(images: (string | { id: string; url: string })[] | undefined, fallback: string, idx?: number) {
     if (images && images.length > 0) {
         // Se idx for fornecido, tenta pegar a imagem do índice
-        const img = typeof idx === 'number' ? images[idx] : images[0];
-        if (img && img.trim() !== '') return img;
+        const imgEntry = typeof idx === 'number' ? images[idx] : images[0];
+
+        if (imgEntry) {
+            const imgUrl = typeof imgEntry === 'string' ? imgEntry : imgEntry.url;
+            if (imgUrl && typeof imgUrl === 'string' && imgUrl.trim() !== '') return imgUrl;
+        }
     }
     return fallback;
 }
@@ -1000,7 +1004,7 @@ export default function PropertiesPage() {
                     ? new Date(property.discountSettings.validTo).toISOString().split('T')[0]
                     : '',
             },
-            pointsOfInterest: property.points_of_interest || [], // Adicionado e mapeado de points_of_interest
+            pointsOfInterest: property.pointsOfInterest || [], // Corrigido para camelCase
         });
 
         setLocalImages(normalizeImages(property.images || [])); // Isso é para o modal antigo, pode não ser necessário para o novo se ele usar formData.images
@@ -1630,7 +1634,7 @@ export default function PropertiesPage() {
                 cancellationPolicy: importedData.cancellationPolicy ? CANCELLATION_POLICY_ITEMS.filter(policy => policy.toLowerCase().includes(importedData.cancellationPolicy.toLowerCase())) : []
             },
             whatYouShouldKnowDynamic: {},
-            pointsOfInterest: importedData.points_of_interest || [], // Adicionado e mapeado de points_of_interest
+            pointsOfInterest: importedData.pointsOfInterest || [], // Adicionado e mapeado de pointsOfInterest
         });
 
         // Close modal and clear data
