@@ -244,17 +244,13 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
                                 <label htmlFor="guests" className="block text-sm font-medium text-gray-700 mb-1">Hóspedes</label>
                                 <Input id="guests" name="guests" type="number" value={formData.guests} onChange={handleChange} placeholder="4" className="w-full" />
                             </div>
-                            <div>
-                                <label htmlFor="area" className="block text-sm font-medium text-gray-700 mb-1">Área (m²)</label>
-                                <Input id="area" name="area" type="number" value={formData.area} onChange={handleChange} placeholder="70" className="w-full" />
-                            </div>
                         </div>
                     </div>
                 );
             case 2:
                 return (
                     <div className="space-y-6">
-                        <div>
+                        <div className="h-[450px]">
                             <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Localização *</label>
                             <MapboxSearch
                                 initialValue={formData.location}
