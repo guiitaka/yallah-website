@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    experimental: {
-        outputFileTracing: false,
-    },
+    outputFileTracing: false,
     images: {
         domains: [
             'images.unsplash.com',
