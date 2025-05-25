@@ -130,6 +130,12 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
     const amenitiesDropdownRefStepper = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        if (isOpen) {
+            setCurrentStep(1); // Reset to first step when modal opens
+        }
+    }, [isOpen]);
+
+    useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (amenitiesDropdownRefStepper.current && !amenitiesDropdownRefStepper.current.contains(event.target as Node)) {
                 setAmenitiesDropdownOpenInStepper(false);
