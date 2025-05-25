@@ -679,10 +679,17 @@ const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
 };
 
 // Função utilitária para garantir que só exibe placeholder se não houver imagem válida
-function getValidImage(images: string[] | undefined, fallback: string, idx?: number) {
+function getValidImage(images: (string | { id: string; url: string })[] | undefined, fallback: string, idx?: number) {
     if (images && images.length > 0) {
-        const img = typeof idx === 'number' ? images[idx] : images[0];
-        if (img && img.trim() !== '') return img;
+        const imgEntry = typeof idx === 'number' ? images[idx] : images[0];
+
+        if (imgEntry) {
+            const imgUrl = typeof imgEntry === 'string' ? imgEntry : imgEntry.url;
+            // Adicionar uma verificação extra para imgUrl não ser null ou undefined
+            if (imgUrl && typeof imgUrl === 'string' && imgUrl.trim() !== '') {
+                return imgUrl;
+            }
+        }
     }
     return fallback;
 }
@@ -765,6 +772,47 @@ const AMENITIES_BY_CATEGORY = [
         ],
     },
 ];
+
+const getIconComponent = (amenityText: string) => {
+    const text = amenityText.toLowerCase();
+    if (text.includes('wi-fi') || text.includes('internet') || text.includes('wifi')) return <WifiHigh className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('tv') || text.includes('televisão')) return <Television className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('cozinha')) return <CookingPot className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('estacionamento')) return <Waves className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('piscina')) return <Waves className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('ar-condicionado')) return <Snowflake className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('aquecimento')) return <Fire className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('café') || text.includes('cafeteira')) return <Coffee className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('ventilador')) return <Desktop className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('água quente') || text.includes('água')) return <Waves className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('segurança') || text.includes('alarme')) return <Lock className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('varanda') || text.includes('terraço') || text.includes('quintal')) return <House className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('jardim')) return <House className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('churrasqueira')) return <Fire className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('academia')) return <Desktop className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('banheiro')) return <Bed className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('quarto')) return <Bed className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('roupa de cama') || text.includes('roupa')) return <Bed className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('chuveiro') || text.includes('ducha')) return <Waves className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('talheres') || text.includes('louça')) return <CookingPot className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('geladeira') || text.includes('refrigerador')) return <CookingPot className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('microondas')) return <CookingPot className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('sofá') || text.includes('sala')) return <House className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('ferro') || text.includes('passar')) return <Lightning className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('cabos') || text.includes('plugue') || text.includes('eletricidade')) return <Lightning className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('bicicleta')) return <House className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('detector') || text.includes('alarme') || text.includes('monóxido')) return <Lock className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('pet') || text.includes('animais') || text.includes('cachorro')) return <Dog className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('lâmpada') || text.includes('iluminação')) return <Lightning className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('secador')) return <Lightning className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('xampu') || text.includes('shampoo') || text.includes('sabonete')) return <Bed className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('vista') || text.includes('montanha')) return <House className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('cobertor') || text.includes('travesseiro')) return <Bed className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('blackout') || text.includes('cortina')) return <House className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('guarda-roupa') || text.includes('armário')) return <House className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('bluetooth') || text.includes('som')) return <Lightning className="w-5 h-5 text-[#8BADA4]" />;
+    return <CheckCircle className="w-5 h-5 text-[#8BADA4]" />;
+};
 
 export default function AllProperties() {
     // Estados para controlar a expansão de cards
