@@ -169,7 +169,7 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
         }
 
         setIsFetchingPOIs(true);
-        const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+        const accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
         if (!accessToken) {
             console.error('Mapbox access token não encontrado.');
             alert('Erro ao buscar POIs: Token de acesso não configurado.');
