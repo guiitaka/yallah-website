@@ -1,0 +1,11 @@
+/* Override React Quill editor text color for visibility */
+.ql-editor {
+  color: #222 !important;
+  background: #fff !important;
+}
+.ql-editor p {
+  color: #222 !important;
+}
+.ql-toolbar {
+  background: #f9f9f9;
+} 

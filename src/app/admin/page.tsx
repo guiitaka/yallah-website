@@ -22,8 +22,9 @@ export default function AdminLogin() {
             // Validar credenciais
             const user = await checkCredentials(username, password);
 
-            // Obter token de ID para uso no cliente
-            const token = await user.getIdToken();
+            // Obter token de sessão do Supabase
+            const { data } = await import('@/utils/supabaseClient').then(m => m.supabase.auth.getSession());
+            const token = data.session?.access_token;
 
             // Salvar token em cookie para acesso persistente (2 horas)
             setCookie('admin_session', token, {

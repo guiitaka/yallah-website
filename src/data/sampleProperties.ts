@@ -38,6 +38,7 @@ export interface Property {
     };
     whatWeOffer?: string;
     whatYouShouldKnow?: string;
+    whatYouShouldKnowRichText?: string;
     serviceFee?: number;
     discountSettings?: {
         amount: number;
@@ -45,6 +46,18 @@ export interface Property {
         minNights?: number;
         validFrom?: Date;
         validTo?: Date;
+    };
+    // Novos campos para as seções "O que você deve saber"
+    whatYouShouldKnowSections?: {
+        houseRules: string[];
+        safetyProperty: string[];
+        cancellationPolicy: string[];
+    };
+    whatYouShouldKnowDynamic?: {
+        checkInTime?: string;
+        checkOutTime?: string;
+        maxGuests?: number;
+        quietHours?: string;
     };
 }
 

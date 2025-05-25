@@ -1,21 +1,22 @@
 'use client'
 
-import React, { useState, useEffect, useRef, useMemo } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
+import Image from 'next/image';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import {
-    ArrowRight, Star, Heart,
     CaretLeft, CaretRight, Buildings, MapPin, Lock, Waves, CookingPot,
     WifiHigh, Desktop, Television, Dog, House, Lightning, Fire, Calendar as CalendarIcon, CaretDown,
-    Clock, X, CookingPot as Coffee, Snowflake, Users, Bed
-} from '@phosphor-icons/react'
-import DatePicker from 'react-datepicker'
-import { format, addDays, differenceInDays } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
-import "react-datepicker/dist/react-datepicker.css"
-import dynamic from 'next/dynamic'
-import { useProperties } from '@/hooks/useProperties'
-import { Property } from '@/data/sampleProperties'
+    Clock, X, CookingPot as Coffee, Snowflake, Users, Bed, ArrowRight, Star, Heart, CheckCircle,
+    Shield, Calendar
+} from '@phosphor-icons/react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { ptBR } from 'date-fns/locale';
+import { format } from 'date-fns';
+import { useProperties } from '@/hooks/useProperties';
+import { Property } from '@/data/sampleProperties';
+import { formatCurrency } from '@/utils/format';
 
 // Importação dinâmica do componente de mapa para evitar erros de SSR
 const MapComponent = dynamic(() => import('../MapComponent'), { ssr: false })
@@ -75,7 +76,7 @@ interface PropertyCard {
     details?: string;
     features: string;
     pricePerNight: number;
-    rating: number;
+    rating: number | { value: number; count: number }; // Pode ser número ou objeto
     reviewCount: number;
     image: string;
     link?: string;
@@ -84,6 +85,7 @@ interface PropertyCard {
     description?: string;
     whatWeOffer?: string;
     whatYouShouldKnow?: string;
+    whatYouShouldKnowRichText?: string; // Campo para o conteúdo do editor rico
     serviceFee?: number;
     discountAmount?: number;
     type?: string;
@@ -92,6 +94,23 @@ interface PropertyCard {
     bathrooms?: number;  // Adicionar campo para banheiros
     beds?: number;       // Adicionar campo para camas
     guests?: number;     // Adicionar campo para hóspedes
+    amenities?: string[]; // Adicionar campo para comodidades
+    houseRules?: {
+        checkIn: string;
+        checkOut: string;
+        maxGuests: number;
+        additionalRules: string[];
+    };
+    safety?: {
+        hasCoAlarm: boolean;
+        hasSmokeAlarm: boolean;
+        hasCameras: boolean;
+    };
+    whatYouShouldKnowSections?: {
+        houseRules: string[];
+        safetyProperty: string[];
+        cancellationPolicy: string[];
+    };
 }
 
 // Static property data as fallback
@@ -534,14 +553,59 @@ const extractGuestsFromFeature = (featureText: string, guestsValue?: number): st
     return '2';
 };
 
+// Adicione a função getAmenityIcon antes do componente principal
+const getAmenityIcon = (amenity: string) => {
+    const text = amenity.toLowerCase();
+    if (text.includes('wi-fi') || text.includes('internet') || text.includes('wifi')) return <WifiHigh className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('tv') || text.includes('televisão')) return <Television className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('cozinha')) return <CookingPot className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('estacionamento')) return <Waves className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('piscina')) return <Waves className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('ar-condicionado')) return <Snowflake className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('aquecimento')) return <Fire className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('café') || text.includes('cafeteira')) return <Coffee className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('ventilador')) return <Desktop className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('água quente') || text.includes('água')) return <Waves className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('segurança') || text.includes('alarme')) return <Lock className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('varanda') || text.includes('terraço') || text.includes('quintal')) return <House className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('jardim')) return <House className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('churrasqueira')) return <Fire className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('academia')) return <Desktop className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('banheiro')) return <Bed className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('quarto')) return <Bed className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('roupa de cama') || text.includes('roupa')) return <Bed className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('chuveiro') || text.includes('ducha')) return <Waves className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('talheres') || text.includes('louça')) return <CookingPot className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('geladeira') || text.includes('refrigerador')) return <CookingPot className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('microondas')) return <CookingPot className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('sofá') || text.includes('sala')) return <House className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('ferro') || text.includes('passar')) return <Lightning className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('cabos') || text.includes('plugue') || text.includes('eletricidade')) return <Lightning className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('bicicleta')) return <House className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('detector') || text.includes('alarme') || text.includes('monóxido')) return <Lock className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('pet') || text.includes('animais') || text.includes('cachorro')) return <Dog className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('lâmpada') || text.includes('iluminação')) return <Lightning className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('secador')) return <Lightning className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('xampu') || text.includes('shampoo') || text.includes('sabonete')) return <Bed className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('vista') || text.includes('montanha')) return <House className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('cobertor') || text.includes('travesseiro')) return <Bed className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('blackout') || text.includes('cortina')) return <House className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('guarda-roupa') || text.includes('armário')) return <House className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('bluetooth') || text.includes('som')) return <Lightning className="w-5 h-5 text-[#8BADA4]" />;
+    return <CheckCircle className="w-5 h-5 text-[#8BADA4]" />;
+};
+
 // Adicionar uma função para mapear as propriedades reais a partir do Firebase para o formato PropertyCard usado pelo frontend
 const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
     if (!properties || properties.length === 0) return staticAllProperties;
 
     return properties.map(property => {
-        // Debug para verificar estrutura dos dados
-        console.log("Dados originais da propriedade:", property);
-        console.log("Preço da propriedade:", property.price, property.pricePerNight);
+        // Debug para verificar estrutura dos dados - REMOVIDO
+        // console.log("[MAPPER DEBUG] Dados originais da propriedade recebidos:", JSON.stringify(property, null, 2)); 
+        // console.log("[MAPPER DEBUG] property.what_you_should_know_rich_text (snake):", property.what_you_should_know_rich_text);
+        // console.log("[MAPPER DEBUG] property.whatYouShouldKnowRichText (camel):", property.whatYouShouldKnowRichText);
+        // console.log("[MAPPER DEBUG] property.what_you_should_know_sections (snake):", JSON.stringify(property.what_you_should_know_sections, null, 2));
+        // console.log("[MAPPER DEBUG] property.whatYouShouldKnowSections (camel):", JSON.stringify(property.whatYouShouldKnowSections, null, 2));
 
         // Verificar qual campo de preço está disponível
         const price = property.price || property.pricePerNight || 0;
@@ -584,16 +648,123 @@ const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
             coordinates: property.coordinates || [-46.6333, -23.5505],
             description: property.description || "",
             whatWeOffer: property.whatWeOffer || "",
-            whatYouShouldKnow: property.whatYouShouldKnow || "",
+            whatYouShouldKnow: property.what_you_should_know || "",
+            whatYouShouldKnowRichText: property.what_you_should_know_rich_text || "",
             type: property.type || "",
             images: property.images || [], // Garantir que images está sendo transferido corretamente
             rooms: rooms,
             bathrooms: bathrooms,
             beds: beds,
-            guests: guests
+            guests: guests,
+            amenities: property.amenities || [],
+            // Adicionar os dados das novas seções
+            houseRules: property.house_rules || { // Ler de snake_case para o objeto principal houseRules
+                checkIn: '15:00',
+                checkOut: '11:00',
+                maxGuests: property.guests || 2,
+                additionalRules: []
+            },
+            safety: property.safety || {
+                hasCoAlarm: false,
+                hasSmokeAlarm: false,
+                hasCameras: false
+            },
+            whatYouShouldKnowSections: property.what_you_should_know_sections || {
+                houseRules: [],
+                safetyProperty: [],
+                cancellationPolicy: []
+            }
         };
     });
 };
+
+// Função utilitária para garantir que só exibe placeholder se não houver imagem válida
+function getValidImage(images: string[] | undefined, fallback: string, idx?: number) {
+    if (images && images.length > 0) {
+        const img = typeof idx === 'number' ? images[idx] : images[0];
+        if (img && img.trim() !== '') return img;
+    }
+    return fallback;
+}
+
+// Defina as categorias e suas comodidades para segmentação
+const AMENITIES_BY_CATEGORY = [
+    {
+        category: 'Cozinha',
+        items: [
+            'Cafeteira',
+            'Produtos de limpeza',
+            'Cozinha',
+            'Microondas',
+            'Louças e talheres',
+            'Frigobar',
+            'Fogão por indução',
+            'Móveis externos',
+        ],
+    },
+    {
+        category: 'Banheiro',
+        items: [
+            'Xampu',
+            'Condicionador',
+            'Sabonete para o corpo',
+            'Água quente',
+            'Secadora',
+            'Básico (Toalhas, lençóis, sabonete e papel higiênico)',
+            'Roupas de cama',
+            'Cobertores e travesseiros extras',
+            'Blackout nas cortinas',
+            'Detector de fumaça',
+            'Alarme de monóxido de carbono',
+            'Extintor de incêndio',
+            'Kit de primeiros socorros',
+        ],
+    },
+    {
+        category: 'Quarto',
+        items: [
+            'Cabides',
+            'Local para guardar as roupas: guarda-roupa',
+            'Ar-condicionado',
+            'Ar-condicionado central',
+            'Aquecimento central',
+            'Máquina de lavar',
+            'Espaço de trabalho exclusivo',
+        ],
+    },
+    {
+        category: 'Sala',
+        items: [
+            'TV',
+            'Wi-Fi',
+            'Pátio ou varanda (Privativa)',
+            'Cadeira espreguiçadeira',
+            'Estacionamento gratuito na rua',
+            'Elevador',
+            'Academia compartilhada (no prédio)',
+            'Estacionamento pago fora da propriedade',
+        ],
+    },
+    {
+        category: 'Segurança',
+        items: [
+            'Produtos de limpeza',
+            'Detector de fumaça',
+            'Alarme de monóxido de carbono',
+            'Extintor de incêndio',
+            'Kit de primeiros socorros',
+        ],
+    },
+    {
+        category: 'Outros',
+        items: [
+            'Sabonete para o corpo',
+            'Cobertores e travesseiros extras',
+            'Móveis externos',
+            'Cadeira espreguiçadeira',
+        ],
+    },
+];
 
 export default function AllProperties() {
     // Estados para controlar a expansão de cards
@@ -614,6 +785,9 @@ export default function AllProperties() {
     const [showFullGallery, setShowFullGallery] = useState(false);
     const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
     const [selectedProperty, setSelectedProperty] = useState<PropertyCard | null>(null);
+    // Estado para controlar a direção da transição de slide
+    const [slideDirection, setSlideDirection] = useState<'next' | 'prev' | null>(null);
+    const [isAnimating, setIsAnimating] = useState(false);
 
     // Função para atualizar o intervalo de datas
     const updateDateRange = (update: [Date | null, Date | null]) => {
@@ -622,14 +796,13 @@ export default function AllProperties() {
 
     // Usar o hook useProperties e mapear os resultados
     const { properties, loading, error } = useProperties({
-        realtime: true,
         sortBy: 'updatedAt',
         sortDirection: 'desc'
     });
 
-    // Mapear propriedades do Firebase para o formato do frontend
+    // Mapear propriedades do Supabase para o formato do frontend
     const allProperties = useMemo(() =>
-        mapFirebaseToPropertyCard(properties),
+        properties && properties.length > 0 ? mapFirebaseToPropertyCard(properties) : [],
         [properties]);
 
     // Função para navegar para o próximo slide
@@ -715,6 +888,23 @@ export default function AllProperties() {
         return () => document.removeEventListener('keydown', handleEscKey);
     }, [expandedCard]); // Re-adiciona o listener quando o expandedCard mudar
 
+    // Adicionar controle de teclado para navegação da galeria
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (showFullGallery && selectedProperty) {
+                // Navegar com setas esquerda/direita
+                if (event.key === 'ArrowLeft') {
+                    prevImage(new MouseEvent('click') as unknown as React.MouseEvent);
+                } else if (event.key === 'ArrowRight') {
+                    nextImage(new MouseEvent('click') as unknown as React.MouseEvent);
+                }
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [showFullGallery, selectedProperty, currentGalleryIndex]);
+
     // Bloquear o scroll do body quando um card estiver expandido
     useEffect(() => {
         if (expandedCard !== null) {
@@ -780,34 +970,81 @@ export default function AllProperties() {
         document.body.style.overflow = '';
     };
 
-    // Funções de navegação da galeria
+    // Função para avançar imagem com animação
     const nextImage = (e: React.MouseEvent) => {
         e.stopPropagation();
-        if (!selectedProperty?.images || selectedProperty.images.length === 0) return;
+        if (!selectedProperty?.images || isAnimating) return;
 
-        setCurrentGalleryIndex(prev =>
-            prev === selectedProperty.images!.length - 1 ? 0 : prev + 1
-        );
+        setIsAnimating(true);
+        setSlideDirection('next');
+
+        setTimeout(() => {
+            setCurrentGalleryIndex(prev =>
+                prev === selectedProperty.images!.length - 1 ? 0 : prev + 1
+            );
+
+            // Permitir um tempo para a nova imagem entrar antes de resetar
+            setTimeout(() => {
+                setIsAnimating(false);
+                setSlideDirection(null);
+            }, 50);
+        }, 300); // Tempo de animação de saída
     };
 
+    // Função para retroceder imagem com animação
     const prevImage = (e: React.MouseEvent) => {
         e.stopPropagation();
-        if (!selectedProperty?.images || selectedProperty.images.length === 0) return;
+        if (!selectedProperty?.images || isAnimating) return;
 
-        setCurrentGalleryIndex(prev =>
-            prev === 0 ? selectedProperty.images!.length - 1 : prev - 1
-        );
+        setIsAnimating(true);
+        setSlideDirection('prev');
+
+        setTimeout(() => {
+            setCurrentGalleryIndex(prev =>
+                prev === 0 ? selectedProperty.images!.length - 1 : prev - 1
+            );
+
+            // Permitir um tempo para a nova imagem entrar antes de resetar
+            setTimeout(() => {
+                setIsAnimating(false);
+                setSlideDirection(null);
+            }, 50);
+        }, 300); // Tempo de animação de saída
     };
 
-    // Add a loading state if necessary
+    // Handle loading state
     if (loading) {
         return (
-            <div className="container mx-auto py-10">
-                <div className="text-center py-20">
-                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
-                        <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Carregando...</span>
+            <div className="container mx-auto py-16">
+                <div className="text-center">
+                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em]" role="status">
+                        <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+                            Carregando...
+                        </span>
                     </div>
                     <p className="mt-2 text-gray-600">Carregando imóveis...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Handle error state
+    if (error) {
+        return (
+            <div className="container mx-auto py-16">
+                <div className="text-center">
+                    <p className="text-red-500">Erro ao carregar imóveis. Por favor, tente novamente mais tarde.</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Handle empty state
+    if (allProperties.length === 0) {
+        return (
+            <div className="container mx-auto py-16">
+                <div className="text-center">
+                    <p className="text-gray-500">Nenhum imóvel encontrado.</p>
                 </div>
             </div>
         );
@@ -864,9 +1101,7 @@ export default function AllProperties() {
                                                         >
                                                             <div className="relative aspect-[3/4] rounded-3xl overflow-hidden">
                                                                 <Image
-                                                                    src={(property as any).images && (property as any).images.length > 0
-                                                                        ? (property as any).images[0]
-                                                                        : property.image}
+                                                                    src={getValidImage((property as any).images, property.image)}
                                                                     alt={property.title}
                                                                     fill
                                                                     className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -883,7 +1118,7 @@ export default function AllProperties() {
 
                                                                 {/* Badge com preço */}
                                                                 <div className="absolute top-4 left-4 bg-white/90 px-3 py-1.5 rounded-full shadow-md text-sm font-medium text-black">
-                                                                    R$ {property.pricePerNight}/noite
+                                                                    {formatCurrency(property.pricePerNight)}/noite
                                                                 </div>
 
                                                                 {/* Conteúdo do card */}
@@ -913,7 +1148,9 @@ export default function AllProperties() {
                                                                     <div className="flex items-center mb-2">
                                                                         <Star className="w-4 h-4 text-yellow-400 mr-1" weight="fill" />
                                                                         <span className="text-white text-sm font-medium">
-                                                                            {property.rating} <span className="text-white/70">({property.reviewCount})</span>
+                                                                            {typeof property.rating === 'object' && property.rating !== null
+                                                                                ? property.rating.value
+                                                                                : property.rating} <span className="text-white/70">({property.reviewCount})</span>
                                                                         </span>
                                                                     </div>
 
@@ -946,9 +1183,7 @@ export default function AllProperties() {
                                                         >
                                                             <div className="relative aspect-[3/4] rounded-3xl overflow-hidden">
                                                                 <Image
-                                                                    src={(property as any).images && (property as any).images.length > 0
-                                                                        ? (property as any).images[0]
-                                                                        : property.image}
+                                                                    src={getValidImage((property as any).images, property.image)}
                                                                     alt={property.title}
                                                                     fill
                                                                     className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -965,7 +1200,7 @@ export default function AllProperties() {
 
                                                                 {/* Badge com preço */}
                                                                 <div className="absolute top-4 left-4 bg-white/90 px-3 py-1.5 rounded-full shadow-md text-sm font-medium text-black">
-                                                                    R$ {property.pricePerNight}/noite
+                                                                    {formatCurrency(property.pricePerNight)}/noite
                                                                 </div>
 
                                                                 {/* Conteúdo do card */}
@@ -995,7 +1230,9 @@ export default function AllProperties() {
                                                                     <div className="flex items-center mb-2">
                                                                         <Star className="w-4 h-4 text-yellow-400 mr-1" weight="fill" />
                                                                         <span className="text-white text-sm font-medium">
-                                                                            {property.rating} <span className="text-white/70">({property.reviewCount})</span>
+                                                                            {typeof property.rating === 'object' && property.rating !== null
+                                                                                ? property.rating.value
+                                                                                : property.rating} <span className="text-white/70">({property.reviewCount})</span>
                                                                         </span>
                                                                     </div>
 
@@ -1076,9 +1313,7 @@ export default function AllProperties() {
                                     {/* Imagem principal (maior) */}
                                     <div className="col-span-6 relative h-[300px] rounded-l-xl overflow-hidden">
                                         <Image
-                                            src={(property as any).images && (property as any).images.length > 0
-                                                ? (property as any).images[0]
-                                                : property.image}
+                                            src={getValidImage((property as any).images, property.image, 0)}
                                             alt={property.title}
                                             fill
                                             className="object-cover"
@@ -1090,9 +1325,7 @@ export default function AllProperties() {
                                         {/* Imagem superior direita */}
                                         <div className="relative h-[146px] rounded-tr-xl overflow-hidden">
                                             <Image
-                                                src={(property as any).images && (property as any).images.length > 1
-                                                    ? (property as any).images[1]
-                                                    : property.image}
+                                                src={getValidImage((property as any).images, property.image, 1)}
                                                 alt={property.title}
                                                 fill
                                                 className="object-cover"
@@ -1103,9 +1336,7 @@ export default function AllProperties() {
                                         <div className="grid grid-cols-2 gap-2">
                                             <div className="relative h-[146px] overflow-hidden">
                                                 <Image
-                                                    src={(property as any).images && (property as any).images.length > 2
-                                                        ? (property as any).images[2]
-                                                        : property.image}
+                                                    src={getValidImage((property as any).images, property.image, 2)}
                                                     alt={property.title}
                                                     fill
                                                     className="object-cover"
@@ -1204,7 +1435,7 @@ export default function AllProperties() {
                                                     {property.details && property.details !== (property as any).description && (
                                                         <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{property.details}</span>
                                                     )}
-                                                    <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{formatLocationForPublic(property.location)}, São Paulo</span>
+                                                    <span className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{formatLocationForPublic(property.location ?? "")}, São Paulo</span>
                                                 </div>
                                             </div>
 
@@ -1255,7 +1486,7 @@ export default function AllProperties() {
                                                     ) : (
                                                         <>
                                                             <p className="text-gray-700 mb-4">
-                                                                Este charmoso imóvel localizado em {formatLocationForPublic(property.location)} oferece um ambiente aconchegante e moderno.
+                                                                Este charmoso imóvel localizado em {formatLocationForPublic(property.location ?? "")} oferece um ambiente aconchegante e moderno.
                                                                 Com {property.features.split('·').join(', ')}, o espaço é perfeito para uma estadia confortável.
                                                             </p>
                                                             <p className="text-gray-700">
@@ -1272,22 +1503,83 @@ export default function AllProperties() {
                                                 <div>
                                                     <h3 className="text-xl font-semibold mb-4 text-[#8BADA4]">Fotos do imóvel</h3>
                                                     <div className="space-y-2">
-                                                        {/* Remover o grid de fotos e manter apenas o botão */}
-                                                        <p className="text-gray-600 mb-4">
-                                                            Este imóvel possui {property.images && property.images.length > 0 ? property.images.length : '1'}
-                                                            {property.images && property.images.length > 1 ? ' fotos' : ' foto'} disponíveis para visualização.
-                                                        </p>
+                                                        {/* Remover o grid de fotos antigo e implementar o novo grid */}
+                                                        <div className="grid grid-cols-4 gap-2">
+                                                            {/* Primeira foto (maior) */}
+                                                            {property.images && property.images.length > 0 && (
+                                                                <div
+                                                                    className="relative overflow-hidden rounded-lg col-span-2 row-span-2 cursor-pointer group"
+                                                                    onClick={() => {
+                                                                        openFullGallery(property as PropertyCard);
+                                                                        setCurrentGalleryIndex(0);
+                                                                    }}
+                                                                >
+                                                                    <div className="aspect-square">
+                                                                        <Image
+                                                                            src={getValidImage(property.images, property.image)}
+                                                                            alt={`${property.title} - Imagem 1`}
+                                                                            fill
+                                                                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                                                            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 40vw"
+                                                                        />
+                                                                    </div>
+                                                                    <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                                                </div>
+                                                            )}
 
-                                                        {/* Botão para ver todas as fotos - Mudar a cor do texto para preto */}
-                                                        <button
-                                                            onClick={() => openFullGallery(property as PropertyCard)}
-                                                            className="w-full py-4 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg flex items-center justify-center gap-3 transition-colors text-gray-800"
-                                                        >
-                                                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                            </svg>
-                                                            <span className="font-medium">Ver todas as fotos</span>
-                                                        </button>
+                                                            {/* Fotos 2-7 (menores) + botão na última célula */}
+                                                            {property.images && (
+                                                                Array.from({ length: Math.min(6, property.images.length - 1) }).map((_, index, arr) => {
+                                                                    // Se for a última célula do grid, renderiza o botão no lugar da última foto
+                                                                    const isLast = index === arr.length - 1;
+                                                                    if (isLast) {
+                                                                        return (
+                                                                            <div
+                                                                                key={`photo-grid-btn`}
+                                                                                className="relative overflow-hidden rounded-lg cursor-pointer group"
+                                                                                onClick={() => openFullGallery(property as PropertyCard)}
+                                                                            >
+                                                                                <div className="aspect-square bg-[#8BADA4] flex items-center justify-center p-4 hover:bg-[#7A9D94] transition-colors">
+                                                                                    <div className="text-center text-white">
+                                                                                        <svg className="w-8 h-8 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                                                        </svg>
+                                                                                        <span className="font-medium text-sm">Ver todas as fotos</span>
+                                                                                        <div className="mt-2 text-xs">
+                                                                                            {property.images && property.images.length > 0
+                                                                                                ? `${property.images.length} fotos disponíveis`
+                                                                                                : '1 foto disponível'}
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        );
+                                                                    }
+                                                                    // Renderiza as miniaturas normalmente
+                                                                    return (
+                                                                        <div
+                                                                            key={`photo-grid-${index + 1}`}
+                                                                            className="relative overflow-hidden rounded-lg cursor-pointer group"
+                                                                            onClick={() => {
+                                                                                openFullGallery(property as PropertyCard);
+                                                                                setCurrentGalleryIndex(index + 1);
+                                                                            }}
+                                                                        >
+                                                                            <div className="aspect-square">
+                                                                                <Image
+                                                                                    src={getValidImage(property.images, property.image, index + 1)}
+                                                                                    alt={`${property.title} - Imagem ${index + 2}`}
+                                                                                    fill
+                                                                                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                                                                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 25vw"
+                                                                                />
+                                                                            </div>
+                                                                            <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                                                        </div>
+                                                                    );
+                                                                })
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             )}
@@ -1297,71 +1589,136 @@ export default function AllProperties() {
                                                 <div>
                                                     <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">O que oferecemos</h3>
                                                     <p className="text-gray-700 mb-4">
-                                                        {(property as any).whatWeOffer || `Nosso imóvel em ${formatLocationForPublic(property.location)} oferece as seguintes comodidades:`}
+                                                        {(property as any).whatWeOffer || `Nosso imóvel em ${formatLocationForPublic(property.location ?? "")} oferece as seguintes comodidades:`}
                                                     </p>
-                                                    <div className="grid grid-cols-2 gap-4 mb-4">
-                                                        <div className="flex items-center space-x-2">
-                                                            <WifiHigh className="h-5 w-5 text-gray-600" />
-                                                            <span className="text-gray-700">Wi-Fi de alta velocidade</span>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2">
-                                                            <Television className="h-5 w-5 text-gray-600" />
-                                                            <span className="text-gray-700">TV com canais a cabo</span>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2">
-                                                            <Coffee className="h-5 w-5 text-gray-600" />
-                                                            <span className="text-gray-700">Cafeteira</span>
-                                                        </div>
-                                                        <div className="flex items-center space-x-2">
-                                                            <Snowflake className="h-5 w-5 text-gray-600" />
-                                                            <span className="text-gray-700">Ar-condicionado</span>
-                                                        </div>
-                                                    </div>
+                                                    {(() => {
+                                                        if (!property.amenities || property.amenities.length === 0) return null;
+
+                                                        // Filtra apenas categorias com pelo menos uma comodidade selecionada
+                                                        const visibleCategories = AMENITIES_BY_CATEGORY
+                                                            .map(({ category, items }) => {
+                                                                const amenitiesInCategory = items.filter((amenity: string) => (property.amenities ?? []).includes(amenity));
+                                                                return amenitiesInCategory.length > 0 ? { category, amenitiesInCategory } : null;
+                                                            })
+                                                            .filter(Boolean) as { category: string; amenitiesInCategory: string[] }[];
+
+                                                        // Divide ao meio para duas colunas equilibradas
+                                                        const mid = Math.ceil(visibleCategories.length / 2);
+                                                        const col1 = visibleCategories.slice(0, mid);
+                                                        const col2 = visibleCategories.slice(mid);
+
+                                                        return (
+                                                            <div className="mb-4">
+                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                                    {[col1, col2].map((col, idx) => (
+                                                                        <div key={idx}>
+                                                                            {col.map(({ category, amenitiesInCategory }) => (
+                                                                                <div key={category} className="mb-3">
+                                                                                    <div className="font-semibold text-base text-[#8BADA4] mb-2 uppercase tracking-wide">{category}</div>
+                                                                                    <ul className="space-y-3">
+                                                                                        {amenitiesInCategory.map((amenity) => (
+                                                                                            <li key={amenity}>
+                                                                                                <div className="flex items-center space-x-2">
+                                                                                                    {getAmenityIcon(amenity)}
+                                                                                                    <span className="text-gray-700">{amenity}</span>
+                                                                                                </div>
+                                                                                            </li>
+                                                                                        ))}
+                                                                                    </ul>
+                                                                                </div>
+                                                                            ))}
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })()}
                                                 </div>
                                             )}
 
                                             {/* Conteúdo do que você deve saber */}
                                             {activeTab === 'saber' && (
                                                 <div>
-                                                    <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">O que você deve saber</h3>
-                                                    <p className="text-gray-700 mb-4">
-                                                        {(property as any).whatYouShouldKnow || 'Informações importantes sobre o imóvel e as regras da estadia:'}
-                                                    </p>
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                                        <div className="bg-gray-50 p-4 rounded-lg">
-                                                            <h4 className="font-medium text-gray-800 mb-2">Regras da casa</h4>
-                                                            <ul className="text-gray-600 space-y-2">
-                                                                <li className="flex items-start">
-                                                                    <Clock className="h-5 w-5 text-gray-500 mr-2 flex-shrink-0 mt-0.5" />
-                                                                    <div>
-                                                                        <span className="block font-medium">Check-in: </span>
-                                                                        <span>A partir das 15:00h</span>
-                                                                    </div>
-                                                                </li>
-                                                                <li className="flex items-start">
-                                                                    <Clock className="h-5 w-5 text-gray-500 mr-2 flex-shrink-0 mt-0.5" />
-                                                                    <div>
-                                                                        <span className="block font-medium">Check-out: </span>
-                                                                        <span>Até 12:00h</span>
-                                                                    </div>
-                                                                </li>
-                                                                <li className="flex items-start">
-                                                                    <X className="h-5 w-5 text-gray-500 mr-2 flex-shrink-0 mt-0.5" />
-                                                                    <span>Não é permitido fumar</span>
-                                                                </li>
-                                                                <li className="flex items-start">
-                                                                    <X className="h-5 w-5 text-gray-500 mr-2 flex-shrink-0 mt-0.5" />
-                                                                    <span>Não são permitidas festas</span>
-                                                                </li>
-                                                            </ul>
-                                                        </div>
-                                                        <div className="bg-gray-50 p-4 rounded-lg">
-                                                            <h4 className="font-medium text-gray-800 mb-2">Cancelamento</h4>
-                                                            <p className="text-gray-600">
-                                                                Cancelamento gratuito até 5 dias antes do check-in. Após este período,
-                                                                a primeira noite não é reembolsável.
-                                                            </p>
-                                                        </div>
+                                                    <h3 className="text-xl font-semibold mb-4 text-[#8BADA4]">O que você deve saber</h3>
+
+                                                    {/* Exibe o conteúdo do editor rico se existir */}
+                                                    {(property as any).whatYouShouldKnowRichText && (
+                                                        <div
+                                                            className="text-gray-700 mb-6 prose prose-sm max-w-none"
+                                                            dangerouslySetInnerHTML={{ __html: (property as any).whatYouShouldKnowRichText }}
+                                                        />
+                                                    )}
+
+                                                    {/* Seções dinâmicas (toggles) */}
+                                                    <div className="space-y-6">
+                                                        {/* Regras da Casa */}
+                                                        {((property as any).whatYouShouldKnowSections?.house_rules?.length > 0 ||  // Acessar com snake_case
+                                                            (property as any).houseRules?.checkIn ||
+                                                            (property as any).houseRules?.checkOut) && (
+                                                                <div className="mb-6">
+                                                                    <h4 className="font-semibold text-base text-gray-800 mb-3 uppercase tracking-wide">Regras da casa</h4>
+                                                                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                                                                        {/* Check-in e Check-out do objeto principal houseRules */}
+                                                                        {(property as any).houseRules?.checkIn && (
+                                                                            <li className="flex items-center space-x-2 text-gray-700">
+                                                                                <Clock className="h-5 w-5 text-[#8BADA4] flex-shrink-0" />
+                                                                                <span>Check-in: A partir das {(property as any).houseRules.checkIn}</span>
+                                                                            </li>
+                                                                        )}
+                                                                        {(property as any).houseRules?.checkOut && (
+                                                                            <li className="flex items-center space-x-2 text-gray-700">
+                                                                                <Clock className="h-5 w-5 text-[#8BADA4] flex-shrink-0" />
+                                                                                <span>Check-out: Até {(property as any).houseRules.checkOut}</span>
+                                                                            </li>
+                                                                        )}
+                                                                        {/* Itens de whatYouShouldKnowSections.house_rules */}
+                                                                        {(property as any).whatYouShouldKnowSections?.house_rules?.map((rule: string, index: number) => ( // Acessar com snake_case
+                                                                            <li key={`house-rule-${index}`} className="flex items-center space-x-2 text-gray-700">
+                                                                                <CheckCircle className="h-5 w-5 text-[#8BADA4] flex-shrink-0" />
+                                                                                <span>{rule.replace("{time}", "").replace("{guests}", "").replace("{hours}", "")}</span>
+                                                                            </li>
+                                                                        ))}
+                                                                    </ul>
+                                                                </div>
+                                                            )}
+
+                                                        {/* Segurança e Propriedade */}
+                                                        {(property as any).whatYouShouldKnowSections?.safety_property?.length > 0 && (
+                                                            <div className="mb-6">
+                                                                <h4 className="font-semibold text-base text-gray-800 mb-3 uppercase tracking-wide">Segurança e propriedade</h4>
+                                                                <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                                                                    {(property as any).whatYouShouldKnowSections.safety_property.map((item: string, index: number) => ( // Acessar com snake_case
+                                                                        <li key={`safety-${index}`} className="flex items-center space-x-2 text-gray-700">
+                                                                            <Shield className="h-5 w-5 text-[#8BADA4] flex-shrink-0" />
+                                                                            <span>{item}</span>
+                                                                        </li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Política de Cancelamento */}
+                                                        {((property as any).whatYouShouldKnowSections?.cancellation_policy?.length > 0 || (property as any).cancellationPolicy) && ( // Acessar com snake_case
+                                                            <div className="mb-6">
+                                                                <h4 className="font-semibold text-base text-gray-800 mb-3 uppercase tracking-wide">Política de Cancelamento</h4>
+                                                                {(property as any).whatYouShouldKnowSections?.cancellation_policy?.length > 0 ? ( // Acessar com snake_case
+                                                                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
+                                                                        {(property as any).whatYouShouldKnowSections.cancellation_policy.map((policy: string, index: number) => ( // Acessar com snake_case
+                                                                            <li key={`cancel-policy-${index}`} className="flex items-center space-x-2 text-gray-700">
+                                                                                <Calendar className="h-5 w-5 text-[#8BADA4] flex-shrink-0" />
+                                                                                <span>{policy}</span>
+                                                                            </li>
+                                                                        ))}
+                                                                    </ul>
+                                                                ) : (
+                                                                    (property as any).cancellationPolicy && (
+                                                                        <p className="text-gray-700">
+                                                                            {(property as any).cancellationPolicy}
+                                                                        </p>
+                                                                    )
+                                                                )}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             )}
@@ -1371,7 +1728,7 @@ export default function AllProperties() {
                                                 <div>
                                                     <h3 className="text-xl font-semibold mb-4 text-[#8BADA4]">Onde você estará</h3>
                                                     <p className="text-gray-700 mb-4">
-                                                        {formatLocationForPublic(property.location)}, São Paulo, Brasil
+                                                        {formatLocationForPublic(property.location ?? "")}, São Paulo, Brasil
                                                     </p>
                                                     <div className="h-[350px] rounded-xl overflow-hidden relative mb-4">
                                                         <MapComponent
@@ -1387,7 +1744,7 @@ export default function AllProperties() {
                                                     </div>
                                                     <div className="text-gray-700">
                                                         <p className="mb-3">
-                                                            Este imóvel está localizado em uma área privilegiada de {formatLocationForPublic(property.location)}, oferecendo fácil acesso a:
+                                                            Este imóvel está localizado em uma área privilegiada de {formatLocationForPublic(property.location ?? "")}, oferecendo fácil acesso a:
                                                         </p>
                                                         <ul className="list-disc pl-5 space-y-1">
                                                             <li>Transporte público a 200m</li>
@@ -1406,23 +1763,23 @@ export default function AllProperties() {
                                                 {/* Preço e avaliação */}
                                                 <div className="flex justify-between items-start mb-4">
                                                     <div>
-                                                        <h3 className="font-bold text-xl mb-1 text-gray-900">R$ {property.pricePerNight} <span className="text-gray-500 text-base font-normal">/ noite</span></h3>
+                                                        <h3 className="font-bold text-xl mb-1 text-gray-900">{formatCurrency(property.pricePerNight)} <span className="text-gray-500 text-base font-normal">/ noite</span></h3>
                                                         <div className="flex items-center">
                                                             <Star className="h-4 w-4 text-[#8BADA4] mr-1" />
-                                                            <span className="text-sm text-gray-700">{property.rating} ({property.reviewCount} avaliações)</span>
+                                                            <span className="text-sm text-gray-700">{typeof property.rating === 'object' && property.rating !== null ? property.rating.value : property.rating} ({property.reviewCount} avaliações)</span>
                                                         </div>
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="text-sm text-gray-500">Preço para 3 noites</p>
-                                                        <div className="font-medium text-gray-900">R$ {property.pricePerNight * 3}</div>
+                                                        <div className="font-medium text-gray-900">{formatCurrency(property.pricePerNight * 3)}</div>
                                                         {(property as any).discountAmount && (
-                                                            <div className="text-green-600 text-sm">-R$ {(property as any).discountAmount}</div>
+                                                            <div className="text-green-600 text-sm">-{formatCurrency((property as any).discountAmount)}</div>
                                                         )}
                                                         {(property as any).serviceFee && (
-                                                            <div className="text-sm text-gray-500">Taxa de serviço: R$ {(property as any).serviceFee}</div>
+                                                            <div className="text-sm text-gray-500">Taxa de serviço: {formatCurrency((property as any).serviceFee)}</div>
                                                         )}
                                                         <div className="font-bold mt-1 text-gray-900">
-                                                            Total: R$ {property.pricePerNight * 3 - ((property as any).discountAmount || 0) + ((property as any).serviceFee || 0)}
+                                                            Total: {formatCurrency(property.pricePerNight * 3 - ((property as any).discountAmount || 0) + ((property as any).serviceFee || 0))}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1514,16 +1871,16 @@ export default function AllProperties() {
                                                 {/* Resumo de valores */}
                                                 <div className="border-t border-gray-200 py-4 space-y-2">
                                                     <div className="flex justify-between">
-                                                        <span className="text-gray-600">R$ {property.pricePerNight} x {calculateNights(startDate, endDate)} noites</span>
-                                                        <span className="text-gray-900">R$ {property.pricePerNight * calculateNights(startDate, endDate)}</span>
+                                                        <span className="text-gray-600">{formatCurrency(property.pricePerNight)} x {calculateNights(startDate, endDate)} noites</span>
+                                                        <span className="text-gray-900">{formatCurrency(property.pricePerNight * calculateNights(startDate, endDate))}</span>
                                                     </div>
                                                     <div className="flex justify-between">
                                                         <span className="text-gray-600">Desconto</span>
-                                                        <span className="text-green-600">-R$ 50</span>
+                                                        <span className="text-green-600">-{formatCurrency(50)}</span>
                                                     </div>
                                                     <div className="flex justify-between">
                                                         <span className="text-gray-600">Taxa de serviço</span>
-                                                        <span className="text-gray-900">R$ 35</span>
+                                                        <span className="text-gray-900">{formatCurrency(35)}</span>
                                                     </div>
                                                 </div>
 
@@ -1531,7 +1888,7 @@ export default function AllProperties() {
                                                 <div className="border-t border-gray-200 pt-4 mb-4">
                                                     <div className="flex justify-between font-bold">
                                                         <span className="text-gray-900">Total</span>
-                                                        <span className="text-gray-900">R$ {(property.pricePerNight * calculateNights(startDate, endDate)) - 50 + 35}</span>
+                                                        <span className="text-gray-900">{formatCurrency((property.pricePerNight * calculateNights(startDate, endDate)) - 50 + 35)}</span>
                                                     </div>
                                                 </div>
 
@@ -1559,71 +1916,183 @@ export default function AllProperties() {
             {/* Modal de galeria em tela cheia */}
             {showFullGallery && selectedProperty && (
                 <div
-                    className="fixed inset-0 z-[60] bg-black/90 flex items-center justify-center"
+                    className="fixed inset-0 z-[60] bg-black flex flex-col items-center justify-center"
                     onClick={closeFullGallery}
+                    role="dialog"
+                    aria-modal="true"
+                    data-no-native-controls="true"
+                    tabIndex={-1}
                 >
-                    {/* Botão de fechar */}
-                    <button
-                        className="absolute top-6 right-6 p-2 bg-white/20 hover:bg-white/30 rounded-full text-white z-10 transition-colors"
-                        onClick={closeFullGallery}
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+                    {/* Cabeçalho com título e informações */}
+                    <div className="absolute top-0 left-0 right-0 p-4 flex justify-between items-center z-20 bg-gradient-to-b from-black/70 to-transparent">
+                        <div className="flex flex-col">
+                            <h3 className="text-xl font-medium text-white">{selectedProperty?.title}</h3>
+                            <p className="text-white/80 text-sm">
+                                {formatLocationForPublic(selectedProperty?.location || "São Paulo")}
+                            </p>
+                        </div>
 
-                    {/* Contador de imagens */}
-                    <div className="absolute top-6 left-6 bg-black/40 text-white px-4 py-2 rounded-full">
-                        {currentGalleryIndex + 1} / {selectedProperty.images?.length || 1}
+                        {/* Botão de fechar redesenhado com efeito glassmorphism */}
+                        <button
+                            className="p-3 rounded-full backdrop-blur-lg bg-white/10 hover:bg-white/20 text-white shadow-lg transition-all duration-300 transform hover:scale-105 focus:outline-none"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                closeFullGallery();
+                            }}
+                            aria-label="Fechar galeria"
+                        >
+                            <X weight="bold" className="w-5 h-5" />
+                        </button>
                     </div>
 
-                    {/* Imagem atual */}
+                    {/* Imagem atual com animação de slide */}
                     <div
-                        className="relative w-full h-full flex items-center justify-center p-10 md:p-16 lg:p-20"
+                        className="relative w-full h-full flex items-center justify-center overflow-hidden"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="relative w-full h-full">
-                            {selectedProperty.images && selectedProperty.images.length > 0 ? (
+                        <div
+                            className={`relative w-full h-full flex items-center justify-center transition-transform duration-300 ease-in-out ${slideDirection === 'next' ? 'animate-slide-out-left' :
+                                slideDirection === 'prev' ? 'animate-slide-out-right' : ''
+                                }`}
+                        >
+                            {selectedProperty?.images && selectedProperty.images.length > 0 ? (
                                 <Image
                                     src={selectedProperty.images[currentGalleryIndex]}
                                     alt={`${selectedProperty.title} - Imagem ${currentGalleryIndex + 1}`}
                                     fill
                                     className="object-contain"
-                                    sizes="(max-width: 768px) 90vw, 80vw"
+                                    sizes="100vw"
                                 />
                             ) : (
                                 <Image
-                                    src={selectedProperty.image}
-                                    alt={selectedProperty.title}
+                                    src={selectedProperty?.image || ''}
+                                    alt={selectedProperty?.title || 'Imagem do imóvel'}
                                     fill
                                     className="object-contain"
-                                    sizes="(max-width: 768px) 90vw, 80vw"
+                                    sizes="100vw"
                                 />
                             )}
                         </div>
 
-                        {/* Botões de navegação */}
-                        {selectedProperty.images && selectedProperty.images.length > 1 && (
-                            <>
-                                <button
-                                    className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/20 hover:bg-white/30 rounded-full text-white transition-colors"
-                                    onClick={prevImage}
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                    </svg>
-                                </button>
-                                <button
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/20 hover:bg-white/30 rounded-full text-white transition-colors"
-                                    onClick={nextImage}
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </button>
-                            </>
-                        )}
+                        {/* Removendo as setas laterais que aparecem nas extremidades */}
                     </div>
+
+                    {/* Controles de navegação na parte inferior */}
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent">
+                        {/* Miniaturas para rápida navegação */}
+                        <div className="px-4 pt-4 pb-2 overflow-x-auto hide-scrollbar">
+                            <div className="flex space-x-2 justify-center">
+                                {selectedProperty?.images && selectedProperty.images.length > 1 && selectedProperty.images.map((img, idx) => (
+                                    <div
+                                        key={`thumb-${idx}`}
+                                        className={`relative h-16 w-24 rounded-lg overflow-hidden cursor-pointer transition-all duration-300 ${currentGalleryIndex === idx
+                                            ? 'border-2 border-white opacity-100 scale-105'
+                                            : 'opacity-60 hover:opacity-90'
+                                            }`}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setCurrentGalleryIndex(idx);
+                                        }}
+                                    >
+                                        <Image
+                                            src={img}
+                                            alt={`Miniatura ${idx + 1}`}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Barra de navegação estilo Apple Photos */}
+                        <div className="flex justify-center py-4 px-8">
+                            <div className="flex rounded-full bg-black/50 backdrop-blur-sm p-1">
+                                <button
+                                    className={`px-6 py-2 rounded-full text-white text-sm font-medium transition-colors ${currentGalleryIndex > 0 ? 'hover:bg-white/20' : 'opacity-50 cursor-not-allowed'
+                                        }`}
+                                    disabled={currentGalleryIndex === 0 || isAnimating}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        prevImage(e);
+                                    }}
+                                >
+                                    Anterior
+                                </button>
+
+                                <div className="px-4 py-2 text-white text-sm flex items-center">
+                                    <span>{currentGalleryIndex + 1}</span>
+                                    <span className="mx-1">/</span>
+                                    <span>{selectedProperty?.images?.length || 1}</span>
+                                </div>
+
+                                <button
+                                    className={`px-6 py-2 rounded-full text-white text-sm font-medium transition-colors ${selectedProperty?.images && currentGalleryIndex < selectedProperty.images.length - 1
+                                        ? 'hover:bg-white/20'
+                                        : 'opacity-50 cursor-not-allowed'
+                                        }`}
+                                    disabled={!selectedProperty?.images || currentGalleryIndex >= selectedProperty.images.length - 1 || isAnimating}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        nextImage(e);
+                                    }}
+                                >
+                                    Próxima
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* CSS para esconder scrollbar mas manter funcionalidade e adicionar animações de slide */}
+                    <style jsx global>{`
+                        .hide-scrollbar::-webkit-scrollbar {
+                            display: none;
+                        }
+                        .hide-scrollbar {
+                            -ms-overflow-style: none;
+                            scrollbar-width: none;
+                        }
+                        /* Esconder controles de navegação nativos do navegador */
+                        body:has(.fixed.inset-0.z-\\[60\\].bg-black) .fixed.inset-y-0:not(.z-\\[60\\]) {
+                            display: none !important;
+                        }
+                        /* Esconder setas de navegação laterais */
+                        @media (min-width: 640px) {
+                            .fixed.inset-0.z-\\[60\\].bg-black > button.absolute:not(.top-0):not(.bottom-0) {
+                                opacity: 0 !important;
+                                pointer-events: none !important;
+                            }
+                        }
+                        /* Animações de slide */
+                        @keyframes slide-out-left {
+                            0% { transform: translateX(0); opacity: 1; }
+                            100% { transform: translateX(-10%); opacity: 0; }
+                        }
+                        @keyframes slide-out-right {
+                            0% { transform: translateX(0); opacity: 1; }
+                            100% { transform: translateX(10%); opacity: 0; }
+                        }
+                        @keyframes slide-in-left {
+                            0% { transform: translateX(10%); opacity: 0; }
+                            100% { transform: translateX(0); opacity: 1; }
+                        }
+                        @keyframes slide-in-right {
+                            0% { transform: translateX(-10%); opacity: 0; }
+                            100% { transform: translateX(0); opacity: 1; }
+                        }
+                        .animate-slide-out-left {
+                            animation: slide-out-left 300ms ease-in-out forwards;
+                        }
+                        .animate-slide-out-right {
+                            animation: slide-out-right 300ms ease-in-out forwards;
+                        }
+                        .animate-slide-in-left {
+                            animation: slide-in-left 300ms ease-in-out forwards;
+                        }
+                        .animate-slide-in-right {
+                            animation: slide-in-right 300ms ease-in-out forwards;
+                        }
+                    `}</style>
                 </div>
             )}
         </div>

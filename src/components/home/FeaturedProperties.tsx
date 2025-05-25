@@ -12,9 +12,68 @@ import DatePicker from 'react-datepicker'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import "react-datepicker/dist/react-datepicker.css"
+import { formatCurrency } from '@/utils/format'
 
 // Importação dinâmica do componente de mapa para evitar erros de SSR
 const MapComponent = dynamic(() => import('../MapComponent'), { ssr: false })
+
+// Define a type for the property data
+interface PropertyData {
+    id: number;
+    title: string;
+    details: string;
+    features: string;
+    pricePerNight: number;
+    rating: number | { value: number; count: number }; // Pode ser número ou objeto
+    reviewCount: number;
+    image: string;
+    location?: string;
+    coordinates?: [number, number];
+    type?: string;
+    images?: string[];
+    description?: string;
+    host?: string;
+    whatWeOffer?: string;
+    whatYouShouldKnow?: string;
+    serviceFee?: number;
+    discountAmount?: number;
+    rooms?: number;
+    bathrooms?: number;
+    beds?: number;
+    guests?: number;
+    amenities?: string[];
+    houseRules?: {
+        checkIn: string;
+        checkOut: string;
+        maxGuests: number;
+        additionalRules: string[];
+    };
+    safety?: {
+        hasCoAlarm: boolean;
+        hasSmokeAlarm: boolean;
+        hasCameras: boolean;
+    };
+    whatYouShouldKnowSections?: {
+        houseRules: string[];
+        safetyProperty: string[];
+        cancellationPolicy: string[];
+    };
+    whatYouShouldKnowDynamic?: {
+        checkInTime?: string;
+        checkOutTime?: string;
+        maxGuests?: number;
+        quietHours?: string;
+    };
+    link?: string;
+    whatYouShouldKnowRichText?: string;
+}
+
+// Interface para o objeto gridProperties
+interface GridProperties {
+    comfort: PropertyData;
+    available: PropertyData;
+    experience: PropertyData;
+}
 
 // Componente para o botão de favorito
 const FavoriteButton = ({ propertyId, className = "" }: { propertyId: number, className?: string }) => {
@@ -111,7 +170,7 @@ const featuredDeals = [
 ]
 
 // Dados para os cartões do grid de imóveis
-const gridProperties = {
+const gridProperties: GridProperties = {
     comfort: {
         id: 1,
         title: "Studio RM - Frente ao mar!",
@@ -707,7 +766,7 @@ export default function FeaturedProperties() {
                             <div className="absolute top-4 right-4 bg-white px-3 py-1 rounded-full shadow-md">
                                 <div className="flex items-center gap-1">
                                     <Star weight="fill" className="w-4 h-4 text-yellow-500" />
-                                    <span className="text-sm font-medium text-black">{gridProperties.comfort.rating}</span>
+                                    <span className="text-sm font-medium text-black">{typeof gridProperties.comfort.rating === 'object' && gridProperties.comfort.rating !== null && 'value' in gridProperties.comfort.rating ? (gridProperties.comfort.rating as { value: number }).value : gridProperties.comfort.rating}</span>
                                     <span className="text-xs text-gray-500">({gridProperties.comfort.reviewCount})</span>
                                 </div>
                             </div>
@@ -724,7 +783,7 @@ export default function FeaturedProperties() {
                                 </p>
                                 <div className="flex justify-between items-center">
                                     <div className="bg-white px-4 py-2 rounded-full shadow-md text-black text-sm font-medium">
-                                        R$ {gridProperties.comfort.pricePerNight} / Noite
+                                        {formatCurrency(gridProperties.comfort.pricePerNight)}/noite
                                     </div>
                                     <button
                                         onClick={() => expandCard(gridProperties.comfort.id)}
@@ -750,7 +809,7 @@ export default function FeaturedProperties() {
                             <div className="absolute top-4 right-4 bg-white px-3 py-1 rounded-full shadow-md">
                                 <div className="flex items-center gap-1">
                                     <Star weight="fill" className="w-4 h-4 text-yellow-500" />
-                                    <span className="text-sm font-medium text-black">{gridProperties.available.rating}</span>
+                                    <span className="text-sm font-medium text-black">{typeof gridProperties.available.rating === 'object' && gridProperties.available.rating !== null && 'value' in gridProperties.available.rating ? (gridProperties.available.rating as { value: number }).value : gridProperties.available.rating}</span>
                                     <span className="text-xs text-gray-500">({gridProperties.available.reviewCount})</span>
                                 </div>
                             </div>
@@ -767,7 +826,7 @@ export default function FeaturedProperties() {
                                 </p>
                                 <div className="flex justify-between items-center">
                                     <div className="bg-white px-4 py-2 rounded-full shadow-md text-black text-sm font-medium">
-                                        R$ {gridProperties.available.pricePerNight} / Noite
+                                        {formatCurrency(gridProperties.available.pricePerNight)}/noite
                                     </div>
                                     <button
                                         onClick={() => expandCard(gridProperties.available.id)}
@@ -794,7 +853,7 @@ export default function FeaturedProperties() {
                         <div className="absolute top-4 right-4 bg-white px-3 py-1 rounded-full shadow-md">
                             <div className="flex items-center gap-1">
                                 <Star weight="fill" className="w-4 h-4 text-yellow-500" />
-                                <span className="text-sm font-medium text-black">{gridProperties.experience.rating}</span>
+                                <span className="text-sm font-medium text-black">{typeof gridProperties.experience.rating === 'object' && gridProperties.experience.rating !== null && 'value' in gridProperties.experience.rating ? (gridProperties.experience.rating as { value: number }).value : gridProperties.experience.rating}</span>
                                 <span className="text-xs text-gray-500">({gridProperties.experience.reviewCount})</span>
                             </div>
                         </div>
@@ -811,7 +870,7 @@ export default function FeaturedProperties() {
                             </p>
                             <div className="flex justify-between items-center">
                                 <div className="bg-white px-4 py-2 rounded-full shadow-md text-black text-sm font-medium">
-                                    R$ {gridProperties.experience.pricePerNight} / Noite
+                                    {formatCurrency(gridProperties.experience.pricePerNight)}/noite
                                 </div>
                                 <button
                                     onClick={() => expandCard(gridProperties.experience.id)}
@@ -865,8 +924,8 @@ export default function FeaturedProperties() {
                                                 </div>
 
                                                 {/* Badge com preço */}
-                                                <div className="absolute top-4 left-4 bg-white/90 px-3 py-1.5 rounded-full shadow-md text-sm font-medium text-black">
-                                                    R$ {property.pricePerNight}/noite
+                                                <div className="absolute top-3 left-3 bg-white/95 px-3 py-1 rounded-full text-sm font-medium text-gray-700 shadow-sm">
+                                                    {formatCurrency(property.pricePerNight)}/noite
                                                 </div>
 
                                                 {/* Conteúdo do card */}
@@ -883,7 +942,9 @@ export default function FeaturedProperties() {
                                                     <div className="flex items-center mb-3">
                                                         <Star weight="fill" className="w-4 h-4 text-yellow-400 mr-1" />
                                                         <span className="text-white text-sm font-medium">
-                                                            {property.rating} <span className="text-white/70">({property.reviewCount})</span>
+                                                            {typeof property.rating === 'object' && property.rating !== null && 'value' in property.rating
+                                                                ? (property.rating as { value: number }).value
+                                                                : property.rating} <span className="text-white/70">({property.reviewCount})</span>
                                                         </span>
                                                     </div>
 
@@ -1095,7 +1156,7 @@ export default function FeaturedProperties() {
                                                         ) : (
                                                             <>
                                                                 <p className="text-gray-700 mb-4">
-                                                                    Este charmoso imóvel localizado em {formatLocationForPublic(property.location)} oferece um ambiente aconchegante e moderno. Com {property.features.split('·').join(', ')}, o espaço é perfeito para uma estadia confortável.
+                                                                    Este charmoso imóvel localizado em {formatLocationForPublic(property.location ?? "")} oferece um ambiente aconchegante e moderno. Com {property.features.split('·').join(', ')}, o espaço é perfeito para uma estadia confortável.
                                                                 </p>
                                                                 <p className="text-gray-700">
                                                                     Próximo a restaurantes, comércio e transporte público. O imóvel conta com Wi-Fi de alta velocidade,
@@ -1186,23 +1247,101 @@ export default function FeaturedProperties() {
                                                 {/* Conteúdo do que você deve saber */}
                                                 {activeTab === 'saber' && (
                                                     <div className="space-y-8">
-                                                        <div>
-                                                            <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Regras da Casa</h3>
-                                                            <p className="text-gray-700 mb-3">
-                                                                Check-in: após as 15:00h<br />
-                                                                Check-out: até as 11:00h<br />
-                                                                Máximo de 4 hóspedes<br />
-                                                                Não é permitido festas ou eventos<br />
-                                                                Proibido fumar dentro do imóvel
-                                                            </p>
-                                                        </div>
+                                                        {/* Regras da Casa */}
+                                                        {(property as any).houseRules?.additionalRules?.length > 0 || (property as any).whatYouShouldKnowSections?.houseRules?.length > 0 ? (
+                                                            <div>
+                                                                <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Regras da Casa</h3>
+                                                                {(property as any).houseRules && (
+                                                                    <p className="text-gray-700 mb-3">
+                                                                        Check-in: após {(property as any).houseRules.checkIn || '15:00'}<br />
+                                                                        Check-out: até {(property as any).houseRules.checkOut || '11:00'}<br />
+                                                                        Máximo de {(property as any).houseRules.maxGuests || 4} hóspedes<br />
+                                                                    </p>
+                                                                )}
 
-                                                        <div>
-                                                            <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Política de cancelamento</h3>
-                                                            <p className="text-gray-700 mb-3">
-                                                                Cancelamento gratuito até 48 horas antes do check-in. Após esse período, será cobrada uma taxa equivalente a 50% do valor total da reserva.
-                                                            </p>
-                                                        </div>
+                                                                {(property as any).whatYouShouldKnowSections?.houseRules?.length > 0 ? (
+                                                                    <ul className="text-gray-700 mb-3 space-y-2">
+                                                                        {(property as any).whatYouShouldKnowSections.houseRules.map((rule: string, index: number) => (
+                                                                            <li key={`house-rule-${index}`}>• {rule}</li>
+                                                                        ))}
+                                                                    </ul>
+                                                                ) : (property as any).houseRules?.additionalRules?.length > 0 ? (
+                                                                    <ul className="text-gray-700 mb-3 space-y-2">
+                                                                        {(property as any).houseRules.additionalRules.map((rule: string, index: number) => (
+                                                                            <li key={`add-rule-${index}`}>• {rule}</li>
+                                                                        ))}
+                                                                    </ul>
+                                                                ) : (
+                                                                    <p className="text-gray-700 mb-3">
+                                                                        Não é permitido festas ou eventos<br />
+                                                                        Proibido fumar dentro do imóvel
+                                                                    </p>
+                                                                )}
+                                                            </div>
+                                                        ) : (
+                                                            <div>
+                                                                <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Regras da Casa</h3>
+                                                                <p className="text-gray-700 mb-3">
+                                                                    Check-in: após as 15:00h<br />
+                                                                    Check-out: até as 11:00h<br />
+                                                                    Máximo de 4 hóspedes<br />
+                                                                    Não é permitido festas ou eventos<br />
+                                                                    Proibido fumar dentro do imóvel
+                                                                </p>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Segurança e Propriedade */}
+                                                        {(property as any).whatYouShouldKnowSections?.safetyProperty?.length > 0 && (
+                                                            <div>
+                                                                <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Segurança e Propriedade</h3>
+                                                                <ul className="text-gray-700 mb-3 space-y-2">
+                                                                    {(property as any).whatYouShouldKnowSections.safetyProperty.map((item: string, index: number) => (
+                                                                        <li key={`safety-${index}`}>• {item}</li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Política de Cancelamento */}
+                                                        {(property as any).whatYouShouldKnowSections?.cancellationPolicy?.length > 0 ? (
+                                                            <div>
+                                                                <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Política de cancelamento</h3>
+                                                                <ul className="text-gray-700 mb-3 space-y-2">
+                                                                    {(property as any).whatYouShouldKnowSections.cancellationPolicy.map((policy: string, index: number) => (
+                                                                        <li key={`cancel-policy-${index}`}>• {policy}</li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                        ) : (
+                                                            <div>
+                                                                <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Política de cancelamento</h3>
+                                                                <p className="text-gray-700 mb-3">
+                                                                    {(property as any).cancellationPolicy || 'Cancelamento gratuito até 48 horas antes do check-in. Após esse período, será cobrada uma taxa equivalente a 50% do valor total da reserva.'}
+                                                                </p>
+                                                            </div>
+                                                        )}
+
+                                                        {/* Informações adicionais */}
+                                                        {(property as any).whatYouShouldKnowRichText && (
+                                                            <div>
+                                                                <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Informações Adicionais</h3>
+                                                                <div
+                                                                    className="text-gray-700 mb-3 prose prose-sm max-w-none"
+                                                                    dangerouslySetInnerHTML={{ __html: (property as any).whatYouShouldKnowRichText }}
+                                                                />
+                                                            </div>
+                                                        )}
+
+                                                        {/* Informações adicionais (fallback para o campo antigo) */}
+                                                        {!((property as any).whatYouShouldKnowRichText) && (property as any).whatYouShouldKnow && (
+                                                            <div>
+                                                                <h3 className="text-xl font-semibold mb-3 text-[#8BADA4]">Informações Adicionais</h3>
+                                                                <p className="text-gray-700 mb-3">
+                                                                    {(property as any).whatYouShouldKnow}
+                                                                </p>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 )}
 
@@ -1211,7 +1350,7 @@ export default function FeaturedProperties() {
                                                     <div>
                                                         <h3 className="text-xl font-semibold mb-4 text-[#8BADA4]">Onde você estará</h3>
                                                         <p className="text-gray-700 mb-4">
-                                                            {formatLocationForPublic(property.location)}, São Paulo, Brasil
+                                                            {formatLocationForPublic(property.location ?? "")}, São Paulo, Brasil
                                                         </p>
                                                         <div className="h-[350px] rounded-xl overflow-hidden relative mb-4">
                                                             <MapComponent
@@ -1235,10 +1374,10 @@ export default function FeaturedProperties() {
                                                     {/* Preço e avaliação */}
                                                     <div className="flex justify-between items-start mb-4">
                                                         <div>
-                                                            <h3 className="font-bold text-xl mb-1 text-gray-900">R$ {property.pricePerNight} <span className="text-gray-500 text-base font-normal">/ noite</span></h3>
+                                                            <h3 className="font-bold text-xl mb-1 text-gray-900">{formatCurrency(property.pricePerNight)} <span className="text-gray-500 text-base font-normal">/ noite</span></h3>
                                                             <div className="flex items-center">
                                                                 <Star className="h-4 w-4 text-[#8BADA4] mr-1" />
-                                                                <span className="text-sm text-gray-700">{property.rating} ({property.reviewCount} avaliações)</span>
+                                                                <span className="text-sm text-gray-700">{typeof property.rating === 'object' && property.rating !== null && 'value' in property.rating ? (property.rating as { value: number }).value : property.rating} ({property.reviewCount} avaliações)</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1330,16 +1469,16 @@ export default function FeaturedProperties() {
                                                     {/* Resumo de valores */}
                                                     <div className="border-t border-gray-200 py-4 space-y-2">
                                                         <div className="flex justify-between">
-                                                            <span className="text-gray-600">R$ {property.pricePerNight} x {calculateNights(startDate, endDate)} noites</span>
-                                                            <span className="text-gray-900">R$ {property.pricePerNight * calculateNights(startDate, endDate)}</span>
+                                                            <span className="text-gray-600">{formatCurrency(property.pricePerNight)} x {calculateNights(startDate, endDate)} noites</span>
+                                                            <span className="text-gray-900">{formatCurrency(property.pricePerNight * calculateNights(startDate, endDate))}</span>
                                                         </div>
                                                         <div className="flex justify-between">
                                                             <span className="text-gray-600">Desconto</span>
-                                                            <span className="text-green-600">-R$ 50</span>
+                                                            <span className="text-green-600">-{formatCurrency(50)}</span>
                                                         </div>
                                                         <div className="flex justify-between">
                                                             <span className="text-gray-600">Taxa de serviço</span>
-                                                            <span className="text-gray-900">R$ 35</span>
+                                                            <span className="text-gray-900">{formatCurrency(35)}</span>
                                                         </div>
                                                     </div>
 
@@ -1347,7 +1486,7 @@ export default function FeaturedProperties() {
                                                     <div className="border-t border-gray-200 pt-4 mb-4">
                                                         <div className="flex justify-between font-bold">
                                                             <span className="text-gray-900">Total</span>
-                                                            <span className="text-gray-900">R$ {(property.pricePerNight * calculateNights(startDate, endDate)) - 50 + 35}</span>
+                                                            <span className="text-gray-900">{formatCurrency((property.pricePerNight * calculateNights(startDate, endDate)) - 50 + 35)}</span>
                                                         </div>
                                                     </div>
 

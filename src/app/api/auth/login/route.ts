@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/utils/firebase-admin';
 import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
@@ -22,11 +21,9 @@ export async function POST(request: Request) {
             );
         }
 
-        // Create a custom token for Firebase Auth
-        const customToken = await auth.createCustomToken(email);
-
+        // Não usamos mais Firebase Admin, apenas validação simples
         // Set secure HTTP-only cookie
-        cookies().set('admin_session', customToken, {
+        cookies().set('admin_session', 'session_valid', {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
@@ -34,10 +31,9 @@ export async function POST(request: Request) {
             path: '/',
         });
 
-        // Return the token in the response as well
+        // Retornar sucesso simples
         return NextResponse.json({
-            success: true,
-            token: customToken
+            success: true
         });
     } catch (error) {
         console.error('Authentication error:', error);

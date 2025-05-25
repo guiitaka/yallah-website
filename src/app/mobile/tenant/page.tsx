@@ -6,6 +6,7 @@ import PopularDestinations from '@/components/home/PopularDestinations';
 import MobileBanner from '@/components/home/MobileBanner';
 import FeaturedProperties from '@/components/home/FeaturedProperties';
 import Footer from '@/components/mobile/Footer';
+import { formatCurrency } from '@/utils/format';
 
 export default function MobileTenantPage() {
   return (
@@ -53,10 +54,7 @@ export default function MobileTenantPage() {
               <div className="p-4">
                 <h3 className="font-semibold mb-1">{property.title}</h3>
                 <p className="text-[#8BADA4] text-sm font-medium mb-2">
-                  {new Intl.NumberFormat('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL'
-                  }).format(property.price)} / Noite
+                  {formatCurrency(property.price)} / Noite
                 </p>
                 <p className="text-sm text-gray-600">{property.description}</p>
               </div>

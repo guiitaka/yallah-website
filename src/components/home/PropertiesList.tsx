@@ -47,7 +47,6 @@ export default function PropertiesList() {
 
     // Use the properties hook to fetch data in real-time
     const { properties, loading, error } = useProperties({
-        realtime: true,
         sortBy: 'updatedAt',
         sortDirection: 'desc'
     });

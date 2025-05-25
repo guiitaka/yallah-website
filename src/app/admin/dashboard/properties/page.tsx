@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuthContext } from '@/utils/AuthContext';
 import { deleteCookie } from 'cookies-next';
 import Image from 'next/image';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import {
     Building, Home, MessageCircle, Bell, ChevronDown,
     Plus, Pencil, Trash2, Search, Filter, ArrowUpDown,
@@ -15,9 +16,9 @@ import {
     Coffee, Fan, Droplet, ShieldAlert, Trees, Flame,
     Dumbbell, Shirt, Utensils, Container, Microwave,
     Sofa, Wrench, Cable, Bike, BellRing, Dog, Lamp,
-    Wind, Baby, Mountain, Warehouse, Zap, Lock
+    Wind, Baby, Mountain, Warehouse, Zap, Lock,
+    Clock, Shield, Calendar
 } from 'lucide-react';
-import { sampleProperties, Property } from '@/data/sampleProperties';
 import { useAirbnbImport } from '@/hooks/useAirbnbImport';
 import { normalizeAmenities, categorizeAmenities } from '@/utils/amenities-utils';
 import AdminHeader from '@/components/admin/Header';
@@ -32,6 +33,58 @@ import {
     fetchFilteredProperties,
     uploadMultiplePropertyImages
 } from '@/services/propertyService';
+import { Property } from '@/data/sampleProperties';
+import { ArrowUp, ArrowDown, Star } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
+import { Input } from '@/components/ui/input'; // Adicionar se não estiver lá
+import { Checkbox } from '@/components/ui/checkbox'; // Adicionar se não estiver lá
+import NewPropertyStepperModal from '@/components/admin/NewPropertyStepperModal'; // <- ADICIONAR IMPORT
+
+// Dinamically import ReactQuill to avoid SSR issues
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+import 'react-quill/dist/quill.snow.css';
+
+// Adicione a função getAmenityIcon logo após os imports, antes do componente PropertiesPage
+const getAmenityIcon = (amenity: string) => {
+    const text = amenity.toLowerCase();
+    if (text.includes('wi-fi') || text.includes('internet') || text.includes('wifi')) return <Wifi className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('tv') || text.includes('televisão')) return <Tv className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('cozinha')) return <ChefHat className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('estacionamento') || text.includes('garage')) return <ParkingCircle className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('piscina')) return <Umbrella className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('ar-condicionado') || text.includes('ar condicionado')) return <Snowflake className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('aquecimento') || text.includes('calefação')) return <Thermometer className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('café') || text.includes('cafeteira')) return <Coffee className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('ventilador')) return <Fan className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('água quente') || text.includes('água')) return <Droplet className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('segurança') || text.includes('alarme')) return <ShieldAlert className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('varanda') || text.includes('terraço') || text.includes('quintal')) return <Trees className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('jardim')) return <Trees className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('churrasqueira') || text.includes('churrasco')) return <Flame className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('academia') || text.includes('fitness')) return <Dumbbell className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('banheiro') || text.includes('banheira')) return <Bath className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('quarto')) return <BedDouble className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('roupa de cama') || text.includes('roupa')) return <Shirt className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('chuveiro') || text.includes('ducha')) return <Droplet className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('talheres') || text.includes('louça')) return <Utensils className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('geladeira') || text.includes('refrigerador')) return <Container className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('microondas')) return <Microwave className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('sofá') || text.includes('sala')) return <Sofa className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('ferro') || text.includes('passar')) return <Wrench className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('cabos') || text.includes('plugue') || text.includes('eletricidade')) return <Cable className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('bicicleta')) return <Bike className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('detector') || text.includes('alarme') || text.includes('monóxido')) return <BellRing className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('pet') || text.includes('animais') || text.includes('cachorro')) return <Dog className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('lâmpada') || text.includes('iluminação')) return <Lamp className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('secador')) return <Wind className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('xampu') || text.includes('shampoo') || text.includes('sabonete')) return <Baby className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('vista') || text.includes('montanha')) return <Mountain className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('cobertor') || text.includes('travesseiro')) return <Shirt className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('blackout') || text.includes('cortina')) return <Umbrella className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('guarda-roupa') || text.includes('armário')) return <Warehouse className="w-5 h-5 text-[#8BADA4]" />;
+    if (text.includes('bluetooth') || text.includes('som')) return <Zap className="w-5 h-5 text-[#8BADA4]" />;
+    return <Check className="w-5 h-5 text-[#8BADA4]" />;
+};
 
 // Componente para renderizar amenities com ícones
 const PropertyAmenityItem = ({ amenity }: { amenity: { text: string; svgIcon?: string; category?: string } }) => {
@@ -120,7 +173,7 @@ interface FormData {
     area: number;
     status: 'available' | 'rented' | 'maintenance';
     featured: boolean;
-    images: string[];
+    images: { id: string, url: string }[];
     amenities: string[];
     categorizedAmenities: {
         [key: string]: string[];
@@ -137,13 +190,12 @@ interface FormData {
         hasCameras: boolean;
     };
     cancellationPolicy: string;
-    // Novos campos adicionados
     rating: {
         value: number;
         count: number;
     };
     whatWeOffer: string;
-    whatYouShouldKnow: string;
+    whatYouShouldKnowRichText: string;
     serviceFee: number;
     discountSettings: {
         amount: number;
@@ -152,7 +204,65 @@ interface FormData {
         validFrom: string;
         validTo: string;
     };
+    whatYouShouldKnowSections: {
+        houseRules: string[];
+        safetyProperty: string[];
+        cancellationPolicy: string[];
+    };
+    whatYouShouldKnowDynamic: {
+        checkInTime?: string;
+        checkOutTime?: string;
+        maxGuests?: number;
+        quietHours?: string;
+    };
 }
+
+// Itens para "O que você deve saber" (aba do imóvel)
+// Estes são os itens que aparecem como checkboxes no painel admin
+const HOUSE_RULES_ITEMS = [
+    "Check-in após {time}",
+    "Checkout antes das {time}",
+    "Self check-in com fechadura inteligente",
+    "Máximo de {guests} hóspedes",
+    "Não é permitido animais de estimação",
+    "Horário de silêncio: {hours}",
+    "Não são permitidas festas ou eventos",
+    "Não é permitido fotografia comercial",
+    "Proibido fumar",
+    "Tire o lixo",
+    "Desligue tudo",
+    "Tranque tudo"
+];
+
+const SAFETY_PROPERTY_ITEMS = [
+    "Detector de monóxido de carbono instalado",
+    "Detector de fumaça instalado",
+    "Câmeras de segurança na propriedade",
+    "Piscina/spa sem portão ou proteção",
+    "Poço/corpo d'água próximo sem cerca",
+    "Escadaria sem corrimão",
+    "Superfícies escorregadias"
+];
+
+const CANCELLATION_POLICY_ITEMS = [
+    "Reembolso integral: Receba o valor integral que você pagou até 48 horas depois da reserva.",
+    "Reembolso parcial: Receba 50% do valor de todas as noites. Sem reembolso integral da taxa de serviço.",
+    "Sem reembolso: Esta reserva não é reembolsável.",
+    "Política de Grandes Eventos Disruptivos aplicável."
+];
+
+// Helper para identificar placeholders
+const getPlaceholderDetails = (rule: string) => {
+    const match = rule.match(/\{([^}]+)\}/);
+    if (!match) return null;
+    const placeholder = match[0]; // e.g., "{time}"
+    const placeholderKey = match[1]; // e.g., "time"
+    const base = rule.substring(0, match.index); // e.g., "Check-in após "
+    let inputType = "text";
+    if (placeholderKey === "time" || placeholderKey === "hours") inputType = "time"; // Ajustado para hours também
+    if (placeholderKey === "guests") inputType = "number";
+    return { placeholder, placeholderKey, base, inputType };
+};
 
 interface ImportProgress {
     step: number;
@@ -181,6 +291,39 @@ const getLocalPlaceholderImage = (propertyId: string) => {
     return localPlaceholderImages[index];
 };
 
+// Função utilitária para garantir que só exibe placeholder se não houver imagem válida
+function getValidImage(images: string[] | undefined, fallback: string, idx?: number) {
+    if (images && images.length > 0) {
+        // Se idx for fornecido, tenta pegar a imagem do índice
+        const img = typeof idx === 'number' ? images[idx] : images[0];
+        if (img && img.trim() !== '') return img;
+    }
+    return fallback;
+}
+
+// Função utilitária para reordenar array
+// Removido função reorder que não é mais necessária
+
+// Função utilitária para normalizar imagens
+function normalizeImages(images: any[]): { id: string, url: string }[] {
+    return images.map((img, idx) => {
+        if (typeof img === 'string') {
+            return { id: uuidv4(), url: img };
+        }
+        if (img && typeof img === 'object' && img.url) {
+            return { id: img.id || uuidv4(), url: img.url };
+        }
+        return { id: uuidv4(), url: '' };
+    });
+}
+
+// Adicione ao tipo Property:
+// (Se não puder editar o arquivo de tipos, crie um type local)
+type PropertyWithList = Property & { whatYouShouldKnowList?: string[] };
+
+// Adicione no topo do arquivo, após os imports principais
+import './quill-overrides.css';
+
 export default function PropertiesPage() {
     const { user, loading, signOut } = useAuthContext();
     const router = useRouter();
@@ -203,6 +346,8 @@ export default function PropertiesPage() {
     const [importedData, setImportedData] = useState<any>(null);
     const [imageUploadProgress, setImageUploadProgress] = useState<number>(0);
     const [isUploadingImages, setIsUploadingImages] = useState<boolean>(false);
+    const [localImages, setLocalImages] = useState<{ id: string, url: string }[]>([]);
+    const [showNewPropertyModal, setShowNewPropertyModal] = useState(false);
 
     const [formData, setFormData] = useState<FormData>({
         id: '',
@@ -234,13 +379,12 @@ export default function PropertiesPage() {
             hasCameras: false
         },
         cancellationPolicy: '',
-        // Inicialização dos novos campos
         rating: {
             value: 0,
             count: 0
         },
         whatWeOffer: '',
-        whatYouShouldKnow: '',
+        whatYouShouldKnowRichText: '',
         serviceFee: 0,
         discountSettings: {
             amount: 0,
@@ -248,12 +392,117 @@ export default function PropertiesPage() {
             minNights: 0,
             validFrom: '',
             validTo: ''
-        }
+        },
+        whatYouShouldKnowSections: {
+            houseRules: [],
+            safetyProperty: [],
+            cancellationPolicy: []
+        },
+        whatYouShouldKnowDynamic: {},
     });
+
+    const [dynamicInputValues, setDynamicInputValues] = useState<Record<string, string>>({});
 
     const [propertyTypes, setPropertyTypes] = useState<string[]>([
         'Apartamento', 'Casa', 'Cobertura', 'Studio', 'Flat', 'Kitnet', 'Loft'
     ]);
+
+    const [amenitiesDropdownOpen, setAmenitiesDropdownOpen] = useState(false);
+    const amenitiesDropdownRef = useRef<HTMLDivElement>(null);
+
+    // Adicionar antes do componente PropertiesPage:
+    const whatYouShouldKnowDropdownRef = useRef<HTMLDivElement>(null);
+    const [whatYouShouldKnowDropdownOpen, setWhatYouShouldKnowDropdownOpen] = useState(false);
+
+    // Defina as categorias e suas comodidades
+    const AMENITIES_BY_CATEGORY = [
+        {
+            category: 'Cozinha',
+            items: [
+                'Cafeteira',
+                'Produtos de limpeza',
+                'Cozinha',
+                'Microondas',
+                'Louças e talheres',
+                'Frigobar',
+                'Fogão por indução',
+                'Móveis externos',
+            ],
+        },
+        {
+            category: 'Banheiro',
+            items: [
+                'Xampu',
+                'Condicionador',
+                'Sabonete para o corpo',
+                'Água quente',
+                'Secadora',
+                'Básico (Toalhas, lençóis, sabonete e papel higiênico)',
+                'Roupas de cama',
+                'Cobertores e travesseiros extras',
+                'Blackout nas cortinas',
+                'Detector de fumaça',
+                'Alarme de monóxido de carbono',
+                'Extintor de incêndio',
+                'Kit de primeiros socorros',
+            ],
+        },
+        {
+            category: 'Quarto',
+            items: [
+                'Cabides',
+                'Local para guardar as roupas: guarda-roupa',
+                'Ar-condicionado',
+                'Ar-condicionado central',
+                'Aquecimento central',
+                'Máquina de lavar',
+                'Espaço de trabalho exclusivo',
+            ],
+        },
+        {
+            category: 'Sala',
+            items: [
+                'TV',
+                'Wi-Fi',
+                'Pátio ou varanda (Privativa)',
+                'Cadeira espreguiçadeira',
+                'Estacionamento gratuito na rua',
+                'Elevador',
+                'Academia compartilhada (no prédio)',
+                'Estacionamento pago fora da propriedade',
+            ],
+        },
+        {
+            category: 'Segurança',
+            items: [
+                'Produtos de limpeza',
+                'Detector de fumaça',
+                'Alarme de monóxido de carbono',
+                'Extintor de incêndio',
+                'Kit de primeiros socorros',
+            ],
+        },
+        {
+            category: 'Outros',
+            items: [
+                'Sabonete para o corpo',
+                'Cobertores e travesseiros extras',
+                'Móveis externos',
+                'Cadeira espreguiçadeira',
+            ],
+        },
+    ];
+
+    // Adicionar um novo state para controlar animações de confirmação
+    const [confirmationAnimation, setConfirmationAnimation] = useState<{ [key: string]: boolean }>({});
+
+    // Função auxiliar para mostrar uma animação de confirmação
+    const showConfirmationAnimation = (field: string) => {
+        setConfirmationAnimation(prev => ({ ...prev, [field]: true }));
+        setTimeout(() => {
+            setConfirmationAnimation(prev => ({ ...prev, [field]: false }));
+        }, 500);
+    };
 
     // Handlers para o MapboxSearch
     const handleLocationSelect = (locationData: { address: string; coordinates: [number, number] }) => {
@@ -267,20 +516,77 @@ export default function PropertiesPage() {
         }));
     };
 
+    // Funções para gerenciar imagens no modal de edição
+    const handleImageUploadLocal = () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.multiple = true;
+        input.onchange = (e: Event) => {
+            const target = e.target as HTMLInputElement;
+            if (target.files) {
+                const newImages = Array.from(target.files).map(file => ({
+                    id: uuidv4(),
+                    url: URL.createObjectURL(file)
+                }));
+                setLocalImages(prev => [...prev, ...newImages]);
+            }
+        };
+        input.click();
+    };
+
+    const handleRemoveImageLocal = (index: number) => {
+        setLocalImages(prev => prev.filter((_, i) => i !== index));
+    };
+
+    // Funções para reordenar imagens via botões
+    const moveImageUp = (index: number) => {
+        if (index === 0) return; // Já está no topo
+        setLocalImages(prev => {
+            const newImages = [...prev];
+            const temp = newImages[index];
+            newImages[index] = newImages[index - 1];
+            newImages[index - 1] = temp;
+            return newImages;
+        });
+    };
+
+    const moveImageDown = (index: number) => {
+        setLocalImages(prev => {
+            if (index === prev.length - 1) return prev; // Já está no final
+            const newImages = [...prev];
+            const temp = newImages[index];
+            newImages[index] = newImages[index + 1];
+            newImages[index + 1] = temp;
+            return newImages;
+        });
+    };
+
+    const moveImageToFirst = (index: number) => {
+        if (index === 0) return; // Já é a primeira
+        setLocalImages(prev => {
+            const newImages = [...prev];
+            const [imageToMove] = newImages.splice(index, 1);
+            newImages.unshift(imageToMove);
+            return newImages;
+        });
+    };
+
     // Form handling functions
     const resetForm = () => {
+        // Reset form to initial state
         setFormData({
             id: '',
             title: '',
             description: '',
-            type: '',
+            type: 'Apartamento',
             location: '',
             coordinates: null,
             price: 0,
-            bedrooms: 0,
-            bathrooms: 0,
-            beds: 0,
-            guests: 0,
+            bedrooms: 1,
+            bathrooms: 1,
+            beds: 1,
+            guests: 2,
             area: 0,
             status: 'available',
             featured: false,
@@ -290,22 +596,21 @@ export default function PropertiesPage() {
             houseRules: {
                 checkIn: '15:00',
                 checkOut: '11:00',
-                maxGuests: 0,
-                additionalRules: []
+                maxGuests: 2,
+                additionalRules: [],
             },
             safety: {
                 hasCoAlarm: false,
                 hasSmokeAlarm: false,
-                hasCameras: false
+                hasCameras: false,
             },
-            cancellationPolicy: '',
-            // Inicialização dos novos campos
+            cancellationPolicy: 'Flexível',
             rating: {
                 value: 0,
                 count: 0
             },
             whatWeOffer: '',
-            whatYouShouldKnow: '',
+            whatYouShouldKnowRichText: '',
             serviceFee: 0,
             discountSettings: {
                 amount: 0,
@@ -313,15 +618,27 @@ export default function PropertiesPage() {
                 minNights: 0,
                 validFrom: '',
                 validTo: ''
-            }
+            },
+            whatYouShouldKnowSections: {
+                houseRules: [],
+                safetyProperty: [],
+                cancellationPolicy: []
+            },
+            whatYouShouldKnowDynamic: {
+                checkInTime: '14:00',
+                checkOutTime: '11:00',
+                maxGuests: 3,
+                quietHours: '22:00 - 08:00'
+            },
         });
+        setLocalImages([]);
         setImageUploadProgress(0);
     };
 
     const handleAddProperty = async () => {
         try {
             // Preparar os dados da propriedade (sem o ID, que será gerado pelo Firebase)
-            const propertyData: Omit<Property, 'id'> = {
+            const propertyData: any = {
                 title: formData.title,
                 description: formData.description,
                 type: formData.type,
@@ -335,7 +652,7 @@ export default function PropertiesPage() {
                 area: formData.area,
                 status: formData.status,
                 featured: formData.featured,
-                images: [], // Será atualizado após o upload
+                images: formData.images.map(img => img.url),
                 amenities: formData.amenities || [],
                 categorizedAmenities: formData.categorizedAmenities || {},
                 houseRules: formData.houseRules || {
@@ -349,7 +666,38 @@ export default function PropertiesPage() {
                     hasSmokeAlarm: false,
                     hasCameras: false,
                 },
-                cancellationPolicy: formData.cancellationPolicy || 'Flexível'
+                cancellationPolicy: formData.cancellationPolicy || 'Flexível',
+                what_you_should_know_sections: {
+                    house_rules: formData.whatYouShouldKnowSections.houseRules.map(rule => {
+                        const placeholderDetails = getPlaceholderDetails(rule);
+                        if (placeholderDetails && dynamicInputValues[rule]) {
+                            return placeholderDetails.base + dynamicInputValues[rule];
+                        }
+                        return rule;
+                    }),
+                    safety_property: formData.whatYouShouldKnowSections.safetyProperty,
+                    cancellation_policy: formData.whatYouShouldKnowSections.cancellationPolicy
+                },
+                rating: {
+                    value: formData.rating.value,
+                    count: formData.rating.count
+                },
+                whatWeOffer: formData.whatWeOffer,
+                whatYouShouldKnowRichText: formData.whatYouShouldKnowRichText,
+                serviceFee: formData.serviceFee,
+                discountSettings: {
+                    amount: formData.discountSettings.amount,
+                    type: formData.discountSettings.type,
+                    minNights: formData.discountSettings.minNights,
+                    validFrom: formData.discountSettings.validFrom ? new Date(formData.discountSettings.validFrom) : undefined,
+                    validTo: formData.discountSettings.validTo ? new Date(formData.discountSettings.validTo) : undefined
+                },
+                whatYouShouldKnowDynamic: {
+                    checkInTime: formData.whatYouShouldKnowDynamic?.checkInTime,
+                    checkOutTime: formData.whatYouShouldKnowDynamic?.checkOutTime,
+                    maxGuests: formData.whatYouShouldKnowDynamic?.maxGuests,
+                    quietHours: formData.whatYouShouldKnowDynamic?.quietHours
+                },
             };
 
             // Salvar a propriedade no Firebase
@@ -360,25 +708,57 @@ export default function PropertiesPage() {
             const imageFiles: File[] = [];
             const remoteUrls: string[] = [];
 
-            // Processar as imagens
+            // Processar as imagens na ordem correta
             if (formData.images && formData.images.length > 0) {
                 setIsUploadingImages(true);
 
-                for (const imageUrl of formData.images) {
+                // Mapa para rastrear a ordem original das imagens
+                const imagePositionMap = new Map();
+
+                // Primeiro passo: mapear todas as imagens com sua posição original
+                formData.images.forEach((img, index) => {
+                    imagePositionMap.set(img.id, {
+                        index,
+                        isLocal: img.url.startsWith('blob:') || img.url.startsWith('data:')
+                    });
+                });
+
+                // Segundo passo: separar imagens locais e remotas mantendo rastreamento
+                const imageInfo: { id: string, file?: File, url: string, index: number }[] = [];
+
+                for (const img of formData.images) {
+                    const originalIndex = imagePositionMap.get(img.id)?.index || 0;
+
                     // Se for uma URL de objeto local
-                    if (imageUrl.startsWith('blob:') || imageUrl.startsWith('data:')) {
+                    if (img.url.startsWith('blob:') || img.url.startsWith('data:')) {
                         try {
                             // Converter para arquivo
-                            const response = await fetch(imageUrl);
+                            const response = await fetch(img.url);
                             const blob = await response.blob();
-                            const file = new File([blob], `image-${Date.now()}.jpg`, { type: 'image/jpeg' });
+                            const file = new File([blob], `image-${Date.now()}-${img.id}.jpg`, { type: 'image/jpeg' });
                             imageFiles.push(file);
+
+                            // Rastrear este arquivo para preservar sua ordem
+                            imageInfo.push({
+                                id: img.id,
+                                file,
+                                url: img.url,
+                                index: originalIndex
+                            });
+
                         } catch (error) {
                             console.error('Erro ao processar imagem local:', error);
                         }
                     } else {
                         // Se for uma URL remota, adicionar diretamente
-                        remoteUrls.push(imageUrl);
+                        remoteUrls.push(img.url);
+
+                        // Rastrear esta URL para preservar sua ordem
+                        imageInfo.push({
+                            id: img.id,
+                            url: img.url,
+                            index: originalIndex
+                        });
                     }
                 }
 
@@ -392,13 +772,31 @@ export default function PropertiesPage() {
                         }
                     );
 
-                    // Atualizar a propriedade com as URLs das imagens
+                    // Associar URLs enviadas com as imagens originais para manter a ordem correta
+                    let localFileIndex = 0;
+                    const orderedImageUrls = imageInfo
+                        .sort((a, b) => a.index - b.index) // Ordena pela posição original
+                        .map(info => {
+                            // Se for uma imagem local que acabou de ser enviada
+                            if (info.file) {
+                                const url = uploadedUrls[localFileIndex++] || '';
+                                return url;
+                            }
+                            // Se for uma URL remota, mantém a mesma
+                            return info.url;
+                        });
+
+                    // Atualizar a propriedade com as URLs das imagens na ordem correta
                     await updateProperty(propertyId, {
-                        images: [...remoteUrls, ...uploadedUrls]
+                        images: orderedImageUrls
                     });
                 } else if (remoteUrls.length > 0) {
-                    // Se só tiver URLs remotas, atualizar diretamente
-                    await updateProperty(propertyId, { images: remoteUrls });
+                    // Se só tiver URLs remotas, ainda garante a ordem correta
+                    const orderedRemoteUrls = imageInfo
+                        .sort((a, b) => a.index - b.index)
+                        .map(info => info.url);
+
+                    await updateProperty(propertyId, { images: orderedRemoteUrls });
                 }
 
                 setIsUploadingImages(false);
@@ -427,7 +825,73 @@ export default function PropertiesPage() {
     // Função para editar uma propriedade
     const handleEditProperty = (property: Property) => {
         setCurrentProperty(property);
-        // Converter propriedade do tipo Property para o tipo FormData
+
+        const images: { id: string; url: string }[] = normalizeImages(property.images || []);
+
+        const whatYouShouldKnowSectionsFromDb = (property as any).whatYouShouldKnowSections;
+        const processedHouseRulesForForm: string[] = [];
+        const initialDynamicValues: Record<string, string> = {};
+
+        // Process House Rules
+        if (whatYouShouldKnowSectionsFromDb?.house_rules && Array.isArray(whatYouShouldKnowSectionsFromDb.house_rules)) {
+            whatYouShouldKnowSectionsFromDb.house_rules.forEach((filledRule: string) => {
+                let matchedTemplate = false;
+                for (const templateRule of HOUSE_RULES_ITEMS) {
+                    const placeholderDetails = getPlaceholderDetails(templateRule);
+                    if (placeholderDetails && filledRule.startsWith(placeholderDetails.base) && filledRule.length > placeholderDetails.base.length) {
+                        if (!processedHouseRulesForForm.includes(templateRule)) {
+                            processedHouseRulesForForm.push(templateRule);
+                        }
+                        const dynamicValue = filledRule.replace(placeholderDetails.base, '').trim();
+                        if (dynamicValue) {
+                            initialDynamicValues[templateRule] = dynamicValue;
+                        }
+                        matchedTemplate = true;
+                        break;
+                    }
+                }
+                if (!matchedTemplate) {
+                    if (HOUSE_RULES_ITEMS.includes(filledRule) && !processedHouseRulesForForm.includes(filledRule)) {
+                        processedHouseRulesForForm.push(filledRule);
+                    }
+                }
+            });
+        }
+
+        // Process Safety Property
+        const processedSafetyPropertyForForm: string[] = [];
+        if (whatYouShouldKnowSectionsFromDb?.safety_property && Array.isArray(whatYouShouldKnowSectionsFromDb.safety_property)) {
+            whatYouShouldKnowSectionsFromDb.safety_property.forEach((item: string) => {
+                // Assuming safety items don't have complex dynamic parts like house rules for now
+                // So, if the item from DB is one of the predefined SAFETY_PROPERTY_ITEMS, we add that predefined item.
+                if (SAFETY_PROPERTY_ITEMS.includes(item) && !processedSafetyPropertyForForm.includes(item)) {
+                    processedSafetyPropertyForForm.push(item);
+                }
+            });
+        }
+
+        // Process Cancellation Policy
+        const processedCancellationPolicyForForm: string[] = [];
+        if (whatYouShouldKnowSectionsFromDb?.cancellation_policy && Array.isArray(whatYouShouldKnowSectionsFromDb.cancellation_policy)) {
+            whatYouShouldKnowSectionsFromDb.cancellation_policy.forEach((item: string) => {
+                // Assuming cancellation policies don't have complex dynamic parts for now
+                if (CANCELLATION_POLICY_ITEMS.includes(item) && !processedCancellationPolicyForForm.includes(item)) {
+                    processedCancellationPolicyForForm.push(item);
+                }
+            });
+        }
+
+        setDynamicInputValues(initialDynamicValues);
+
+        const whatYouShouldKnowSectionsForForm = {
+            houseRules: processedHouseRulesForForm,
+            safetyProperty: processedSafetyPropertyForForm,
+            cancellationPolicy: processedCancellationPolicyForForm
+        };
+
+        console.log("[handleEditProperty] whatYouShouldKnowSectionsForForm:", JSON.stringify(whatYouShouldKnowSectionsForForm, null, 2));
+        console.log("[handleEditProperty] dynamicInputValues para ser setado:", JSON.stringify(initialDynamicValues, null, 2));
+
         setFormData({
             id: property.id,
             title: property.title,
@@ -443,47 +907,95 @@ export default function PropertiesPage() {
             area: property.area,
             status: property.status,
             featured: property.featured,
-            images: property.images || [],
+            images, // Já normalizadas
             amenities: property.amenities || [],
             categorizedAmenities: property.categorizedAmenities || {},
-            houseRules: {
-                checkIn: property.houseRules?.checkIn || '15:00',
-                checkOut: property.houseRules?.checkOut || '12:00',
-                maxGuests: property.houseRules?.maxGuests || property.guests || 2,
-                additionalRules: property.houseRules?.additionalRules || []
+            houseRules: property.houseRules || {
+                checkIn: '15:00',
+                checkOut: '11:00',
+                maxGuests: 2,
+                additionalRules: [],
             },
-            safety: {
-                hasCoAlarm: property.safety?.hasCoAlarm || false,
-                hasSmokeAlarm: property.safety?.hasSmokeAlarm || false,
-                hasCameras: property.safety?.hasCameras || false
+            safety: property.safety || {
+                hasCoAlarm: false,
+                hasSmokeAlarm: false,
+                hasCameras: false,
             },
             cancellationPolicy: property.cancellationPolicy || 'Flexível',
-            // Novos campos adicionados
-            rating: {
-                value: property.rating?.value || 4.5,
-                count: property.rating?.count || 0
+            rating: property.rating || {
+                value: 0,
+                count: 0
             },
             whatWeOffer: property.whatWeOffer || '',
-            whatYouShouldKnow: property.whatYouShouldKnow || '',
-            serviceFee: property.serviceFee || 35,
+            whatYouShouldKnowRichText: (property as any).what_you_should_know_rich_text || '',
+            serviceFee: property.serviceFee || 0,
+            whatYouShouldKnowSections: whatYouShouldKnowSectionsForForm,
+            whatYouShouldKnowDynamic: property.whatYouShouldKnowDynamic || {
+                checkInTime: '14:00',
+                checkOutTime: '11:00',
+                maxGuests: property.guests || 2,
+                quietHours: '22:00 - 08:00'
+            },
             discountSettings: {
-                amount: property.discountSettings?.amount || 0,
-                type: property.discountSettings?.type || 'fixed',
-                minNights: property.discountSettings?.minNights || 0,
-                validFrom: property.discountSettings?.validFrom ? new Date(property.discountSettings.validFrom).toISOString().split('T')[0] : '',
-                validTo: property.discountSettings?.validTo ? new Date(property.discountSettings.validTo).toISOString().split('T')[0] : ''
+                amount: property.discountSettings?.amount ?? 0,
+                type: property.discountSettings?.type ?? 'fixed',
+                minNights: property.discountSettings?.minNights ?? 0,
+                // Garantir que as datas sejam strings no formato YYYY-MM-DD ou vazias
+                validFrom: property.discountSettings?.validFrom
+                    ? new Date(property.discountSettings.validFrom).toISOString().split('T')[0]
+                    : '',
+                validTo: property.discountSettings?.validTo
+                    ? new Date(property.discountSettings.validTo).toISOString().split('T')[0]
+                    : '',
             }
         });
 
-        setShowEditModal(true);
+        setLocalImages(normalizeImages(property.images || [])); // Isso é para o modal antigo, pode não ser necessário para o novo se ele usar formData.images
+        // setShowEditModal(true); // Comentar ou remover esta linha (modal antigo)
+        setShowNewPropertyModal(true); // Adicionar esta linha para abrir o novo modal stepper
     };
 
     const handleUpdateProperty = async () => {
         if (!currentProperty) return;
 
+        // console.log("[FINAL DEBUG] FormData no início de handleUpdateProperty:", JSON.stringify(formData, null, 2));
+
+        // Log detalhado do estado antes do submit
+        // console.log("[DEBUG] Estado do formData no submit:", JSON.stringify(formData, null, 2));
+
+        // Blindagem: garantir que o campo whatYouShouldKnowSections está sempre populado corretamente
+        const whatYouShouldKnowSections = {
+            houseRules: Array.isArray(formData.whatYouShouldKnowSections?.houseRules) ? formData.whatYouShouldKnowSections.houseRules : [],
+            safetyProperty: Array.isArray(formData.whatYouShouldKnowSections?.safetyProperty) ? formData.whatYouShouldKnowSections.safetyProperty : [],
+            cancellationPolicy: Array.isArray(formData.whatYouShouldKnowSections?.cancellationPolicy) ? formData.whatYouShouldKnowSections.cancellationPolicy : []
+        };
+
+        const whatYouShouldKnowSectionsProcessed = {
+            houseRules: (formData.whatYouShouldKnowSections?.houseRules || []).map(rule => {
+                const placeholderDetails = getPlaceholderDetails(rule);
+                if (placeholderDetails && dynamicInputValues[rule]) {
+                    return placeholderDetails.base + dynamicInputValues[rule];
+                }
+                return rule;
+            }),
+            safetyProperty: formData.whatYouShouldKnowSections?.safetyProperty || [],
+            cancellationPolicy: formData.whatYouShouldKnowSections?.cancellationPolicy || []
+        };
+
         try {
+            // Log para debug
+            // console.log("DEBUG: whatYouShouldKnowSections antes de salvar:", JSON.stringify(formData.whatYouShouldKnowSections, null, 2));
+            // console.log("DEBUG: whatYouShouldKnowDynamic antes de salvar:", JSON.stringify(formData.whatYouShouldKnowDynamic, null, 2));
+
+            // Verificar se há itens selecionados
+            const hasSelectedItems =
+                whatYouShouldKnowSections.houseRules.length > 0 ||
+                whatYouShouldKnowSections.safetyProperty.length > 0 ||
+                whatYouShouldKnowSections.cancellationPolicy.length > 0;
+
             // Preparar os dados atualizados
-            const propertyData: Partial<Property> = {
+            // IMPORTANTE: Use localImages que contém a ordem correta das imagens definida pelo usuário
+            const propertyData: any = {
                 title: formData.title,
                 price: formData.price,
                 location: formData.location,
@@ -510,28 +1022,65 @@ export default function PropertiesPage() {
                     hasSmokeAlarm: false,
                     hasCameras: false,
                 },
-                cancellationPolicy: formData.cancellationPolicy || 'Flexível'
+                cancellationPolicy: formData.cancellationPolicy || 'Flexível',
+                // Usamos localImages.map para garantir que a ordem definida pelo usuário seja mantida
+                images: localImages.map(img => img.url),
+                // CORREÇÃO: Usar a versão garantida das seções para evitar undefined
+                what_you_should_know_sections: whatYouShouldKnowSectionsProcessed, // Usar a variável processada aqui
+                whatYouShouldKnowDynamic: {
+                    checkInTime: formData.whatYouShouldKnowDynamic?.checkInTime,
+                    checkOutTime: formData.whatYouShouldKnowDynamic?.checkOutTime,
+                    maxGuests: formData.whatYouShouldKnowDynamic?.maxGuests,
+                    quietHours: formData.whatYouShouldKnowDynamic?.quietHours
+                },
+                // Também adicionamos os outros campos do frontend que podem ser úteis
+                rating: formData.rating,
+                whatWeOffer: formData.whatWeOffer,
+                whatYouShouldKnowRichText: formData.whatYouShouldKnowRichText, // Novo campo para o editor de texto rico
+                serviceFee: formData.serviceFee,
+                discountSettings: {
+                    amount: formData.discountSettings.amount,
+                    type: formData.discountSettings.type,
+                    minNights: formData.discountSettings.minNights,
+                    validFrom: formData.discountSettings.validFrom ? new Date(formData.discountSettings.validFrom) : undefined,
+                    validTo: formData.discountSettings.validTo ? new Date(formData.discountSettings.validTo) : undefined
+                }
             };
 
-            // Processar as imagens, similar ao processo de adição
+            // Log para debug do objeto final que será enviado
+            // console.log("DEBUG: Objeto propertyData enviado ao Supabase:", JSON.stringify(propertyData, null, 2));
+
+            // Processar as imagens, mantendo a ordem definida pelo usuário
             const imageFiles: File[] = [];
             const remoteUrls: string[] = [];
+            const imageIndexMap = new Map(); // Mapa para manter a ordem original
 
-            if (formData.images && formData.images.length > 0) {
+            if (localImages && localImages.length > 0) {
                 setIsUploadingImages(true);
 
-                for (const imageUrl of formData.images) {
-                    if (imageUrl.startsWith('blob:') || imageUrl.startsWith('data:')) {
+                // Primeiro passo: identificar e mapear todas as imagens com seu índice original
+                localImages.forEach((img, index) => {
+                    if (img.url.startsWith('blob:') || img.url.startsWith('data:')) {
+                        // Marca a posição das imagens locais para preservar a ordem
+                        imageIndexMap.set(img.id, { index, type: 'local' });
+                    } else {
+                        // Marca a posição das imagens remotas para preservar a ordem
+                        remoteUrls.push(img.url);
+                        imageIndexMap.set(img.id, { index, type: 'remote', url: img.url });
+                    }
+                });
+
+                // Segundo passo: processar os uploads de imagens novas/locais
+                for (const img of localImages) {
+                    if (img.url.startsWith('blob:') || img.url.startsWith('data:')) {
                         try {
-                            const response = await fetch(imageUrl);
+                            const response = await fetch(img.url);
                             const blob = await response.blob();
-                            const file = new File([blob], `image-${Date.now()}.jpg`, { type: 'image/jpeg' });
+                            const file = new File([blob], `image-${Date.now()}-${img.id}.jpg`, { type: 'image/jpeg' });
                             imageFiles.push(file);
                         } catch (error) {
                             console.error('Erro ao processar imagem local:', error);
                         }
-                    } else {
-                        remoteUrls.push(imageUrl);
                     }
                 }
 
@@ -545,30 +1094,54 @@ export default function PropertiesPage() {
                         }
                     );
 
-                    // Incluir as URLs no objeto de atualização
-                    propertyData.images = [...remoteUrls, ...uploadedUrls];
+                    // Aqui usamos diretamente a ordem das imagens definida em localImages
+                    propertyData.images = localImages.map(img => {
+                        // Se for uma imagem que acabou de ser carregada (blob/data URL)
+                        if (img.url.startsWith('blob:') || img.url.startsWith('data:')) {
+                            const index = imageIndexMap.get(img.id)?.index || 0;
+                            const localIndex = Array.from(imageIndexMap.entries())
+                                .filter(([_, val]) => val.type === 'local')
+                                .sort((a, b) => a[1].index - b[1].index)
+                                .findIndex(([key, _]) => key === img.id);
+
+                            return localIndex >= 0 && localIndex < uploadedUrls.length
+                                ? uploadedUrls[localIndex]
+                                : (uploadedUrls[0] || img.url);
+                        }
+
+                        // Se for uma URL remota, mantém a mesma
+                        return img.url;
+                    });
                 } else {
-                    propertyData.images = remoteUrls;
+                    // Se não houver novos uploads, usa as URLs na ordem definida em localImages
+                    propertyData.images = localImages.map(img => img.url);
                 }
 
                 setIsUploadingImages(false);
             }
 
-            // Atualizar no Firebase
+            // Verificar os dados sendo enviados para o Supabase
+            // console.log('DEBUG: Enviando para o Supabase:', JSON.stringify(propertyData, null, 2));
+
+            // Atualizar no Supabase
             await updateProperty(currentProperty.id, propertyData);
 
-            // Atualizar a lista localmente
+            // Atualizar a lista localmente com a ordem correta das imagens
             const updatedProperties = properties.map(p => {
                 if (p.id === currentProperty.id) {
                     return {
                         ...p,
-                        ...propertyData
+                        ...propertyData,
+                        // Garantir que a propriedade images tenha o valor correto de propertyData.images
+                        // que contém a ordem definida pelo usuário
+                        images: propertyData.images || []
                     };
                 }
                 return p;
             });
 
             setProperties(updatedProperties);
+            // console.log("DEBUG: Propriedade atualizada com sucesso. Ordem das imagens salva:", propertyData.images);
             setShowEditModal(false);
 
             // Recarregar as propriedades para ter os dados atualizados
@@ -578,7 +1151,26 @@ export default function PropertiesPage() {
             alert('Erro ao atualizar propriedade. Tente novamente.');
         }
     };
-
+    const handleSaveFromStepperModal = async (): Promise<boolean> => {
+        try {
+            if (formData.id) { // Se tem ID, é uma edição
+                await handleUpdateProperty();
+            } else { // Sem ID, é uma adição
+                await handleAddProperty();
+            }
+            // As funções handleAddProperty e handleUpdateProperty já cuidam de fechar
+            // os modais relevantes (se necessário), resetar o formulário (resetForm),
+            // e recarregar as propriedades.
+            // O NewPropertyStepperModal se fechará por conta própria através da sua prop onClose
+            // se o salvamento for bem-sucedido, e o resetForm é chamado nesse onClose.
+            return true; // Indica sucesso
+        } catch (error) {
+            console.error("Erro ao salvar propriedade pelo stepper modal:", error);
+            // Os alertas de erro específicos já devem ser tratados dentro de
+            // handleAddProperty e handleUpdateProperty.
+            return false; // Indica falha
+        }
+    };
     const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
 
@@ -599,17 +1191,19 @@ export default function PropertiesPage() {
 
     // Add the amenity toggle handler function
     const handleAmenityToggle = (amenity: string, isChecked: boolean) => {
-        if (isChecked) {
-            setFormData(prev => ({
-                ...prev,
-                amenities: [...prev.amenities, amenity]
-            }));
-        } else {
-            setFormData(prev => ({
-                ...prev,
-                amenities: prev.amenities.filter(item => item !== amenity)
-            }));
-        }
+        setFormData(prev => {
+            if (isChecked) {
+                return {
+                    ...prev,
+                    amenities: [...prev.amenities, amenity]
+                };
+            } else {
+                return {
+                    ...prev,
+                    amenities: prev.amenities.filter(a => a !== amenity)
+                };
+            }
+        });
     };
 
     const handleImageUpload = () => {
@@ -620,7 +1214,10 @@ export default function PropertiesPage() {
         input.onchange = (e: Event) => {
             const target = e.target as HTMLInputElement;
             if (target.files) {
-                const newImages = Array.from(target.files).map(file => URL.createObjectURL(file));
+                const newImages = Array.from(target.files).map(file => ({
+                    id: uuidv4(),
+                    url: URL.createObjectURL(file)
+                }));
                 setFormData(prev => ({
                     ...prev,
                     images: [...prev.images, ...newImages]
@@ -635,6 +1232,48 @@ export default function PropertiesPage() {
             ...prev,
             images: prev.images.filter((_, i) => i !== index)
         }));
+    };
+
+    // Funções para reordenar imagens via botões no modal de adicionar
+    const moveFormImageUp = (index: number) => {
+        if (index === 0) return; // Já está no topo
+        setFormData(prev => {
+            const newImages = [...prev.images];
+            const temp = newImages[index];
+            newImages[index] = newImages[index - 1];
+            newImages[index - 1] = temp;
+            return {
+                ...prev,
+                images: newImages
+            };
+        });
+    };
+
+    const moveFormImageDown = (index: number) => {
+        setFormData(prev => {
+            if (index === prev.images.length - 1) return prev; // Já está no final
+            const newImages = [...prev.images];
+            const temp = newImages[index];
+            newImages[index] = newImages[index + 1];
+            newImages[index + 1] = temp;
+            return {
+                ...prev,
+                images: newImages
+            };
+        });
+    };
+
+    const moveFormImageToFirst = (index: number) => {
+        if (index === 0) return; // Já é a primeira
+        setFormData(prev => {
+            const newImages = [...prev.images];
+            const [imageToMove] = newImages.splice(index, 1);
+            newImages.unshift(imageToMove);
+            return {
+                ...prev,
+                images: newImages
+            };
+        });
     };
 
     useEffect(() => {
@@ -674,6 +1313,29 @@ export default function PropertiesPage() {
             setImportProgress(progress);
         }
     }, [progress]);
+
+    useEffect(() => {
+        if (showEditModal && currentProperty) {
+            setLocalImages(normalizeImages(currentProperty.images || []));
+        }
+    }, [showEditModal, currentProperty]);
+
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (amenitiesDropdownRef.current && !amenitiesDropdownRef.current.contains(event.target as Node)) {
+                setAmenitiesDropdownOpen(false);
+            }
+            if (whatYouShouldKnowDropdownRef.current && !whatYouShouldKnowDropdownRef.current.contains(event.target as Node)) {
+                setWhatYouShouldKnowDropdownOpen(false);
+            }
+        }
+        if (amenitiesDropdownOpen || whatYouShouldKnowDropdownOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+        }
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [amenitiesDropdownOpen, whatYouShouldKnowDropdownOpen]);
 
     const handleSignOut = async () => {
         try {
@@ -864,6 +1526,8 @@ export default function PropertiesPage() {
         }
 
         // Update form state with imported data
+        const processedImagesWithId = normalizeImages(processedImages);
+
         setFormData({
             id: '',
             title: importedData.title || '',
@@ -881,7 +1545,7 @@ export default function PropertiesPage() {
             featured: false,
             amenities: normalizedAmenities,
             categorizedAmenities: categorizedAmenities,
-            images: processedImages, // Use reliable local images
+            images: processedImagesWithId,
             houseRules: {
                 checkIn: importedData.houseRules?.checkIn || '15:00',
                 checkOut: importedData.houseRules?.checkOut || '12:00',
@@ -900,7 +1564,7 @@ export default function PropertiesPage() {
                 count: importedData.rating?.count || Math.floor(Math.random() * 40) + 10 // Gerar um valor aleatório entre 10 e 50
             },
             whatWeOffer: importedData.whatWeOffer || (importedData.description ? `${importedData.description.substring(0, 100)}...` : ''),
-            whatYouShouldKnow: importedData.whatYouShouldKnow || 'Regras de check-in e check-out flexíveis. Entre em contato para mais informações.',
+            whatYouShouldKnowRichText: importedData.whatYouShouldKnowRichText || '', // Novo campo para o editor de texto rico
             serviceFee: importedData.serviceFee || 35, // Taxa de serviço padrão
             discountSettings: {
                 amount: importedData.discountSettings?.amount || 50,
@@ -908,7 +1572,13 @@ export default function PropertiesPage() {
                 minNights: importedData.discountSettings?.minNights || 3,
                 validFrom: importedData.discountSettings?.validFrom || '',
                 validTo: importedData.discountSettings?.validTo || ''
-            }
+            },
+            whatYouShouldKnowSections: {
+                houseRules: importedData.houseRules?.additionalRules || [],
+                safetyProperty: importedData.amenities?.filter((amenity: string) => SAFETY_PROPERTY_ITEMS.includes(amenity)) || [],
+                cancellationPolicy: importedData.cancellationPolicy ? CANCELLATION_POLICY_ITEMS.filter(policy => policy.toLowerCase().includes(importedData.cancellationPolicy.toLowerCase())) : []
+            },
+            whatYouShouldKnowDynamic: {},
         });
 
         // Close modal and clear data
@@ -930,16 +1600,46 @@ export default function PropertiesPage() {
             setLoadingProperties(true);
             const propertiesData = await fetchProperties();
 
-            // Se não houver dados ainda no Firebase, usar os dados de exemplo
-            if (propertiesData.length === 0) {
-                setProperties(sampleProperties);
-            } else {
-                setProperties(propertiesData);
-            }
+            // Verificar se cada propriedade tem o campo whatYouShouldKnowSections
+            const processedProperties = propertiesData.map(property => {
+                // Verificar se existe a versão em snake_case do campo 
+                // @ts-ignore - O campo pode existir nos dados do Supabase mesmo não estando no tipo
+                if (property.what_you_should_know_sections) {
+                    // Converter de snake_case para camelCase para manter consistência
+                    // @ts-ignore - O campo pode existir nos dados do Supabase
+                    property.whatYouShouldKnowSections = property.what_you_should_know_sections;
+                    // @ts-ignore - O campo pode existir nos dados do Supabase
+                    delete property.what_you_should_know_sections;
+                }
+
+                // Garantir que o campo whatYouShouldKnowSections exista
+                if (!property.whatYouShouldKnowSections) {
+                    property.whatYouShouldKnowSections = {
+                        houseRules: [],
+                        safetyProperty: [],
+                        cancellationPolicy: []
+                    };
+                }
+
+                // Garantir que todas as subseções existam e sejam arrays
+                if (!Array.isArray(property.whatYouShouldKnowSections.houseRules)) {
+                    property.whatYouShouldKnowSections.houseRules = [];
+                }
+                if (!Array.isArray(property.whatYouShouldKnowSections.safetyProperty)) {
+                    property.whatYouShouldKnowSections.safetyProperty = [];
+                }
+                if (!Array.isArray(property.whatYouShouldKnowSections.cancellationPolicy)) {
+                    property.whatYouShouldKnowSections.cancellationPolicy = [];
+                }
+
+                return property;
+            });
+
+            setProperties(processedProperties);
+            // console.log("DEBUG: Propriedades carregadas e processadas com sucesso");
         } catch (error) {
             console.error('Erro ao carregar propriedades:', error);
-            // Em caso de erro, usar os dados de exemplo
-            setProperties(sampleProperties);
+            setProperties([]); // Não usar sampleProperties
         } finally {
             setLoadingProperties(false);
         }
@@ -959,6 +1659,36 @@ export default function PropertiesPage() {
             }
         }
     };
+
+    const handleWYSLCheckboxChange = (item: string, checked: boolean, sectionKey: 'houseRules' | 'safetyProperty' | 'cancellationPolicy') => {
+        setFormData(prev => {
+            const currentSectionItems = prev.whatYouShouldKnowSections[sectionKey] || [];
+            let newSectionItems;
+            if (checked) {
+                newSectionItems = currentSectionItems.includes(item) ? currentSectionItems : [...currentSectionItems, item];
+            } else {
+                newSectionItems = currentSectionItems.filter((i: string) => i !== item);
+            }
+
+            const placeholderDetails = getPlaceholderDetails(item);
+            if (!checked && placeholderDetails) {
+                setDynamicInputValues(prevDynamicValues => {
+                    const newDynamicValues = { ...prevDynamicValues };
+                    delete newDynamicValues[item];
+                    return newDynamicValues;
+                });
+            }
+            return {
+                ...prev,
+                whatYouShouldKnowSections: {
+                    ...prev.whatYouShouldKnowSections,
+                    [sectionKey]: newSectionItems
+                }
+            };
+        });
+    };
+
+    // ... (outras funções)
 
     // Renderização condicionada à carga de propriedades
     if (loading || loadingProperties) {
@@ -994,13 +1724,22 @@ export default function PropertiesPage() {
                                 <h1 className="text-2xl font-bold text-white mb-2">Gerenciamento de Imóveis</h1>
                                 <p className="text-white/80">Gerencie os imóveis disponíveis na plataforma</p>
                             </div>
-                            <button
-                                onClick={() => setShowAddModal(true)}
-                                className="inline-flex items-center px-4 py-2 bg-[#8BADA4] text-white rounded-lg hover:bg-opacity-90 transition-colors"
-                            >
-                                <Plus className="mr-2 h-5 w-5" />
-                                Adicionar Imóvel
-                            </button>
+                            <div className="flex space-x-2"> {/* Adicionado div para alinhar botões */}
+                                <button
+                                    onClick={() => setShowAddModal(true)}
+                                    className="inline-flex items-center px-4 py-2 bg-[#8BADA4] text-white rounded-lg hover:bg-opacity-90 transition-colors"
+                                >
+                                    <Plus className="mr-2 h-5 w-5" />
+                                    Adicionar Imóvel
+                                </button>
+                                <button
+                                    onClick={() => setShowNewPropertyModal(true)} // Aciona o novo modal
+                                    className="inline-flex items-center px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                                >
+                                    <Plus className="mr-2 h-5 w-5" />
+                                    Adicionar Imóvel (Novo)
+                                </button>
+                            </div>
                         </div>
 
                         <div className="bg-white/25 backdrop-blur-lg rounded-xl shadow-lg p-4 mb-6 border border-white/20">
@@ -1051,7 +1790,7 @@ export default function PropertiesPage() {
                                 <div key={property.id} className="bg-white/25 backdrop-blur-lg rounded-xl shadow-lg overflow-hidden border border-white/20">
                                     <div className="relative h-48">
                                         <Image
-                                            src={property.images[0] || localPlaceholderImages[idx % localPlaceholderImages.length]}
+                                            src={getValidImage(property.images, localPlaceholderImages[idx % localPlaceholderImages.length], 0)}
                                             alt={property.title}
                                             width={500}
                                             height={300}
@@ -1364,29 +2103,66 @@ export default function PropertiesPage() {
                                         </button>
 
                                         {formData.images.length > 0 && (
-                                            <div className="mt-4 grid grid-cols-3 gap-4 mb-10">
-                                                {formData.images.map((img, index) => (
-                                                    <div key={index} className="relative">
-                                                        <div className="h-20 w-full bg-gray-200 rounded-md overflow-hidden">
-                                                            <Image
-                                                                src={img || localPlaceholderImages[index % localPlaceholderImages.length]}
-                                                                alt={`Imagem ${index + 1}`}
-                                                                width={100}
-                                                                height={80}
-                                                                className="w-full h-full object-cover"
-                                                                onError={handleImageError}
-                                                                unoptimized={img && !img.startsWith('/') ? true : undefined}
-                                                            />
+                                            <div className="mt-4 mb-10">
+                                                <h4 className="text-sm font-medium text-gray-700 mb-2">Organize a ordem das imagens:</h4>
+                                                <div className="grid grid-cols-3 gap-4">
+                                                    {formData.images.map((img, index) => (
+                                                        <div key={`image-${index}`} className="relative">
+                                                            <div className="h-20 w-full bg-gray-200 rounded-md overflow-hidden">
+                                                                <Image
+                                                                    src={img.url}
+                                                                    alt={`Imagem ${index + 1}`}
+                                                                    width={100}
+                                                                    height={80}
+                                                                    className="w-full h-full object-cover"
+                                                                    onError={handleImageError}
+                                                                    unoptimized={img.url && !img.url.startsWith('/') ? true : undefined}
+                                                                    priority={index === 0}
+                                                                    style={{ width: '100%', height: 'auto', aspectRatio: '5/4' }}
+                                                                />
+                                                            </div>
+                                                            <div className="absolute top-0 left-0 bg-black bg-opacity-50 text-white px-2 py-1 text-xs rounded-br">
+                                                                #{index + 1}
+                                                            </div>
+                                                            <div className="absolute right-1 top-1 flex flex-col space-y-1">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => moveFormImageToFirst(index)}
+                                                                    disabled={index === 0}
+                                                                    className={`bg-white rounded-full p-1 shadow-sm ${index === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                                    title="Mover para primeiro"
+                                                                >
+                                                                    <Star size={12} className="text-yellow-500" />
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => moveFormImageUp(index)}
+                                                                    disabled={index === 0}
+                                                                    className={`bg-white rounded-full p-1 shadow-sm ${index === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                                    title="Mover para cima"
+                                                                >
+                                                                    <ArrowUp size={12} className="text-gray-700" />
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => moveFormImageDown(index)}
+                                                                    disabled={index === formData.images.length - 1}
+                                                                    className={`bg-white rounded-full p-1 shadow-sm ${index === formData.images.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                                    title="Mover para baixo"
+                                                                >
+                                                                    <ArrowDown size={12} className="text-gray-700" />
+                                                                </button>
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleRemoveImage(index)}
+                                                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+                                                            >
+                                                                &times;
+                                                            </button>
                                                         </div>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleRemoveImage(index)}
-                                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
-                                                        >
-                                                            &times;
-                                                        </button>
-                                                    </div>
-                                                ))}
+                                                    ))}
+                                                </div>
                                             </div>
                                         )}
                                     </div>
@@ -1566,29 +2342,75 @@ export default function PropertiesPage() {
                                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                                 O que oferecemos (aba do imóvel)
                                             </label>
-                                            <textarea
-                                                name="whatWeOffer"
-                                                value={formData.whatWeOffer}
-                                                onChange={handleFormChange}
-                                                rows={4}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
-                                                placeholder="Descreva o que seu imóvel oferece aos hóspedes..."
-                                            ></textarea>
+                                            <div className="relative" ref={amenitiesDropdownRef}>
+                                                <button
+                                                    type="button"
+                                                    className="w-full flex flex-wrap items-center gap-2 px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-[#8BADA4] text-left min-h-[44px]"
+                                                    onClick={() => setAmenitiesDropdownOpen((open) => !open)}
+                                                    aria-haspopup="listbox"
+                                                    aria-expanded={amenitiesDropdownOpen}
+                                                >
+                                                    {formData.amenities.length === 0 ? (
+                                                        <span className="text-gray-400">Selecione as comodidades...</span>
+                                                    ) : (
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {formData.amenities.map((amenity) => (
+                                                                <span key={amenity} className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-xs text-gray-700">
+                                                                    {getAmenityIcon(amenity)}
+                                                                    {amenity}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                    <svg className={`ml-auto w-4 h-4 transition-transform ${amenitiesDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                                                </button>
+                                                {amenitiesDropdownOpen && (
+                                                    <div className="absolute z-50 mt-2 w-full bg-white border border-gray-200 rounded-md shadow-lg p-3 max-h-72 overflow-y-auto animate-fade-in">
+                                                        {formData.amenities.length > 0 && (
+                                                            <button
+                                                                type="button"
+                                                                className="mb-2 text-xs text-[#8BADA4] hover:underline focus:outline-none"
+                                                                onClick={() => setFormData(prev => ({ ...prev, amenities: [] }))}
+                                                            >
+                                                                Limpar comodidades
+                                                            </button>
+                                                        )}
+                                                        {AMENITIES_BY_CATEGORY.map(({ category, items }) => (
+                                                            <div key={category} className="mb-3">
+                                                                <div className="font-semibold text-xs text-gray-500 mb-1 uppercase tracking-wide">{category}</div>
+                                                                <ul className="space-y-1">
+                                                                    {items.map((amenity) => (
+                                                                        <li key={amenity}>
+                                                                            <label className="flex items-center space-x-2 cursor-pointer px-2 py-1 rounded hover:bg-gray-50">
+                                                                                <input
+                                                                                    type="checkbox"
+                                                                                    checked={formData.amenities.includes(amenity)}
+                                                                                    onChange={e => {
+                                                                                        const checked = e.target.checked;
+                                                                                        setFormData(prev => ({
+                                                                                            ...prev,
+                                                                                            amenities: checked
+                                                                                                ? [...prev.amenities, amenity]
+                                                                                                : prev.amenities.filter(a => a !== amenity)
+                                                                                        }));
+                                                                                    }}
+                                                                                    className="form-checkbox h-4 w-4 text-[#8BADA4] border-gray-300 rounded"
+                                                                                />
+                                                                                {getAmenityIcon(amenity)}
+                                                                                <span className="text-sm text-gray-700">{amenity}</span>
+                                                                            </label>
+                                                                        </li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
 
-                                        <div className="mb-4">
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                O que você deve saber (aba do imóvel)
-                                            </label>
-                                            <textarea
-                                                name="whatYouShouldKnow"
-                                                value={formData.whatYouShouldKnow}
-                                                onChange={handleFormChange}
-                                                rows={4}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
-                                                placeholder="Informações importantes que o hóspede deve saber..."
-                                            ></textarea>
-                                        </div>
+                                        {/* O campo "O que você deve saber (aba do imóvel)" foi removido */}
+
                                     </div>
                                 </div>
                             </div>
@@ -1689,7 +2511,7 @@ export default function PropertiesPage() {
                                                 {importedData.images.slice(0, 6).map((img: string, index: number) => (
                                                     <div key={index} className="relative h-20 bg-gray-200 rounded-md overflow-hidden">
                                                         <Image
-                                                            src={img || localPlaceholderImages[index % localPlaceholderImages.length]}
+                                                            src={getValidImage(importedData.images, localPlaceholderImages[index % localPlaceholderImages.length], index)}
                                                             alt={`Imagem ${index + 1}`}
                                                             width={100}
                                                             height={80}
@@ -1987,7 +2809,7 @@ export default function PropertiesPage() {
                                     <div className="mb-4">
                                         <button
                                             type="button"
-                                            onClick={handleImageUpload}
+                                            onClick={handleImageUploadLocal}
                                             className="flex items-center px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
                                         >
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -1996,30 +2818,67 @@ export default function PropertiesPage() {
                                             Adicionar Imagem
                                         </button>
 
-                                        {formData.images.length > 0 && (
-                                            <div className="mt-4 grid grid-cols-3 gap-4 mb-10">
-                                                {formData.images.map((img, index) => (
-                                                    <div key={index} className="relative">
-                                                        <div className="h-20 w-full bg-gray-200 rounded-md overflow-hidden">
-                                                            <Image
-                                                                src={img || localPlaceholderImages[index % localPlaceholderImages.length]}
-                                                                alt={`Imagem ${index + 1}`}
-                                                                width={100}
-                                                                height={80}
-                                                                className="w-full h-full object-cover"
-                                                                onError={handleImageError}
-                                                                unoptimized={img && !img.startsWith('/') ? true : undefined}
-                                                            />
+                                        {localImages.length > 0 && (
+                                            <div className="mt-4 mb-10">
+                                                <h4 className="text-sm font-medium text-gray-700 mb-2">Organize a ordem das imagens:</h4>
+                                                <div className="grid grid-cols-3 gap-4">
+                                                    {localImages.map((img, index) => (
+                                                        <div key={`image-${index}`} className="relative">
+                                                            <div className="h-20 w-full bg-gray-200 rounded-md overflow-hidden">
+                                                                <Image
+                                                                    src={img.url}
+                                                                    alt={`Imagem ${index + 1}`}
+                                                                    width={100}
+                                                                    height={80}
+                                                                    className="w-full h-full object-cover"
+                                                                    onError={handleImageError}
+                                                                    unoptimized={img.url && !img.url.startsWith('/') ? true : undefined}
+                                                                    priority={index === 0}
+                                                                    style={{ width: '100%', height: 'auto', aspectRatio: '5/4' }}
+                                                                />
+                                                            </div>
+                                                            <div className="absolute top-0 left-0 bg-black bg-opacity-50 text-white px-2 py-1 text-xs rounded-br">
+                                                                #{index + 1}
+                                                            </div>
+                                                            <div className="absolute right-1 top-1 flex flex-col space-y-1">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => moveImageToFirst(index)}
+                                                                    disabled={index === 0}
+                                                                    className={`bg-white rounded-full p-1 shadow-sm ${index === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                                    title="Mover para primeiro"
+                                                                >
+                                                                    <Star size={12} className="text-yellow-500" />
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => moveImageUp(index)}
+                                                                    disabled={index === 0}
+                                                                    className={`bg-white rounded-full p-1 shadow-sm ${index === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                                    title="Mover para cima"
+                                                                >
+                                                                    <ArrowUp size={12} className="text-gray-700" />
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => moveImageDown(index)}
+                                                                    disabled={index === localImages.length - 1}
+                                                                    className={`bg-white rounded-full p-1 shadow-sm ${index === localImages.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                                    title="Mover para baixo"
+                                                                >
+                                                                    <ArrowDown size={12} className="text-gray-700" />
+                                                                </button>
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleRemoveImageLocal(index)}
+                                                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+                                                            >
+                                                                &times;
+                                                            </button>
                                                         </div>
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleRemoveImage(index)}
-                                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
-                                                        >
-                                                            &times;
-                                                        </button>
-                                                    </div>
-                                                ))}
+                                                    ))}
+                                                </div>
                                             </div>
                                         )}
                                     </div>
@@ -2199,30 +3058,293 @@ export default function PropertiesPage() {
                                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                                 O que oferecemos (aba do imóvel)
                                             </label>
-                                            <textarea
-                                                name="whatWeOffer"
-                                                value={formData.whatWeOffer}
-                                                onChange={handleFormChange}
-                                                rows={4}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
-                                                placeholder="Descreva o que seu imóvel oferece aos hóspedes..."
-                                            ></textarea>
+                                            <div className="relative" ref={amenitiesDropdownRef}>
+                                                <button
+                                                    type="button"
+                                                    className="w-full flex flex-wrap items-center gap-2 px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-[#8BADA4] text-left min-h-[44px]"
+                                                    onClick={() => setAmenitiesDropdownOpen((open) => !open)}
+                                                    aria-haspopup="listbox"
+                                                    aria-expanded={amenitiesDropdownOpen}
+                                                >
+                                                    {formData.amenities.length === 0 ? (
+                                                        <span className="text-gray-400">Selecione as comodidades...</span>
+                                                    ) : (
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {formData.amenities.map((amenity) => (
+                                                                <span key={amenity} className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-xs text-gray-700">
+                                                                    {getAmenityIcon(amenity)}
+                                                                    {amenity}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                    <svg className={`ml-auto w-4 h-4 transition-transform ${amenitiesDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                                                </button>
+                                                {amenitiesDropdownOpen && (
+                                                    <div className="absolute z-50 mt-2 w-full bg-white border border-gray-200 rounded-md shadow-lg p-3 max-h-72 overflow-y-auto animate-fade-in">
+                                                        {formData.amenities.length > 0 && (
+                                                            <button
+                                                                type="button"
+                                                                className="mb-2 text-xs text-[#8BADA4] hover:underline focus:outline-none"
+                                                                onClick={() => setFormData(prev => ({ ...prev, amenities: [] }))}
+                                                            >
+                                                                Limpar comodidades
+                                                            </button>
+                                                        )}
+                                                        {AMENITIES_BY_CATEGORY.map(({ category, items }) => (
+                                                            <div key={category} className="mb-3">
+                                                                <div className="font-semibold text-xs text-gray-500 mb-1 uppercase tracking-wide">{category}</div>
+                                                                <ul className="space-y-1">
+                                                                    {items.map((amenity) => (
+                                                                        <li key={amenity}>
+                                                                            <label className="flex items-center space-x-2 cursor-pointer px-2 py-1 rounded hover:bg-gray-50">
+                                                                                <input
+                                                                                    type="checkbox"
+                                                                                    checked={formData.amenities.includes(amenity)}
+                                                                                    onChange={e => {
+                                                                                        const checked = e.target.checked;
+                                                                                        setFormData(prev => ({
+                                                                                            ...prev,
+                                                                                            amenities: checked
+                                                                                                ? [...prev.amenities, amenity]
+                                                                                                : prev.amenities.filter(a => a !== amenity)
+                                                                                        }));
+                                                                                    }}
+                                                                                    className="form-checkbox h-4 w-4 text-[#8BADA4] border-gray-300 rounded"
+                                                                                />
+                                                                                {getAmenityIcon(amenity)}
+                                                                                <span className="text-sm text-gray-700">{amenity}</span>
+                                                                            </label>
+                                                                        </li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
 
-                                        <div className="mb-4">
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                O que você deve saber (aba do imóvel)
-                                            </label>
-                                            <textarea
-                                                name="whatYouShouldKnow"
-                                                value={formData.whatYouShouldKnow}
-                                                onChange={handleFormChange}
-                                                rows={4}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4]"
-                                                placeholder="Informações importantes que o hóspede deve saber..."
-                                            ></textarea>
-                                        </div>
+                                        {/* O campo "O que você deve saber (aba do imóvel)" foi removido */}
+
                                     </div>
+                                </div>
+                            </div>
+
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    O que você deve saber (aba do imóvel)
+                                </label>
+                                <div className="relative" ref={whatYouShouldKnowDropdownRef}>
+                                    <button
+                                        type="button"
+                                        className="w-full flex flex-wrap items-center gap-2 px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-[#8BADA4] text-left min-h-[44px]"
+                                        onClick={() => setWhatYouShouldKnowDropdownOpen((open) => !open)}
+                                        aria-haspopup="listbox"
+                                        aria-expanded={whatYouShouldKnowDropdownOpen}
+                                    >
+                                        {formData.whatYouShouldKnowSections.houseRules.length === 0 &&
+                                            formData.whatYouShouldKnowSections.safetyProperty.length === 0 &&
+                                            formData.whatYouShouldKnowSections.cancellationPolicy.length === 0 ? (
+                                            <span className="text-gray-400">Selecione regras, segurança e políticas...</span>
+                                        ) : (
+                                            <div className="flex flex-wrap gap-2">
+                                                {formData.whatYouShouldKnowSections.houseRules.map((rule) => (
+                                                    <span key={rule} className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-xs text-gray-700">
+                                                        <Clock className="w-3 h-3" />
+                                                        {rule}
+                                                    </span>
+                                                ))}
+                                                {formData.whatYouShouldKnowSections.safetyProperty.map((item) => (
+                                                    <span key={item} className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-xs text-gray-700">
+                                                        <Shield className="w-3 h-3" />
+                                                        {item}
+                                                    </span>
+                                                ))}
+                                                {formData.whatYouShouldKnowSections.cancellationPolicy.map((policy) => (
+                                                    <span key={policy} className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-xs text-gray-700">
+                                                        <Calendar className="w-3 h-3" />
+                                                        {typeof policy === 'string' && policy.length > 30 ? policy.substring(0, 30) + '...' : policy}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+                                        <svg className={`ml-auto w-4 h-4 transition-transform ${whatYouShouldKnowDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                                    </button>
+                                    {whatYouShouldKnowDropdownOpen && (
+                                        <div className="absolute z-50 mt-2 w-full bg-white border border-gray-200 rounded-md shadow-lg p-3 max-h-72 overflow-y-auto animate-fade-in">
+                                            {(formData.whatYouShouldKnowSections.houseRules.length > 0 ||
+                                                formData.whatYouShouldKnowSections.safetyProperty.length > 0 ||
+                                                formData.whatYouShouldKnowSections.cancellationPolicy.length > 0) && (
+                                                    <button
+                                                        type="button"
+                                                        className="mb-2 text-xs text-[#8BADA4] hover:underline focus:outline-none"
+                                                        onClick={() => setFormData(prev => ({
+                                                            ...prev,
+                                                            whatYouShouldKnowSections: {
+                                                                houseRules: [],
+                                                                safetyProperty: [],
+                                                                cancellationPolicy: []
+                                                            }
+                                                        }))}
+                                                    >
+                                                        Limpar seleções
+                                                    </button>
+                                                )}
+
+                                            {/* Regras da Casa */}
+                                            <div className="mb-6">
+                                                <h4 className="font-semibold mb-2 text-gray-700">Regras da Casa</h4>
+                                                <div className="space-y-1">
+                                                    {HOUSE_RULES_ITEMS.map((ruleItem) => {
+                                                        // Correctly check if the item is in the houseRules array
+                                                        const isChecked = formData.whatYouShouldKnowSections.houseRules.includes(ruleItem);
+                                                        const placeholderDetails = getPlaceholderDetails(ruleItem);
+
+                                                        return (
+                                                            <div key={ruleItem} className="p-2 border rounded-md bg-gray-50">
+                                                                <div className="flex items-center justify-between">
+                                                                    <div className="flex items-center">
+                                                                        <Checkbox
+                                                                            id={`hr-${ruleItem}`}
+                                                                            checked={isChecked}
+                                                                            onCheckedChange={(checkedState: boolean | 'indeterminate') => {
+                                                                                handleWYSLCheckboxChange(ruleItem, !!checkedState, 'houseRules');
+                                                                            }}
+                                                                            className="mr-3 flex-shrink-0"
+                                                                        />
+                                                                        {isChecked && <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />}
+                                                                        <label htmlFor={`hr-${ruleItem}`} className="text-sm text-gray-800 cursor-pointer">
+                                                                            {placeholderDetails ? placeholderDetails.base : ruleItem}
+                                                                            {placeholderDetails && !isChecked && (
+                                                                                <span className="ml-1 text-xs text-gray-400 italic">
+                                                                                    {placeholderDetails.placeholder} (customizável ao marcar)
+                                                                                </span>
+                                                                            )}
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                {isChecked && placeholderDetails && (
+                                                                    <div className="mt-2 pl-8 flex items-center space-x-2">
+                                                                        <Input
+                                                                            type={placeholderDetails.inputType}
+                                                                            placeholder={placeholderDetails.placeholderKey}
+                                                                            value={dynamicInputValues[ruleItem] || ""}
+                                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDynamicInputValues(prev => ({ // Tipado explicitamente
+                                                                                ...prev,
+                                                                                [ruleItem]: e.target.value
+                                                                            }))}
+                                                                            className="p-1.5 border rounded-md text-sm h-9 flex-grow min-w-0"
+                                                                        />
+                                                                        {dynamicInputValues[ruleItem] && (
+                                                                            <span className="text-xs text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis flex items-center">
+                                                                                <Check className="w-4 h-4 text-green-500 mr-1 flex-shrink-0" />
+                                                                                Final: {placeholderDetails.base}<span className="font-medium">{dynamicInputValues[ruleItem]}</span>
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+
+                                            {/* Segurança e Propriedade */}
+                                            <div className="mb-3">
+                                                <div className="font-semibold text-xs text-gray-500 mb-1 uppercase tracking-wide">SEGURANÇA E PROPRIEDADE</div>
+                                                <ul className="space-y-1">
+                                                    {SAFETY_PROPERTY_ITEMS.map((item) => {
+                                                        const isChecked = formData.whatYouShouldKnowSections.safetyProperty.includes(item);
+                                                        return (
+                                                            <li key={item}>
+                                                                <label className="flex items-center space-x-2 cursor-pointer px-2 py-1 rounded hover:bg-gray-50">
+                                                                    <Checkbox // Usando o componente Checkbox
+                                                                        id={`safety-${item}`}
+                                                                        checked={isChecked}
+                                                                        onCheckedChange={(checkedState: boolean | 'indeterminate') => {
+                                                                            handleWYSLCheckboxChange(item, !!checkedState, 'safetyProperty');
+                                                                        }}
+                                                                        className="mr-1 flex-shrink-0" // Ajustado mr-1 e adicionado flex-shrink-0
+                                                                    />
+                                                                    {isChecked && <Check className="w-4 h-4 text-green-500 mr-1 flex-shrink-0" />}
+                                                                    <Shield className="w-4 h-4 text-gray-500 mr-1 flex-shrink-0" />
+                                                                    <span className="text-sm text-gray-700">{item}</span>
+                                                                </label>
+                                                            </li>
+                                                        );
+                                                    })}
+                                                </ul>
+                                            </div>
+
+                                            {/* Política de Cancelamento */}
+                                            <div className="mb-3">
+                                                <div className="font-semibold text-xs text-gray-500 mb-1 uppercase tracking-wide">POLÍTICA DE CANCELAMENTO</div>
+                                                <ul className="space-y-1">
+                                                    {CANCELLATION_POLICY_ITEMS.map((policy) => {
+                                                        const isChecked = formData.whatYouShouldKnowSections.cancellationPolicy.includes(policy);
+                                                        return (
+                                                            <li key={policy}>
+                                                                <label className="flex items-center space-x-2 cursor-pointer px-2 py-1 rounded hover:bg-gray-50">
+                                                                    <Checkbox // Usando o componente Checkbox
+                                                                        id={`cancel-${policy}`}
+                                                                        checked={isChecked}
+                                                                        onCheckedChange={(checkedState: boolean | 'indeterminate') => {
+                                                                            handleWYSLCheckboxChange(policy, !!checkedState, 'cancellationPolicy');
+                                                                        }}
+                                                                        className="mr-1 flex-shrink-0"
+                                                                    />
+                                                                    {isChecked && <Check className="w-4 h-4 text-green-500 mr-1 flex-shrink-0" />}
+                                                                    <Calendar className="w-4 h-4 text-gray-500 mr-1 flex-shrink-0" />
+                                                                    <span className="text-sm text-gray-700">{policy}</span>
+                                                                </label>
+                                                            </li>
+                                                        );
+                                                    })}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Novo campo: Editor de Texto Rico para "O que você deve saber" */}
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Conteúdo Adicional - O que você deve saber (Editor Rico)
+                                </label>
+                                <div className="text-xs text-gray-500 mb-2">
+                                    Use este editor para adicionar informações personalizadas e formatadas que aparecerão na aba "O que você deve saber" do frontend.
+                                </div>
+                                <div className="border border-gray-300 rounded-md overflow-hidden">
+                                    <ReactQuill
+                                        theme="snow"
+                                        value={formData.whatYouShouldKnowRichText}
+                                        onChange={(content, delta, source, editor) => {
+                                            // console.log("ReactQuill content:", content);
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                whatYouShouldKnowRichText: content
+                                            }));
+                                        }}
+                                        modules={{
+                                            toolbar: [
+                                                [{ 'header': [1, 2, 3, false] }],
+                                                ['bold', 'italic', 'underline'],
+                                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                ['link'],
+                                                ['clean']
+                                            ],
+                                        }}
+                                        formats={[
+                                            'header',
+                                            'bold', 'italic', 'underline',
+                                            'list', 'bullet',
+                                            'link'
+                                        ]}
+                                        placeholder="Digite informações adicionais que os hóspedes devem saber..."
+                                        style={{ minHeight: '150px' }}
+                                    />
                                 </div>
                             </div>
 
@@ -2265,6 +3387,38 @@ export default function PropertiesPage() {
                     </p>
                 </div>
             )}
+
+            {/* NOVO MODAL STEPPER */}
+            <NewPropertyStepperModal
+                isOpen={showNewPropertyModal}
+                onClose={() => {
+                    setShowNewPropertyModal(false);
+                    resetForm(); // <- CHAMAR resetForm AQUI
+                }}
+                onSaveAttempt={handleSaveFromStepperModal} // <- PASSAR A NOVA FUNÇÃO
+                formData={formData}
+                setFormData={setFormData}
+                handleChange={handleFormChange}
+                propertyTypes={propertyTypes}
+                handleLocationSelect={handleLocationSelect}
+                handleImageUpload={handleImageUpload}
+                handleRemoveImage={handleRemoveImage}
+                moveFormImageUp={moveFormImageUp}
+                moveFormImageDown={moveFormImageDown}
+                moveFormImageToFirst={moveFormImageToFirst}
+                // Props para "O que você deve saber"
+                handleWYSLCheckboxChange={handleWYSLCheckboxChange}
+                dynamicInputValues={dynamicInputValues}
+                setDynamicInputValues={setDynamicInputValues}
+                HOUSE_RULES_ITEMS={HOUSE_RULES_ITEMS}
+                SAFETY_PROPERTY_ITEMS={SAFETY_PROPERTY_ITEMS}
+                CANCELLATION_POLICY_ITEMS={CANCELLATION_POLICY_ITEMS}
+                getPlaceholderDetails={getPlaceholderDetails}
+                // Props para Amenities (novas)
+                AMENITIES_BY_CATEGORY={AMENITIES_BY_CATEGORY}
+                handleAmenityToggle={handleAmenityToggle} // Reutilizando a função existente
+                getAmenityIcon={getAmenityIcon} // Passando a função de ícone
+            />
         </div>
     );
 } 
