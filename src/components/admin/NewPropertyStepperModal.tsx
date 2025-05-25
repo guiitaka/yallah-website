@@ -720,7 +720,10 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
                 <div className="px-6 py-5 flex justify-center items-center space-x-4 border-b border-gray-200">
                     {STEPS.map((step, index) => (
                         <React.Fragment key={step.id}>
-                            <div className="flex flex-col items-center">
+                            <div
+                                className="flex flex-col items-center cursor-pointer"
+                                onClick={() => setCurrentStep(step.id)}
+                            >
                                 <div
                                     className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium 
                     ${currentStep >= step.id ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'}`}
@@ -767,35 +770,10 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
                                 }
                             }}
                             disabled={isSaving}
-                            className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-100 rounded-md hover:bg-blue-200 transition-colors disabled:opacity-50"
+                            className="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-md hover:bg-green-600 disabled:opacity-50"
                         >
-                            {isSaving ? 'Salvando...' : 'Salvar Rascunho'}
+                            {isSaving ? 'Salvando...' : 'Salvar'}
                         </button>
-                        {currentStep < STEPS.length ? (
-                            <button
-                                onClick={handleNext}
-                                disabled={isSaving}
-                                className="px-4 py-2 text-sm font-medium text-white bg-orange-500 rounded-md hover:bg-orange-600 flex items-center disabled:opacity-50"
-                            >
-                                Próximo
-                                <ArrowRight size={16} className="ml-2" />
-                            </button>
-                        ) : (
-                            <button
-                                onClick={async () => {
-                                    setIsSaving(true);
-                                    const success = await onSaveAttempt();
-                                    setIsSaving(false);
-                                    if (success) {
-                                        onClose();
-                                    }
-                                }}
-                                disabled={isSaving}
-                                className="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-md hover:bg-green-600 disabled:opacity-50"
-                            >
-                                {isSaving ? 'Salvando...' : 'Concluir Cadastro'}
-                            </button>
-                        )}
                     </div>
                 </div>
             </div>
