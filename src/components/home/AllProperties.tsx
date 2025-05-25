@@ -1803,12 +1803,7 @@ export default function AllProperties() {
                                                                 ))}
                                                             </ul>
                                                         ) : (
-                                                            <ul className="list-disc pl-5 space-y-1">
-                                                                <li>Transporte público a 200m</li>
-                                                                <li>Restaurantes e cafés a 5 minutos a pé</li>
-                                                                <li>Supermercados e farmácias próximos</li>
-                                                                <li>Parques e áreas de lazer nas redondezas</li>
-                                                            </ul>
+                                                            <p className="text-gray-700">Ótima localização e boa vizinhança</p>
                                                         )}
                                                     </div>
                                                 </div>
