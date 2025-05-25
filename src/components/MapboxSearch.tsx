@@ -231,87 +231,59 @@ const MapboxSearch: React.FC<MapboxSearchProps> = ({ onLocationSelect, initialVa
     }
 
     return (
-        <div className="relative w-full h-full">
-            {/* Map container */}
-            <div
-                ref={mapContainer}
-                className="h-60 w-full rounded-lg overflow-hidden mb-2"
-            />
+        <div className="relative w-full flex flex-col h-full">
+            <form onSubmit={handleAddressSubmit} className="relative mb-2 flex-shrink-0">
+                <input
+                    placeholder="Digite o endereço do imóvel"
+                    className="w-full px-3 py-2 bg-transparent text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#8BADA4] text-base"
+                    value={addressInput}
+                    onChange={handleManualAddressInput}
+                    onFocus={() => {
+                        if (searchResults.length > 0) {
+                            setShowResults(true);
+                        }
+                    }}
+                />
+                <button type="submit" className="absolute right-0 top-0 bottom-0 px-3 flex items-center bg-[#8BADA4] rounded-r-md">
+                    <MagnifyingGlass size={20} color="white" />
+                </button>
+            </form>
 
-            {/* Search overlay */}
-            <div className="relative w-full z-10">
-                <div className="relative">
-                    <form
-                        className="relative w-full bg-white rounded-md shadow-sm flex items-stretch overflow-hidden border border-gray-300"
-                        onSubmit={handleAddressSubmit}
-                    >
-                        <div className="flex-1">
-                            <input
-                                placeholder="Digite o endereço do imóvel"
-                                className="w-full px-3 py-2 bg-transparent text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#8BADA4] text-base"
-                                value={addressInput}
-                                onChange={handleManualAddressInput}
-                                onFocus={() => {
-                                    if (searchResults.length > 0) {
-                                        setShowResults(true);
-                                    }
-                                }}
-                            />
-                        </div>
-                        <div className="flex-none">
-                            <button
-                                type="submit"
-                                className="h-full px-3 bg-[#8BADA4] text-white hover:bg-[#7A9B94] transition-colors flex items-center"
+            {showResults && searchResults.length > 0 && (
+                <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-[150px] overflow-y-auto mt-12 flex-shrink-0">
+                    {searchResults.map((result) => {
+                        // Extract neighborhood from context if available
+                        let neighborhood = '';
+                        if (result.context) {
+                            const neighborhoodContext = result.context.find((ctx: any) =>
+                                ctx.id.startsWith('neighborhood')
+                            );
+                            if (neighborhoodContext) {
+                                neighborhood = neighborhoodContext.text;
+                            }
+                        }
+
+                        return (
+                            <li
+                                key={result.id}
+                                className="px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-0"
+                                onClick={() => handleAddressSelect(result)}
                             >
-                                {isSearching ? (
-                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                ) : (
-                                    <MagnifyingGlass size={20} weight="bold" />
+                                <p className="text-gray-800">{result.place_name}</p>
+                                {neighborhood && !result.place_name.includes(neighborhood) && (
+                                    <p className="text-gray-500 text-xs mt-1">
+                                        Bairro: {neighborhood}
+                                    </p>
                                 )}
-                            </button>
-                        </div>
-                    </form>
+                            </li>
+                        );
+                    })}
+                </ul>
+            )}
 
-                    {/* Search Results Dropdown */}
-                    {showResults && searchResults.length > 0 && (
-                        <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-md shadow-lg max-h-60 overflow-y-auto z-20">
-                            <ul>
-                                {searchResults.map((result) => {
-                                    // Extract neighborhood from context if available
-                                    let neighborhood = '';
-                                    if (result.context) {
-                                        const neighborhoodContext = result.context.find((ctx: any) =>
-                                            ctx.id.startsWith('neighborhood')
-                                        );
-                                        if (neighborhoodContext) {
-                                            neighborhood = neighborhoodContext.text;
-                                        }
-                                    }
+            {mapError && <div className="text-red-500 text-sm p-2 bg-red-100 rounded-md">{mapError}</div>}
 
-                                    return (
-                                        <li
-                                            key={result.id}
-                                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-0"
-                                            onClick={() => handleAddressSelect(result)}
-                                        >
-                                            <p className="text-gray-800">{result.place_name}</p>
-                                            {neighborhood && !result.place_name.includes(neighborhood) && (
-                                                <p className="text-gray-500 text-xs mt-1">
-                                                    Bairro: {neighborhood}
-                                                </p>
-                                            )}
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            <div className="text-xs text-gray-500 mt-1">
-                Selecione o endereço exato para a listagem. Este será mantido privado até a reserva.
-            </div>
+            <div ref={mapContainer} className="map-container w-full h-[350px] rounded-lg flex-grow" />
         </div>
     );
 };

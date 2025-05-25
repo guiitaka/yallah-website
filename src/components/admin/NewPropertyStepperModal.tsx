@@ -249,19 +249,19 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
                 );
             case 2:
                 return (
-                    <div className="space-y-6">
-                        <div className="h-[450px]">
+                    <div className="space-y-6 flex flex-col h-[500px]">
+                        <div className="flex-shrink-0">
                             <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Localização *</label>
                             <MapboxSearch
                                 initialValue={formData.location}
                                 onLocationSelect={handleLocationSelect}
                             />
-                            {formData.coordinates && (
-                                <p className="mt-2 text-xs text-gray-500">
-                                    Latitude: {formData.coordinates.lat.toFixed(6)}, Longitude: {formData.coordinates.lng.toFixed(6)}
-                                </p>
-                            )}
                         </div>
+                        {formData.coordinates && (
+                            <p className="mt-2 text-xs text-gray-500 flex-shrink-0">
+                                Latitude: {formData.coordinates.lat.toFixed(6)}, Longitude: {formData.coordinates.lng.toFixed(6)}
+                            </p>
+                        )}
                     </div>
                 );
             case 3:
