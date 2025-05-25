@@ -760,13 +760,14 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
                     </div>
 
                     <div className="flex items-center space-x-3">
+                        {/* Botão Salvar (antigo Concluir Cadastro) - agora visível em todas as etapas */}
                         <button
                             onClick={async () => {
                                 setIsSaving(true);
                                 const success = await onSaveAttempt();
                                 setIsSaving(false);
                                 if (success) {
-                                    onClose();
+                                    onClose(); // Fecha o modal após salvar com sucesso
                                 }
                             }}
                             disabled={isSaving}
@@ -774,6 +775,18 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
                         >
                             {isSaving ? 'Salvando...' : 'Salvar'}
                         </button>
+
+                        {/* Botão Próximo - visível se não for a última etapa */}
+                        {currentStep < STEPS.length && (
+                            <button
+                                onClick={handleNext} // Ação de avançar para a próxima etapa
+                                disabled={isSaving} // Desabilitado enquanto estiver salvando
+                                className="px-4 py-2 text-sm font-medium text-white bg-orange-500 rounded-md hover:bg-orange-600 flex items-center disabled:opacity-50"
+                            >
+                                Próximo
+                                <ArrowRight size={16} className="ml-2" />
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
