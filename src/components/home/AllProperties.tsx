@@ -84,7 +84,7 @@ interface PropertyCard {
     coordinates?: [number, number];
     description?: string;
     whatWeOffer?: string;
-    whatYouShouldKnow?: string;
+    whatYouShouldKnow?: string; // Corrigido para ser opcional novamente
     whatYouShouldKnowRichText?: string; // Campo para o conteúdo do editor rico
     serviceFee?: number;
     discountAmount?: number;
@@ -111,6 +111,7 @@ interface PropertyCard {
         safetyProperty: string[];
         cancellationPolicy: string[];
     };
+    pointsOfInterest?: string[]; // Novo campo para pontos de interesse
 }
 
 // Static property data as fallback
@@ -673,7 +674,8 @@ const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
                 houseRules: [],
                 safetyProperty: [],
                 cancellationPolicy: []
-            }
+            },
+            pointsOfInterest: property.points_of_interest || [] // Novo campo para pontos de interesse
         };
     });
 };
@@ -1794,12 +1796,20 @@ export default function AllProperties() {
                                                         <p className="mb-3">
                                                             Este imóvel está localizado em uma área privilegiada de {formatLocationForPublic(property.location ?? "")}, oferecendo fácil acesso a:
                                                         </p>
-                                                        <ul className="list-disc pl-5 space-y-1">
-                                                            <li>Transporte público a 200m</li>
-                                                            <li>Restaurantes e cafés a 5 minutos a pé</li>
-                                                            <li>Supermercados e farmácias próximos</li>
-                                                            <li>Parques e áreas de lazer nas redondezas</li>
-                                                        </ul>
+                                                        {(property.pointsOfInterest && property.pointsOfInterest.length > 0) ? (
+                                                            <ul className="list-disc pl-5 space-y-1">
+                                                                {property.pointsOfInterest.map((poi, index) => (
+                                                                    <li key={`poi-${index}`}>{poi}</li>
+                                                                ))}
+                                                            </ul>
+                                                        ) : (
+                                                            <ul className="list-disc pl-5 space-y-1">
+                                                                <li>Transporte público a 200m</li>
+                                                                <li>Restaurantes e cafés a 5 minutos a pé</li>
+                                                                <li>Supermercados e farmácias próximos</li>
+                                                                <li>Parques e áreas de lazer nas redondezas</li>
+                                                            </ul>
+                                                        )}
                                                     </div>
                                                 </div>
                                             )}
