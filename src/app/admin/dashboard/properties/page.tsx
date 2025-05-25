@@ -301,9 +301,6 @@ function getValidImage(images: string[] | undefined, fallback: string, idx?: num
     return fallback;
 }
 
-// Função utilitária para reordenar array
-// Removido função reorder que não é mais necessária
-
 // Função utilitária para normalizar imagens
 function normalizeImages(images: any[]): { id: string, url: string }[] {
     return images.map((img, idx) => {
@@ -1094,22 +1091,19 @@ export default function PropertiesPage() {
                         }
                     );
 
-                    // Aqui usamos diretamente a ordem das imagens definida em localImages
+                    // Construir o array final de imagens na ordem correta de localImages
+                    let newImageUploadIndex = 0;
                     propertyData.images = localImages.map(img => {
-                        // Se for uma imagem que acabou de ser carregada (blob/data URL)
                         if (img.url.startsWith('blob:') || img.url.startsWith('data:')) {
-                            const index = imageIndexMap.get(img.id)?.index || 0;
-                            const localIndex = Array.from(imageIndexMap.entries())
-                                .filter(([_, val]) => val.type === 'local')
-                                .sort((a, b) => a[1].index - b[1].index)
-                                .findIndex(([key, _]) => key === img.id);
-
-                            return localIndex >= 0 && localIndex < uploadedUrls.length
-                                ? uploadedUrls[localIndex]
-                                : (uploadedUrls[0] || img.url);
+                            // Esta é uma nova imagem que foi carregada
+                            // Pega a próxima URL da lista de URLs carregadas
+                            if (newImageUploadIndex < uploadedUrls.length) {
+                                return uploadedUrls[newImageUploadIndex++];
+                            }
+                            // Fallback, embora não devesse acontecer se tudo estiver correto
+                            return img.url;
                         }
-
-                        // Se for uma URL remota, mantém a mesma
+                        // Esta é uma imagem existente (URL remota), mantém a URL
                         return img.url;
                     });
                 } else {
