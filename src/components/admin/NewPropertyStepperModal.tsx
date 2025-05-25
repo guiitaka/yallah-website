@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic'; // Import dynamic para ReactQuill
-import { X, ArrowLeft, ArrowRight, UploadCloud, Star, ArrowUp, ArrowDown, Trash2, Clock, Shield, Calendar, Wifi, Tv, ChefHat, ParkingCircle, Umbrella, Snowflake, Thermometer, Coffee, Fan, Droplet, ShieldAlert, Trees, Flame, Dumbbell, Shirt, Utensils, Container, Microwave, Sofa, Wrench, Cable, Bike, BellRing, Dog, Lamp, Wind, Baby, Mountain, Warehouse, Zap, Lock, Home, MapPin, Check, ChevronDown } from 'lucide-react';
+import { X, ArrowLeft, ArrowRight, UploadCloud, Star, ArrowUp, ArrowDown, Trash2, Clock, Shield, Calendar, Wifi, Tv, ChefHat, ParkingCircle, Umbrella, Snowflake, Thermometer, Coffee, Fan, Droplet, ShieldAlert, Trees, Flame, Dumbbell, Shirt, Utensils, Container, Microwave, Sofa, Wrench, Cable, Bike, BellRing, Dog, Lamp, Wind, Baby, Mountain, Warehouse, Zap, Lock, Home, MapPin, Check, ChevronDown, Search, RefreshCw } from 'lucide-react';
 import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox'; // Importar Checkbox
@@ -129,6 +129,7 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
     const [isSaving, setIsSaving] = useState(false);
     const [amenitiesDropdownOpenInStepper, setAmenitiesDropdownOpenInStepper] = useState(false);
     const amenitiesDropdownRefStepper = useRef<HTMLDivElement>(null);
+    const [isFetchingPOIs, setIsFetchingPOIs] = useState(false); // Novo estado para carregamento de POIs
 
     useEffect(() => {
         if (isOpen) {
@@ -158,6 +159,62 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
 
     const handleBack = () => {
         setCurrentStep((prev) => Math.max(prev - 1, 1));
+    };
+
+    // Função para buscar POIs da Mapbox
+    const fetchNearbyPOIs = async () => {
+        if (!formData.coordinates) {
+            alert('Por favor, defina uma localização para o imóvel primeiro.');
+            return;
+        }
+
+        setIsFetchingPOIs(true);
+        const accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+        if (!accessToken) {
+            console.error('Mapbox access token não encontrado.');
+            alert('Erro ao buscar POIs: Token de acesso não configurado.');
+            setIsFetchingPOIs(false);
+            return;
+        }
+
+        const { lng, lat } = formData.coordinates;
+        const categories = [
+            'restaurant', 'cafe', 'bar', 'park', 'supermarket',
+            'pharmacy', 'shopping_mall', 'transit_station', 'school', 'hospital'
+        ];
+        const limitPerCategory = 2; // Buscar até 2 de cada para ter variedade inicial
+        let fetchedPOIs: string[] = [];
+
+        try {
+            for (const category of categories) {
+                if (fetchedPOIs.length >= 10) break; // Parar se já temos 10 POIs
+
+                const url = `https://api.mapbox.com/search/searchbox/v1/category/${category}?access_token=${accessToken}&proximity=${lng},${lat}&limit=${limitPerCategory}&language=pt`;
+                const response = await fetch(url);
+                if (!response.ok) {
+                    console.warn(`Erro ao buscar POIs para categoria ${category}: ${response.statusText}`);
+                    continue; // Pula para a próxima categoria em caso de erro
+                }
+                const data = await response.json();
+                if (data.features) {
+                    data.features.forEach((feature: any) => {
+                        if (feature.properties && feature.properties.name) {
+                            fetchedPOIs.push(feature.properties.name);
+                        }
+                    });
+                }
+            }
+
+            // Remover duplicados e limitar a 10
+            const uniquePOIs = Array.from(new Set(fetchedPOIs)).slice(0, 10);
+            setFormData(prev => ({ ...prev, pointsOfInterest: uniquePOIs }));
+
+        } catch (error) {
+            console.error('Erro ao buscar POIs:', error);
+            alert('Ocorreu um erro ao buscar os pontos de interesse próximos.');
+        } finally {
+            setIsFetchingPOIs(false);
+        }
     };
 
     const renderStepContent = () => {
@@ -253,20 +310,40 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
                     <div className="space-y-6 flex flex-col h-[550px]">
                         <div className="flex-shrink-0">
                             <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Localização *</label>
-                            <MapboxSearch
-                                initialValue={formData.location}
-                                onLocationSelect={handleLocationSelect}
-                            />
+                            <div className="flex-grow h-full">
+                                <MapboxSearch
+                                    initialValue={formData.location}
+                                    onLocationSelect={handleLocationSelect}
+                                />
+                            </div>
+                            {formData.coordinates && (
+                                <p className="text-sm text-gray-600 mt-2">
+                                    Latitude: {formData.coordinates.lat.toFixed(6)}, Longitude: {formData.coordinates.lng.toFixed(6)}
+                                </p>
+                            )}
                         </div>
-                        {formData.coordinates && (
-                            <p className="mt-2 text-xs text-gray-500 flex-shrink-0">
-                                Latitude: {formData.coordinates.lat.toFixed(6)}, Longitude: {formData.coordinates.lng.toFixed(6)}
-                            </p>
-                        )}
 
-                        {/* Seção de Pontos de Interesse */}
-                        <div className="mt-6 pt-6 border-t border-gray-200 flex-shrink-0">
-                            <h4 className="text-md font-semibold text-gray-800 mb-3">Pontos de Interesse Próximos</h4>
+                        {/* Seção de Pontos de Interesse Próximos */}
+                        <div className="mt-6 pt-6 border-t border-gray-200">
+                            <div className="flex justify-between items-center mb-3">
+                                <h4 className="text-lg font-semibold text-gray-800">Pontos de Interesse Próximos</h4>
+                                <button
+                                    type="button"
+                                    onClick={fetchNearbyPOIs}
+                                    disabled={isFetchingPOIs || !formData.coordinates}
+                                    className="px-4 py-2 text-sm font-medium text-white bg-[#8BADA4] rounded-md hover:bg-[#7A9D94] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#8BADA4] disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                                >
+                                    {isFetchingPOIs ? (
+                                        <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                                    ) : (
+                                        <Search className="w-4 h-4 mr-2" />
+                                    )}
+                                    {isFetchingPOIs ? 'Buscando...' : 'Buscar Pontos Próximos'}
+                                </button>
+                            </div>
+                            <p className="text-sm text-gray-500 mb-3">
+                                Adicione até 10 pontos de interesse relevantes próximos ao imóvel (ex: Parque Ibirapuera, Metrô Vila Madalena, Padaria Pão Feliz).
+                            </p>
                             <div className="space-y-3 max-h-[200px] overflow-y-auto pr-2">
                                 {formData.pointsOfInterest.map((point, index) => (
                                     <div key={index} className="flex items-center space-x-2">
