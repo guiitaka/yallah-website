@@ -812,7 +812,7 @@ export default function PropertiesPage() {
             setShowAddModal(false);
 
             // Recarregar as propriedades para ter os dados atualizados
-            loadPropertiesFromFirebase();
+            fetchProperties().then(data => setProperties(data)).catch(console.error);
         } catch (error) {
             console.error('Erro ao adicionar propriedade:', error);
             alert('Erro ao adicionar propriedade. Tente novamente.');
@@ -991,7 +991,7 @@ export default function PropertiesPage() {
                 whatYouShouldKnowSections.cancellationPolicy.length > 0;
 
             // Preparar os dados atualizados
-            // IMPORTANTE: Use localImages que contém a ordem correta das imagens definida pelo usuário
+            // IMPORTANTE: Use formData.images que contém a ordem correta das imagens definida pelo usuário no NewPropertyStepperModal
             const propertyData: any = {
                 title: formData.title,
                 price: formData.price,
@@ -1020,8 +1020,8 @@ export default function PropertiesPage() {
                     hasCameras: false,
                 },
                 cancellationPolicy: formData.cancellationPolicy || 'Flexível',
-                // Usamos localImages.map para garantir que a ordem definida pelo usuário seja mantida
-                images: localImages.map(img => img.url),
+                // Usamos formData.images.map para garantir que a ordem definida pelo usuário seja mantida
+                images: formData.images.map(img => img.url),
                 // CORREÇÃO: Usar a versão garantida das seções para evitar undefined
                 what_you_should_know_sections: whatYouShouldKnowSectionsProcessed, // Usar a variável processada aqui
                 whatYouShouldKnowDynamic: {
@@ -1049,26 +1049,27 @@ export default function PropertiesPage() {
 
             // Processar as imagens, mantendo a ordem definida pelo usuário
             const imageFiles: File[] = [];
-            const remoteUrls: string[] = [];
-            const imageIndexMap = new Map(); // Mapa para manter a ordem original
+            const remoteUrls: string[] = []; // Este array pode ser simplificado ou removido se não for usado posteriormente
+            const imageIndexMap = new Map(); // Mapa para manter a ordem original (se ainda necessário)
 
-            if (localImages && localImages.length > 0) {
+            if (formData.images && formData.images.length > 0) {
                 setIsUploadingImages(true);
 
                 // Primeiro passo: identificar e mapear todas as imagens com seu índice original
-                localImages.forEach((img, index) => {
+                // (Esta parte pode precisar de ajuste se imageIndexMap não for crucial para a nova lógica)
+                formData.images.forEach((img, index) => {
                     if (img.url.startsWith('blob:') || img.url.startsWith('data:')) {
                         // Marca a posição das imagens locais para preservar a ordem
                         imageIndexMap.set(img.id, { index, type: 'local' });
                     } else {
                         // Marca a posição das imagens remotas para preservar a ordem
-                        remoteUrls.push(img.url);
+                        remoteUrls.push(img.url); // Coleta URLs remotas
                         imageIndexMap.set(img.id, { index, type: 'remote', url: img.url });
                     }
                 });
 
                 // Segundo passo: processar os uploads de imagens novas/locais
-                for (const img of localImages) {
+                for (const img of formData.images) {
                     if (img.url.startsWith('blob:') || img.url.startsWith('data:')) {
                         try {
                             const response = await fetch(img.url);
@@ -1091,9 +1092,9 @@ export default function PropertiesPage() {
                         }
                     );
 
-                    // Construir o array final de imagens na ordem correta de localImages
+                    // Construir o array final de imagens na ordem correta de formData.images
                     let newImageUploadIndex = 0;
-                    propertyData.images = localImages.map(img => {
+                    propertyData.images = formData.images.map(img => {
                         if (img.url.startsWith('blob:') || img.url.startsWith('data:')) {
                             // Esta é uma nova imagem que foi carregada
                             // Pega a próxima URL da lista de URLs carregadas
@@ -1107,11 +1108,14 @@ export default function PropertiesPage() {
                         return img.url;
                     });
                 } else {
-                    // Se não houver novos uploads, usa as URLs na ordem definida em localImages
-                    propertyData.images = localImages.map(img => img.url);
+                    // Se não houver novos uploads, usa as URLs na ordem definida em formData.images
+                    propertyData.images = formData.images.map(img => img.url);
                 }
 
                 setIsUploadingImages(false);
+            } else {
+                // Se não houver imagens em formData.images (todas foram removidas, por exemplo)
+                propertyData.images = [];
             }
 
             // Verificar os dados sendo enviados para o Supabase
@@ -1139,7 +1143,7 @@ export default function PropertiesPage() {
             setShowEditModal(false);
 
             // Recarregar as propriedades para ter os dados atualizados
-            loadPropertiesFromFirebase();
+            fetchProperties().then(data => setProperties(data)).catch(console.error);
         } catch (error) {
             console.error('Erro ao atualizar propriedade:', error);
             alert('Erro ao atualizar propriedade. Tente novamente.');
@@ -1584,60 +1588,44 @@ export default function PropertiesPage() {
     // Carregar propriedades do Firebase ao iniciar
     useEffect(() => {
         if (!loading && user) {
-            loadPropertiesFromFirebase();
+            // loadPropertiesFromFirebase(); // Comentado ou removido
+            fetchProperties().then(data => {
+                // Aplicar o mesmo processamento que existia em loadPropertiesFromFirebase
+                const processedProperties = data.map(property => {
+                    // @ts-ignore
+                    if (property.what_you_should_know_sections) {
+                        // @ts-ignore
+                        property.whatYouShouldKnowSections = property.what_you_should_know_sections;
+                        // @ts-ignore
+                        delete property.what_you_should_know_sections;
+                    }
+                    if (!property.whatYouShouldKnowSections) {
+                        property.whatYouShouldKnowSections = {
+                            houseRules: [],
+                            safetyProperty: [],
+                            cancellationPolicy: []
+                        };
+                    }
+                    if (!Array.isArray(property.whatYouShouldKnowSections.houseRules)) {
+                        property.whatYouShouldKnowSections.houseRules = [];
+                    }
+                    if (!Array.isArray(property.whatYouShouldKnowSections.safetyProperty)) {
+                        property.whatYouShouldKnowSections.safetyProperty = [];
+                    }
+                    if (!Array.isArray(property.whatYouShouldKnowSections.cancellationPolicy)) {
+                        property.whatYouShouldKnowSections.cancellationPolicy = [];
+                    }
+                    return property;
+                });
+                setProperties(processedProperties);
+                setLoadingProperties(false);
+            }).catch(error => {
+                console.error('Erro ao carregar propriedades do Supabase:', error);
+                setProperties([]);
+                setLoadingProperties(false);
+            });
         }
     }, [loading, user]);
-
-    // Função para carregar propriedades do Firebase
-    const loadPropertiesFromFirebase = async () => {
-        try {
-            setLoadingProperties(true);
-            const propertiesData = await fetchProperties();
-
-            // Verificar se cada propriedade tem o campo whatYouShouldKnowSections
-            const processedProperties = propertiesData.map(property => {
-                // Verificar se existe a versão em snake_case do campo 
-                // @ts-ignore - O campo pode existir nos dados do Supabase mesmo não estando no tipo
-                if (property.what_you_should_know_sections) {
-                    // Converter de snake_case para camelCase para manter consistência
-                    // @ts-ignore - O campo pode existir nos dados do Supabase
-                    property.whatYouShouldKnowSections = property.what_you_should_know_sections;
-                    // @ts-ignore - O campo pode existir nos dados do Supabase
-                    delete property.what_you_should_know_sections;
-                }
-
-                // Garantir que o campo whatYouShouldKnowSections exista
-                if (!property.whatYouShouldKnowSections) {
-                    property.whatYouShouldKnowSections = {
-                        houseRules: [],
-                        safetyProperty: [],
-                        cancellationPolicy: []
-                    };
-                }
-
-                // Garantir que todas as subseções existam e sejam arrays
-                if (!Array.isArray(property.whatYouShouldKnowSections.houseRules)) {
-                    property.whatYouShouldKnowSections.houseRules = [];
-                }
-                if (!Array.isArray(property.whatYouShouldKnowSections.safetyProperty)) {
-                    property.whatYouShouldKnowSections.safetyProperty = [];
-                }
-                if (!Array.isArray(property.whatYouShouldKnowSections.cancellationPolicy)) {
-                    property.whatYouShouldKnowSections.cancellationPolicy = [];
-                }
-
-                return property;
-            });
-
-            setProperties(processedProperties);
-            // console.log("DEBUG: Propriedades carregadas e processadas com sucesso");
-        } catch (error) {
-            console.error('Erro ao carregar propriedades:', error);
-            setProperties([]); // Não usar sampleProperties
-        } finally {
-            setLoadingProperties(false);
-        }
-    };
 
     // Função para remover propriedade
     const handleDeleteProperty = async (id: string) => {
@@ -2812,11 +2800,11 @@ export default function PropertiesPage() {
                                             Adicionar Imagem
                                         </button>
 
-                                        {localImages.length > 0 && (
+                                        {formData.images.length > 0 && (
                                             <div className="mt-4 mb-10">
                                                 <h4 className="text-sm font-medium text-gray-700 mb-2">Organize a ordem das imagens:</h4>
                                                 <div className="grid grid-cols-3 gap-4">
-                                                    {localImages.map((img, index) => (
+                                                    {formData.images.map((img, index) => (
                                                         <div key={`image-${index}`} className="relative">
                                                             <div className="h-20 w-full bg-gray-200 rounded-md overflow-hidden">
                                                                 <Image
@@ -2856,8 +2844,8 @@ export default function PropertiesPage() {
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => moveImageDown(index)}
-                                                                    disabled={index === localImages.length - 1}
-                                                                    className={`bg-white rounded-full p-1 shadow-sm ${index === localImages.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                                    disabled={index === formData.images.length - 1}
+                                                                    className={`bg-white rounded-full p-1 shadow-sm ${index === formData.images.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                                     title="Mover para baixo"
                                                                 >
                                                                     <ArrowDown size={12} className="text-gray-700" />
