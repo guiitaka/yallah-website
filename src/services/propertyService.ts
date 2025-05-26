@@ -43,6 +43,10 @@ function toSnakeCase(obj: any): any {
                 // Preservar arrays como estão
                 result[snakeKey] = Array.isArray(value) ? value : value;
             }
+            // Adicionando uma verificação para tipos primitivos para evitar recursão desnecessária
+            else if (typeof value !== 'object' || value === null) {
+                result[snakeKey] = value; // Não fazer chamada recursiva para primitivos
+            }
             else {
                 // Para todos os outros campos, usamos a conversão recursiva normal
                 result[snakeKey] = toSnakeCase(value);
@@ -53,6 +57,33 @@ function toSnakeCase(obj: any): any {
     }
 
     // Para tipos primitivos, retornar como está
+    return obj;
+}
+
+// Novo: Utilitário para converter snake_case para camelCase
+function toCamelCase(obj: any): any {
+    if (obj === null || obj === undefined) {
+        return obj;
+    }
+
+    if (Array.isArray(obj)) {
+        return obj.map(item => toCamelCase(item));
+    }
+
+    if (typeof obj === 'object' && Object.prototype.toString.call(obj) === '[object Object]') {
+        const result: any = {};
+        Object.entries(obj).forEach(([key, value]) => {
+            const camelKey = key.replace(/_([a-z])/g, g => g[1].toUpperCase());
+            // Se o valor for um objeto (e não uma data, por exemplo), aplicar recursivamente
+            // Evitar converter Date objects ou outros tipos especiais que são objetos mas não devem ter chaves convertidas
+            if (value instanceof Date) {
+                result[camelKey] = value;
+            } else {
+                result[camelKey] = toCamelCase(value);
+            }
+        });
+        return result;
+    }
     return obj;
 }
 
@@ -71,7 +102,6 @@ export const saveProperty = async (property: Omit<Property, 'id'>): Promise<stri
 // Atualiza uma propriedade existente no Supabase
 export const updateProperty = async (id: string, propertyData: Partial<Property>): Promise<void> => {
     const snakeProperty = toSnakeCase(propertyData);
-
     const { error } = await supabase
         .from('properties')
         .update(snakeProperty)
@@ -100,7 +130,7 @@ export const fetchProperties = async (): Promise<Property[]> => {
         .select('*, what_you_should_know_sections, what_you_should_know_rich_text')
         .order('created_at', { ascending: false });
     if (error) throw error;
-    return data as Property[];
+    return data.map(item => toCamelCase(item)) as Property[];
 };
 
 // Busca propriedades com filtros
@@ -122,7 +152,7 @@ export const fetchFilteredProperties = async (
     }
     const { data, error } = await query;
     if (error) throw error;
-    return data as Property[];
+    return data.map(item => toCamelCase(item)) as Property[];
 };
 
 // Busca uma propriedade pelo ID
@@ -132,8 +162,12 @@ export const fetchPropertyById = async (id: string): Promise<Property | null> =>
         .select('*, what_you_should_know_sections, what_you_should_know_rich_text')
         .eq('id', id)
         .single();
-    if (error) throw error;
-    return data as Property;
+    if (error) {
+        console.error(`Erro ao buscar propriedade com ID ${id}:`, error);
+        throw error;
+    }
+    if (!data) return null;
+    return toCamelCase(data) as Property;
 };
 
 // Upload de uma imagem para o Supabase Storage

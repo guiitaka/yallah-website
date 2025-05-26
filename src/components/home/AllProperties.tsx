@@ -13,7 +13,7 @@ import {
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { ptBR } from 'date-fns/locale';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { useProperties } from '@/hooks/useProperties';
 import { Property } from '@/data/sampleProperties';
 import { formatCurrency } from '@/utils/format';
@@ -76,8 +76,8 @@ interface PropertyCard {
     details?: string;
     features: string;
     pricePerNight: number;
-    rating: number | { value: number; count: number }; // Pode ser número ou objeto
-    reviewCount: number;
+    rating: { value: number; count: number }; // Changed to always be an object
+    // reviewCount: number; // This line is effectively removed by ensuring it's not present
     image: string;
     link?: string;
     host?: string;
@@ -87,7 +87,13 @@ interface PropertyCard {
     whatYouShouldKnow?: string; // Corrigido para ser opcional novamente
     whatYouShouldKnowRichText?: string; // Campo para o conteúdo do editor rico
     serviceFee?: number;
-    discountAmount?: number;
+    discountSettings?: { // Added discountSettings object
+        amount: number;
+        type: 'percentage' | 'fixed';
+        minNights: number;
+        validFrom: string;
+        validTo: string;
+    };
     type?: string;
     images?: string[];
     rooms?: number;      // Adicionar campo para quartos
@@ -123,8 +129,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: estúdio",
         features: "2 hóspedes · Studio · 1 cama · 1 banheiro",
         pricePerNight: 190,
-        rating: 4.6,
-        reviewCount: 43,
+        rating: { value: 4.6, count: 43 },
+        // reviewCount: 43, // Removed
         image: "/recomendado2.jpg",
         link: "/imoveis/vintage-madalena",
         host: "Anfitrião: Clara",
@@ -138,8 +144,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: apartamento",
         features: "3 hóspedes · 2 quartos · 2 camas · 1 banheiro",
         pricePerNight: 210,
-        rating: 4.7,
-        reviewCount: 52,
+        rating: { value: 4.7, count: 52 },
+        // reviewCount: 52, // Removed
         image: "/recomendado3.jpg",
         link: "/imoveis/morumbi-shopping",
         host: "Anfitrião: Francisco",
@@ -153,8 +159,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: casa",
         features: "8 hóspedes · 4 quartos · 5 camas · 3 banheiros",
         pricePerNight: 580,
-        rating: 4.9,
-        reviewCount: 67,
+        rating: { value: 4.9, count: 67 },
+        // reviewCount: 67, // Removed
         image: "/card4.jpg",
         link: "/imoveis/riviera-piscina",
         host: "Anfitrião: Tatiana",
@@ -167,8 +173,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: loft",
         features: "3 hóspedes · 1 quarto · 2 camas · 1 banheiro",
         pricePerNight: 175,
-        rating: 4.5,
-        reviewCount: 38,
+        rating: { value: 4.5, count: 38 },
+        // reviewCount: 38, // Removed
         image: "/card1.jpg",
         link: "/imoveis/loft-industrial",
         host: "Anfitrião: Diego",
@@ -181,8 +187,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: penthouse",
         features: "4 hóspedes · 2 quartos · 2 camas · 2 banheiros",
         pricePerNight: 450,
-        rating: 4.9,
-        reviewCount: 61,
+        rating: { value: 4.9, count: 61 },
+        // reviewCount: 61, // Removed
         image: "/recomendado1.jpg",
         link: "/imoveis/penthouse-higienopolis",
         host: "Anfitrião: Laura",
@@ -195,8 +201,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: cabana",
         features: "2 hóspedes · 1 quarto · 1 cama · 1 banheiro",
         pricePerNight: 320,
-        rating: 4.8,
-        reviewCount: 49,
+        rating: { value: 4.8, count: 49 },
+        // reviewCount: 49, // Removed
         image: "/recomendado2.jpg",
         link: "/imoveis/cabana-serra",
         host: "Anfitrião: Roberto",
@@ -209,8 +215,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: apartamento",
         features: "3 hóspedes · 2 quartos · 2 camas · 1 banheiro",
         pricePerNight: 240,
-        rating: 4.7,
-        reviewCount: 55,
+        rating: { value: 4.7, count: 55 },
+        // reviewCount: 55, // Removed
         image: "/card2.jpg",
         link: "/imoveis/perdizes-office",
         host: "Anfitrião: Isabela",
@@ -223,8 +229,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: casa",
         features: "6 hóspedes · 3 quartos · 4 camas · 2 banheiros",
         pricePerNight: 390,
-        rating: 4.8,
-        reviewCount: 64,
+        rating: { value: 4.8, count: 64 },
+        // reviewCount: 64, // Removed
         image: "/recomendado3.jpg",
         link: "/imoveis/atibaia-lareira",
         host: "Anfitrião: Henrique",
@@ -237,8 +243,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: studio",
         features: "2 hóspedes · Studio · 1 cama · 1 banheiro",
         pricePerNight: 200,
-        rating: 4.6,
-        reviewCount: 41,
+        rating: { value: 4.6, count: 41 },
+        // reviewCount: 41, // Removed
         image: "/card4.jpg",
         link: "/imoveis/studio-minimalista",
         host: "Anfitrião: Marcia",
@@ -251,8 +257,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: apartamento",
         features: "4 hóspedes · 2 quartos · 2 camas · 2 banheiros",
         pricePerNight: 280,
-        rating: 4.7,
-        reviewCount: 47,
+        rating: { value: 4.7, count: 47 },
+        // reviewCount: 47, // Removed
         image: "/recomendado1.jpg",
         link: "/imoveis/tatuape-terraco",
         host: "Anfitrião: Renato",
@@ -265,8 +271,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: cobertura",
         features: "6 hóspedes · 3 quartos · 4 camas · 2 banheiros",
         pricePerNight: 420,
-        rating: 4.8,
-        reviewCount: 58,
+        rating: { value: 4.8, count: 58 },
+        // reviewCount: 58, // Removed
         image: "/card1.jpg",
         link: "/imoveis/cobertura-paraiso",
         host: "Anfitrião: Miguel",
@@ -279,8 +285,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: studio",
         features: "2 hóspedes · Studio · 1 cama · 1 banheiro",
         pricePerNight: 230,
-        rating: 4.7,
-        reviewCount: 45,
+        rating: { value: 4.7, count: 45 },
+        // reviewCount: 45, // Removed
         image: "/card2.jpg",
         link: "/imoveis/studio-vila-nova",
         host: "Anfitrião: Paula",
@@ -293,8 +299,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: apartamento",
         features: "4 hóspedes · 2 quartos · 3 camas · 2 banheiros",
         pricePerNight: 350,
-        rating: 4.9,
-        reviewCount: 62,
+        rating: { value: 4.9, count: 62 },
+        // reviewCount: 62, // Removed
         image: "/card3.jpg",
         link: "/imoveis/jardim-pinheiros",
         host: "Anfitrião: Ricardo",
@@ -307,8 +313,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: loft",
         features: "3 hóspedes · 1 quarto · 2 camas · 1 banheiro",
         pricePerNight: 280,
-        rating: 4.6,
-        reviewCount: 39,
+        rating: { value: 4.6, count: 39 },
+        // reviewCount: 39, // Removed
         image: "/card4.jpg",
         link: "/imoveis/loft-olimpia",
         host: "Anfitrião: Beatriz",
@@ -321,8 +327,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: casa",
         features: "8 hóspedes · 4 quartos · 6 camas · 3 banheiros",
         pricePerNight: 650,
-        rating: 4.9,
-        reviewCount: 71,
+        rating: { value: 4.9, count: 71 },
+        // reviewCount: 71, // Removed
         image: "/recomendado1.jpg",
         link: "/imoveis/casa-granja",
         host: "Anfitrião: Fernando",
@@ -335,8 +341,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: apartamento",
         features: "4 hóspedes · 2 quartos · 2 camas · 1 banheiro",
         pricePerNight: 220,
-        rating: 4.7,
-        reviewCount: 48,
+        rating: { value: 4.7, count: 48 },
+        // reviewCount: 48, // Removed
         image: "/recomendado2.jpg",
         link: "/imoveis/metro-cecilia",
         host: "Anfitrião: Amanda",
@@ -349,8 +355,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: studio",
         features: "2 hóspedes · Studio · 1 cama · 1 banheiro",
         pricePerNight: 195,
-        rating: 4.5,
-        reviewCount: 35,
+        rating: { value: 4.5, count: 35 },
+        // reviewCount: 35, // Removed
         image: "/recomendado3.jpg",
         link: "/imoveis/studio-brooklin",
         host: "Anfitrião: Lucas",
@@ -363,8 +369,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: cobertura",
         features: "6 hóspedes · 3 quartos · 4 camas · 3 banheiros",
         pricePerNight: 580,
-        rating: 4.9,
-        reviewCount: 64,
+        rating: { value: 4.9, count: 64 },
+        // reviewCount: 64, // Removed
         image: "/card1.jpg",
         link: "/imoveis/duplex-itaim",
         host: "Anfitrião: Carolina",
@@ -377,8 +383,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: casa",
         features: "10 hóspedes · 5 quartos · 7 camas · 4 banheiros",
         pricePerNight: 720,
-        rating: 4.8,
-        reviewCount: 53,
+        rating: { value: 4.8, count: 53 },
+        // reviewCount: 53, // Removed
         image: "/card2.jpg",
         link: "/imoveis/casa-cotia",
         host: "Anfitrião: Roberto",
@@ -391,8 +397,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: apartamento",
         features: "4 hóspedes · 2 quartos · 3 camas · 2 banheiros",
         pricePerNight: 340,
-        rating: 4.7,
-        reviewCount: 49,
+        rating: { value: 4.7, count: 49 },
+        // reviewCount: 49, // Removed
         image: "/card3.jpg",
         link: "/imoveis/vista-moema",
         host: "Anfitrião: Patricia",
@@ -405,8 +411,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: studio",
         features: "2 hóspedes · Studio · 1 cama · 1 banheiro",
         pricePerNight: 180,
-        rating: 4.6,
-        reviewCount: 41,
+        rating: { value: 4.6, count: 41 },
+        // reviewCount: 41, // Removed
         image: "/card4.jpg",
         link: "/imoveis/studio-republica",
         host: "Anfitrião: Thiago",
@@ -419,8 +425,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: apartamento",
         features: "3 hóspedes · 2 quartos · 2 camas · 1 banheiro",
         pricePerNight: 250,
-        rating: 4.7,
-        reviewCount: 46,
+        rating: { value: 4.7, count: 46 },
+        // reviewCount: 46, // Removed
         image: "/recomendado1.jpg",
         link: "/imoveis/office-mariana",
         host: "Anfitrião: Juliana",
@@ -433,8 +439,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: cobertura",
         features: "6 hóspedes · 3 quartos · 4 camas · 3 banheiros",
         pricePerNight: 620,
-        rating: 4.9,
-        reviewCount: 68,
+        rating: { value: 4.9, count: 68 },
+        // reviewCount: 68, // Removed
         image: "/recomendado2.jpg",
         link: "/imoveis/cobertura-jardins",
         host: "Anfitrião: Marcelo",
@@ -447,8 +453,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: casa",
         features: "8 hóspedes · 4 quartos · 5 camas · 3 banheiros",
         pricePerNight: 480,
-        rating: 4.8,
-        reviewCount: 57,
+        rating: { value: 4.8, count: 57 },
+        // reviewCount: 57, // Removed
         image: "/recomendado3.jpg",
         link: "/imoveis/casa-santana",
         host: "Anfitrião: Rafael",
@@ -461,8 +467,8 @@ const staticAllProperties: PropertyCard[] = [
         details: "Espaço inteiro: loft",
         features: "4 hóspedes · 2 quartos · 2 camas · 2 banheiros",
         pricePerNight: 380,
-        rating: 4.7,
-        reviewCount: 52,
+        rating: { value: 4.7, count: 52 },
+        // reviewCount: 52, // Removed
         image: "/card1.jpg",
         link: "/imoveis/loft-berrini",
         host: "Anfitrião: Gabriela",
@@ -480,6 +486,18 @@ const calculateNights = (checkIn: Date | null, checkOut: Date | null): number =>
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     return diffDays;
+};
+
+// Nova função para calcular o desconto real
+const calculateActualDiscount = (basePrice: number, discountSettings?: PropertyCard['discountSettings']): number => {
+    if (!discountSettings || discountSettings.amount <= 0) {
+        return 0;
+    }
+    if (discountSettings.type === 'percentage') {
+        return (basePrice * discountSettings.amount) / 100;
+    }
+    // Se for 'fixed' ou qualquer outro tipo não reconhecido (fallback para fixed)
+    return discountSettings.amount;
 };
 
 // Função para extrair e formatar o bairro do endereço completo
@@ -643,8 +661,8 @@ const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
             details: property.details || "",
             features: featuresString,
             pricePerNight: price,
-            rating: property.rating || 4.5,
-            reviewCount: property.reviewCount || 0,
+            rating: property.rating || { value: 4.5, count: 0 },
+            // reviewCount: property.reviewCount || 0, // This line is effectively removed
             image: property.image || "/card1.jpg",
             coordinates: property.coordinates || [-46.6333, -23.5505],
             description: property.description || "",
@@ -652,14 +670,13 @@ const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
             whatYouShouldKnow: property.what_you_should_know || "",
             whatYouShouldKnowRichText: property.what_you_should_know_rich_text || "",
             type: property.type || "",
-            images: property.images || [], // Garantir que images está sendo transferido corretamente
+            images: property.images || [],
             rooms: rooms,
             bathrooms: bathrooms,
             beds: beds,
             guests: guests,
             amenities: property.amenities || [],
-            // Adicionar os dados das novas seções
-            houseRules: property.house_rules || { // Ler de snake_case para o objeto principal houseRules
+            houseRules: property.house_rules || {
                 checkIn: '15:00',
                 checkOut: '11:00',
                 maxGuests: property.guests || 2,
@@ -675,7 +692,9 @@ const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
                 safetyProperty: [],
                 cancellationPolicy: []
             },
-            pointsOfInterest: property.points_of_interest || [] // Novo campo para pontos de interesse
+            pointsOfInterest: property.points_of_interest || [],
+            serviceFee: property.serviceFee, // Added serviceFee from property data
+            discountSettings: property.discountSettings, // Added full discountSettings object
         };
     });
 };
@@ -1200,7 +1219,7 @@ export default function AllProperties() {
                                                                         <span className="text-white text-sm font-medium">
                                                                             {typeof property.rating === 'object' && property.rating !== null
                                                                                 ? property.rating.value
-                                                                                : property.rating} <span className="text-white/70">({property.reviewCount})</span>
+                                                                                : property.rating} <span className="text-white/70">({property.rating.count})</span>
                                                                         </span>
                                                                     </div>
 
@@ -1282,7 +1301,7 @@ export default function AllProperties() {
                                                                         <span className="text-white text-sm font-medium">
                                                                             {typeof property.rating === 'object' && property.rating !== null
                                                                                 ? property.rating.value
-                                                                                : property.rating} <span className="text-white/70">({property.reviewCount})</span>
+                                                                                : property.rating} <span className="text-white/70">({property.rating.count})</span>
                                                                         </span>
                                                                     </div>
 
@@ -1819,20 +1838,38 @@ export default function AllProperties() {
                                                         <h3 className="font-bold text-xl mb-1 text-gray-900">{formatCurrency(property.pricePerNight)} <span className="text-gray-500 text-base font-normal">/ noite</span></h3>
                                                         <div className="flex items-center">
                                                             <Star className="h-4 w-4 text-[#8BADA4] mr-1" />
-                                                            <span className="text-sm text-gray-700">{typeof property.rating === 'object' && property.rating !== null ? property.rating.value : property.rating} ({property.reviewCount} avaliações)</span>
+                                                            <span className="text-sm text-gray-700">{typeof property.rating === 'object' && property.rating !== null ? property.rating.value : property.rating} ({property.rating.count} avaliações)</span>
                                                         </div>
+                                                        {/* Display Minimum Nights */}
+                                                        {property.discountSettings && property.discountSettings.minNights > 0 && (
+                                                            <p className="text-xs text-gray-500 mt-1">
+                                                                Estadia mínima: {property.discountSettings.minNights} noites
+                                                            </p>
+                                                        )}
+                                                        {/* Display Promotion Validity */}
+                                                        {property.discountSettings && property.discountSettings.validFrom && property.discountSettings.validTo && (
+                                                            <p className="text-xs text-gray-500 mt-1">
+                                                                Promoção: {format(parseISO(property.discountSettings.validFrom), 'dd/MM/yyyy', { locale: ptBR })} - {format(parseISO(property.discountSettings.validTo), 'dd/MM/yyyy', { locale: ptBR })}
+                                                            </p>
+                                                        )}
                                                     </div>
                                                     <div className="text-right">
-                                                        <p className="text-sm text-gray-500">Preço para 3 noites</p>
-                                                        <div className="font-medium text-gray-900">{formatCurrency(property.pricePerNight * 3)}</div>
-                                                        {(property as any).discountAmount && (
-                                                            <div className="text-green-600 text-sm">-{formatCurrency((property as any).discountAmount)}</div>
+                                                        <p className="text-sm text-gray-500">Preço para {calculateNights(startDate, endDate)} noites</p>
+                                                        <div className="font-medium text-gray-900">{formatCurrency(property.pricePerNight * calculateNights(startDate, endDate))}</div>
+                                                        {property.discountSettings && property.discountSettings.amount > 0 && (
+                                                            <div className="text-green-600 text-sm">
+                                                                -{formatCurrency(calculateActualDiscount(property.pricePerNight * calculateNights(startDate, endDate), property.discountSettings))}
+                                                            </div>
                                                         )}
                                                         {(property as any).serviceFee && (
                                                             <div className="text-sm text-gray-500">Taxa de serviço: {formatCurrency((property as any).serviceFee)}</div>
                                                         )}
                                                         <div className="font-bold mt-1 text-gray-900">
-                                                            Total: {formatCurrency(property.pricePerNight * 3 - ((property as any).discountAmount || 0) + ((property as any).serviceFee || 0))}
+                                                            Total: {formatCurrency(
+                                                                (property.pricePerNight * calculateNights(startDate, endDate)) -
+                                                                calculateActualDiscount(property.pricePerNight * calculateNights(startDate, endDate), property.discountSettings) +
+                                                                (property.serviceFee || 0)
+                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1929,11 +1966,13 @@ export default function AllProperties() {
                                                     </div>
                                                     <div className="flex justify-between">
                                                         <span className="text-gray-600">Desconto</span>
-                                                        <span className="text-green-600">-{formatCurrency(50)}</span>
+                                                        <span className="text-green-600">
+                                                            -{formatCurrency(calculateActualDiscount(property.pricePerNight * calculateNights(startDate, endDate), property.discountSettings))}
+                                                        </span>
                                                     </div>
                                                     <div className="flex justify-between">
                                                         <span className="text-gray-600">Taxa de serviço</span>
-                                                        <span className="text-gray-900">{formatCurrency(35)}</span>
+                                                        <span className="text-gray-900">{formatCurrency((property as any).serviceFee || 0)}</span>
                                                     </div>
                                                 </div>
 
@@ -1941,7 +1980,13 @@ export default function AllProperties() {
                                                 <div className="border-t border-gray-200 pt-4 mb-4">
                                                     <div className="flex justify-between font-bold">
                                                         <span className="text-gray-900">Total</span>
-                                                        <span className="text-gray-900">{formatCurrency((property.pricePerNight * calculateNights(startDate, endDate)) - 50 + 35)}</span>
+                                                        <span className="text-gray-900">
+                                                            {formatCurrency(
+                                                                (property.pricePerNight * calculateNights(startDate, endDate)) -
+                                                                calculateActualDiscount(property.pricePerNight * calculateNights(startDate, endDate), property.discountSettings) +
+                                                                (property.serviceFee || 0)
+                                                            )}
+                                                        </span>
                                                     </div>
                                                 </div>
 

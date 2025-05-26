@@ -23,6 +23,7 @@ interface FormData {
     title: string;
     description: string;
     type: string;
+    category: string;
     location: string;
     coordinates: { lat: number; lng: number } | null;
     price: number;
@@ -160,6 +161,18 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
         setCurrentStep((prev) => Math.max(prev - 1, 1));
     };
 
+    const isStepValid = (step: number) => {
+        switch (step) {
+            case 1:
+                return formData.title.trim() !== '' && formData.type.trim() !== '' && formData.price > 0;
+            case 2:
+                return formData.location.trim() !== '' && formData.coordinates !== null;
+            // Add more cases as needed for other steps
+            default:
+                return true;
+        }
+    };
+
     const renderStepContent = () => {
         switch (currentStep) {
             case 1:
@@ -220,6 +233,42 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
                                     <option value="rented">Alugado</option>
                                     <option value="maintenance">Em Manutenção</option>
                                 </select>
+                            </div>
+                        </div>
+
+                        {/* Categoria and Em Destaque */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                                <select
+                                    id="category"
+                                    name="category"
+                                    value={formData.category}
+                                    onChange={handleChange}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[#8BADA4] sm:text-sm"
+                                >
+                                    <option value="Business Ready">Business Ready</option>
+                                    <option value="Vida Universitária">Vida Universitária</option>
+                                    <option value="Espaço para Eventos">Espaço para Eventos</option>
+                                    <option value="Refúgio & Relaxamento">Refúgio & Relaxamento</option>
+                                    <option value="Estadia Familiar">Estadia Familiar</option>
+                                </select>
+                            </div>
+                            <div className="flex items-end pb-1">
+                                <div className="flex items-center h-full">
+                                    <Checkbox
+                                        id="featured"
+                                        name="featured"
+                                        checked={formData.featured}
+                                        onCheckedChange={(checked) => {
+                                            setFormData(prev => ({ ...prev, featured: Boolean(checked) }));
+                                        }}
+                                        className="h-5 w-5 text-[#8BADA4] border-gray-300 rounded focus:ring-[#8BADA4] mr-2"
+                                    />
+                                    <label htmlFor="featured" className="text-sm font-medium text-gray-700 select-none">
+                                        Em destaque
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
@@ -773,16 +822,16 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
                             >
                                 <div
                                     className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium 
-                    ${currentStep >= step.id ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-600'}`}
+                    ${currentStep >= step.id ? 'bg-[#8BADA4] text-white' : 'bg-gray-200 text-gray-600'}`}
                                 >
                                     {step.id}
                                 </div>
-                                <p className={`mt-1 text-xs ${currentStep >= step.id ? 'text-orange-500' : 'text-gray-500'}`}>
+                                <p className={`mt-1 text-xs ${currentStep >= step.id ? 'text-[#8BADA4]' : 'text-gray-500'}`}>
                                     {step.name}
                                 </p>
                             </div>
                             {index < STEPS.length - 1 && (
-                                <div className={`flex-1 h-px ${currentStep > step.id + 0.5 ? 'bg-orange-500' : 'bg-gray-200'} self-start mt-4`}></div>
+                                <div className={`flex-1 h-px ${currentStep > step.id + 0.5 ? 'bg-[#8BADA4]' : 'bg-gray-200'} self-start mt-4`}></div>
                             )}
                         </React.Fragment>
                     ))}
@@ -797,9 +846,10 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
                 <div className="px-6 py-4 border-t border-gray-200 flex justify-between items-center">
                     <div>
                         <button
+                            type="button"
                             onClick={handleBack}
+                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center transition-colors"
                             disabled={currentStep === 1 || isSaving}
-                            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                         >
                             <ArrowLeft size={16} className="mr-2" />
                             Voltar
@@ -807,8 +857,8 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
                     </div>
 
                     <div className="flex items-center space-x-3">
-                        {/* Botão Salvar (antigo Concluir Cadastro) - agora visível em todas as etapas */}
                         <button
+                            type="button"
                             onClick={async () => {
                                 setIsSaving(true);
                                 const success = await onSaveAttempt();
@@ -817,18 +867,22 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
                                     onClose(); // Fecha o modal após salvar com sucesso
                                 }
                             }}
+                            className="px-6 py-2.5 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm disabled:opacity-50"
                             disabled={isSaving}
-                            className="px-4 py-2 text-sm font-medium text-white bg-green-500 rounded-md hover:bg-green-600 disabled:opacity-50"
                         >
-                            {isSaving ? 'Salvando...' : 'Salvar'}
+                            {isSaving ? (
+                                <RefreshCw size={18} className="animate-spin" />
+                            ) : (
+                                'Salvar'
+                            )}
                         </button>
 
-                        {/* Botão Próximo - visível se não for a última etapa */}
                         {currentStep < STEPS.length && (
                             <button
-                                onClick={handleNext} // Ação de avançar para a próxima etapa
-                                disabled={isSaving} // Desabilitado enquanto estiver salvando
-                                className="px-4 py-2 text-sm font-medium text-white bg-orange-500 rounded-md hover:bg-orange-600 flex items-center disabled:opacity-50"
+                                type="button"
+                                onClick={handleNext}
+                                className="px-6 py-2.5 text-sm font-semibold text-white bg-[#8BADA4] hover:bg-opacity-90 rounded-lg flex items-center transition-colors shadow-sm disabled:opacity-50"
+                                disabled={isSaving || !isStepValid(currentStep)}
                             >
                                 Próximo
                                 <ArrowRight size={16} className="ml-2" />

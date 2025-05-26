@@ -160,6 +160,7 @@ interface FormData {
     title: string;
     description: string;
     type: string;
+    category: string; // Added category
     location: string;
     coordinates: {
         lat: number;
@@ -173,7 +174,7 @@ interface FormData {
     area: number;
     status: 'available' | 'rented' | 'maintenance';
     featured: boolean;
-    images: { id: string, url: string }[];
+    images: { file?: File; id: string; url: string }[]; // Updated images type
     amenities: string[];
     categorizedAmenities: {
         [key: string]: string[];
@@ -224,6 +225,7 @@ const initialFormData: FormData = {
     title: '',
     description: '',
     type: '',
+    category: 'Business Ready', // Added category with a default value
     location: '',
     coordinates: null,
     price: 0,
@@ -234,7 +236,7 @@ const initialFormData: FormData = {
     area: 0,
     status: 'available',
     featured: false,
-    images: [],
+    images: [], // Remains empty, will be populated with new structure
     amenities: [],
     categorizedAmenities: {},
     houseRules: {
@@ -399,14 +401,16 @@ export default function PropertiesPage() {
     const [importedData, setImportedData] = useState<any>(null);
     const [imageUploadProgress, setImageUploadProgress] = useState<number>(0);
     const [isUploadingImages, setIsUploadingImages] = useState<boolean>(false);
-    const [localImages, setLocalImages] = useState<{ id: string, url: string }[]>([]);
+    const [localImages, setLocalImages] = useState<(File | { id: string, url: string })[]>([]); // Allow File or object type
     const [showNewPropertyModal, setShowNewPropertyModal] = useState(false);
+    const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' } | null>(null); // Added notification state
 
     const [formData, setFormData] = useState<FormData>({
         id: '',
         title: '',
         description: '',
         type: '',
+        category: 'Business Ready', // Added category with a default value
         location: '',
         coordinates: null,
         price: 0,
@@ -441,7 +445,7 @@ export default function PropertiesPage() {
         serviceFee: 0,
         discountSettings: {
             amount: 0,
-            type: 'fixed',
+            type: 'percentage',
             minNights: 0,
             validFrom: '',
             validTo: ''
@@ -579,11 +583,8 @@ export default function PropertiesPage() {
         input.onchange = (e: Event) => {
             const target = e.target as HTMLInputElement;
             if (target.files) {
-                const newImages = Array.from(target.files).map(file => ({
-                    id: uuidv4(),
-                    url: URL.createObjectURL(file)
-                }));
-                setLocalImages(prev => [...prev, ...newImages]);
+                const newFiles = Array.from(target.files);
+                setLocalImages(prev => [...prev, ...newFiles]); // Store File objects directly
             }
         };
         input.click();
@@ -634,6 +635,7 @@ export default function PropertiesPage() {
             title: '',
             description: '',
             type: 'Apartamento',
+            category: 'Business Ready', // Added category with a default value
             location: '',
             coordinates: null,
             price: 0,
@@ -668,7 +670,7 @@ export default function PropertiesPage() {
             serviceFee: 0,
             discountSettings: {
                 amount: 0,
-                type: 'fixed',
+                type: 'percentage',
                 minNights: 0,
                 validFrom: '',
                 validTo: ''
@@ -691,12 +693,46 @@ export default function PropertiesPage() {
     };
 
     const handleAddProperty = async () => {
+        // Basic validation
+        if (!formData.title || !formData.type || formData.price <= 0) {
+            alert('Por favor, preencha todos os campos obrigatórios: Título, Tipo e Preço.');
+            return;
+        }
+
         try {
-            // Preparar os dados da propriedade (sem o ID, que será gerado pelo Firebase)
-            const propertyData: any = {
+            setIsUploadingImages(true); // Indicate upload start
+            setImageUploadProgress(0); // Reset progress
+
+            const filesToUpload = formData.images
+                .map(imgEntry => imgEntry.file)
+                .filter(file => file instanceof File) as File[];
+
+            let uploadedImageUrls: string[] = [];
+            const propertyUploadId = uuidv4(); // ID for grouping images in storage
+
+            if (filesToUpload.length > 0) {
+                // Pass progress callback to uploadMultiplePropertyImages
+                uploadedImageUrls = await uploadMultiplePropertyImages(
+                    filesToUpload,
+                    propertyUploadId,
+                    (progress) => setImageUploadProgress(progress)
+                );
+            }
+
+            // Combine with any existing URLs (e.g., if editing, though this function is for add)
+            // For pure add, existingImageUrls would be empty.
+            // This primarily ensures we only save permanent string URLs.
+            const existingImageUrls = formData.images
+                .filter(imgEntry => !imgEntry.file && typeof imgEntry.url === 'string')
+                .map(imgEntry => imgEntry.url);
+
+            const finalImageUrls = [...existingImageUrls, ...uploadedImageUrls];
+
+            const propertyData: Omit<Property, 'id'> = { // Ensure type matches saveProperty
                 title: formData.title,
                 description: formData.description,
                 type: formData.type,
+                category: formData.category,
                 location: formData.location,
                 coordinates: formData.coordinates,
                 price: formData.price,
@@ -707,7 +743,7 @@ export default function PropertiesPage() {
                 area: formData.area,
                 status: formData.status,
                 featured: formData.featured,
-                images: formData.images.map(img => img.url),
+                images: finalImageUrls, // Save only permanent string URLs
                 amenities: formData.amenities || [],
                 categorizedAmenities: formData.categorizedAmenities || {},
                 houseRules: formData.houseRules || {
@@ -722,21 +758,8 @@ export default function PropertiesPage() {
                     hasCameras: false,
                 },
                 cancellationPolicy: formData.cancellationPolicy || 'Flexível',
-                what_you_should_know_sections: {
-                    house_rules: formData.whatYouShouldKnowSections.houseRules.map(rule => {
-                        const placeholderDetails = getPlaceholderDetails(rule);
-                        if (placeholderDetails && dynamicInputValues[rule]) {
-                            return placeholderDetails.base + dynamicInputValues[rule];
-                        }
-                        return rule;
-                    }),
-                    safety_property: formData.whatYouShouldKnowSections.safetyProperty,
-                    cancellation_policy: formData.whatYouShouldKnowSections.cancellationPolicy
-                },
-                rating: {
-                    value: formData.rating.value,
-                    count: formData.rating.count
-                },
+                // Ensure all other fields from Omit<Property, 'id'> are present and correctly typed
+                rating: formData.rating,
                 whatWeOffer: formData.whatWeOffer,
                 whatYouShouldKnowRichText: formData.whatYouShouldKnowRichText,
                 serviceFee: formData.serviceFee,
@@ -745,467 +768,179 @@ export default function PropertiesPage() {
                     type: formData.discountSettings.type,
                     minNights: formData.discountSettings.minNights,
                     validFrom: formData.discountSettings.validFrom ? new Date(formData.discountSettings.validFrom) : undefined,
-                    validTo: formData.discountSettings.validTo ? new Date(formData.discountSettings.validTo) : undefined
+                    validTo: formData.discountSettings.validTo ? new Date(formData.discountSettings.validTo) : undefined,
                 },
-                whatYouShouldKnowDynamic: {
-                    checkInTime: formData.whatYouShouldKnowDynamic?.checkInTime,
-                    checkOutTime: formData.whatYouShouldKnowDynamic?.checkOutTime,
-                    maxGuests: formData.whatYouShouldKnowDynamic?.maxGuests,
-                    quietHours: formData.whatYouShouldKnowDynamic?.quietHours
-                },
-                points_of_interest: formData.pointsOfInterest, // Adicionado para pontos de interesse
+                whatYouShouldKnowSections: formData.whatYouShouldKnowSections,
+                whatYouShouldKnowDynamic: formData.whatYouShouldKnowDynamic,
+                pointsOfInterest: formData.pointsOfInterest,
+                // created_at and updated_at will be handled by Supabase
             };
 
-            // Salvar a propriedade no Firebase
-            const propertyId = await saveProperty(propertyData);
+            const savedPropertyId = await saveProperty(propertyData);
 
-            // Converter as URLs de objeto para arquivos (se estiverem na memória)
-            // ou manter as URLs remotas
-            const imageFiles: File[] = [];
-            const remoteUrls: string[] = [];
-
-            // Processar as imagens na ordem correta
-            if (formData.images && formData.images.length > 0) {
-                setIsUploadingImages(true);
-
-                // Mapa para rastrear a ordem original das imagens
-                const imagePositionMap = new Map();
-
-                // Primeiro passo: mapear todas as imagens com sua posição original
-                formData.images.forEach((img, index) => {
-                    imagePositionMap.set(img.id, {
-                        index,
-                        isLocal: img.url.startsWith('blob:') || img.url.startsWith('data:')
-                    });
-                });
-
-                // Segundo passo: separar imagens locais e remotas mantendo rastreamento
-                const imageInfo: { id: string, file?: File, url: string, index: number }[] = [];
-
-                for (const img of formData.images) {
-                    const originalIndex = imagePositionMap.get(img.id)?.index || 0;
-
-                    // Se for uma URL de objeto local
-                    if (img.url.startsWith('blob:') || img.url.startsWith('data:')) {
-                        try {
-                            // Converter para arquivo
-                            const response = await fetch(img.url);
-                            const blob = await response.blob();
-                            const file = new File([blob], `image-${Date.now()}-${img.id}.jpg`, { type: 'image/jpeg' });
-                            imageFiles.push(file);
-
-                            // Rastrear este arquivo para preservar sua ordem
-                            imageInfo.push({
-                                id: img.id,
-                                file,
-                                url: img.url,
-                                index: originalIndex
-                            });
-
-                        } catch (error) {
-                            console.error('Erro ao processar imagem local:', error);
-                        }
-                    } else {
-                        // Se for uma URL remota, adicionar diretamente
-                        remoteUrls.push(img.url);
-
-                        // Rastrear esta URL para preservar sua ordem
-                        imageInfo.push({
-                            id: img.id,
-                            url: img.url,
-                            index: originalIndex
-                        });
-                    }
-                }
-
-                // Fazer upload das imagens
-                if (imageFiles.length > 0) {
-                    const uploadedUrls = await uploadMultiplePropertyImages(
-                        imageFiles,
-                        propertyId,
-                        (progress) => {
-                            setImageUploadProgress(progress);
-                        }
-                    );
-
-                    // Associar URLs enviadas com as imagens originais para manter a ordem correta
-                    let localFileIndex = 0;
-                    const orderedImageUrls = imageInfo
-                        .sort((a, b) => a.index - b.index) // Ordena pela posição original
-                        .map(info => {
-                            // Se for uma imagem local que acabou de ser enviada
-                            if (info.file) {
-                                const url = uploadedUrls[localFileIndex++] || '';
-                                return url;
-                            }
-                            // Se for uma URL remota, mantém a mesma
-                            return info.url;
-                        });
-
-                    // Atualizar a propriedade com as URLs das imagens na ordem correta
-                    await updateProperty(propertyId, {
-                        images: orderedImageUrls
-                    });
-                } else if (remoteUrls.length > 0) {
-                    // Se só tiver URLs remotas, ainda garante a ordem correta
-                    const orderedRemoteUrls = imageInfo
-                        .sort((a, b) => a.index - b.index)
-                        .map(info => info.url);
-
-                    await updateProperty(propertyId, { images: orderedRemoteUrls });
-                }
-
-                setIsUploadingImages(false);
-            }
-
-            // Atualizar a lista na interface
-            const newProperty: Property = {
-                ...propertyData,
-                id: propertyId,
-                // Usar as URLs das imagens já processadas
-                images: [...remoteUrls, ...imageFiles.map(() => '')]
+            // Update the UI with the new property, using the savedPropertyId
+            // and the finalImageUrls that were actually saved.
+            const newPropertyDisplay: Property = {
+                ...propertyData, // Spread the data that was saved
+                id: savedPropertyId, // Use the ID returned from the save operation
+                images: finalImageUrls, // Ensure this is the array of string URLs
             };
 
-            setProperties(prev => [...prev, newProperty]);
+            setProperties(prev => [newPropertyDisplay, ...prev]);
+            setShowNewPropertyModal(false);
             resetForm();
-            setShowAddModal(false);
+            setNotification({ message: 'Propriedade adicionada com sucesso!', type: 'success' });
 
-            // Recarregar as propriedades para ter os dados atualizados
-            fetchProperties().then(data => setProperties(data)).catch(console.error);
         } catch (error) {
-            console.error('Erro ao adicionar propriedade:', error);
-            alert('Erro ao adicionar propriedade. Tente novamente.');
+            console.error("Erro ao adicionar propriedade:", error);
+            setNotification({ message: 'Erro ao adicionar propriedade. Tente novamente.', type: 'error' });
+        } finally {
+            setIsUploadingImages(false); // Reset upload indicator
         }
-    };
-
-    // Função para editar uma propriedade
-    const handleEditProperty = (property: Property) => {
-        setCurrentProperty(property);
-
-        const images: { id: string; url: string }[] = normalizeImages(property.images || []);
-
-        const whatYouShouldKnowSectionsFromDb = (property as any).whatYouShouldKnowSections;
-        const processedHouseRulesForForm: string[] = [];
-        const initialDynamicValues: Record<string, string> = {};
-
-        // Process House Rules
-        if (whatYouShouldKnowSectionsFromDb?.house_rules && Array.isArray(whatYouShouldKnowSectionsFromDb.house_rules)) {
-            whatYouShouldKnowSectionsFromDb.house_rules.forEach((filledRule: string) => {
-                let matchedTemplate = false;
-                for (const templateRule of HOUSE_RULES_ITEMS) {
-                    const placeholderDetails = getPlaceholderDetails(templateRule);
-                    if (placeholderDetails && filledRule.startsWith(placeholderDetails.base) && filledRule.length > placeholderDetails.base.length) {
-                        if (!processedHouseRulesForForm.includes(templateRule)) {
-                            processedHouseRulesForForm.push(templateRule);
-                        }
-                        const dynamicValue = filledRule.replace(placeholderDetails.base, '').trim();
-                        if (dynamicValue) {
-                            initialDynamicValues[templateRule] = dynamicValue;
-                        }
-                        matchedTemplate = true;
-                        break;
-                    }
-                }
-                if (!matchedTemplate) {
-                    if (HOUSE_RULES_ITEMS.includes(filledRule) && !processedHouseRulesForForm.includes(filledRule)) {
-                        processedHouseRulesForForm.push(filledRule);
-                    }
-                }
-            });
-        }
-
-        // Process Safety Property
-        const processedSafetyPropertyForForm: string[] = [];
-        if (whatYouShouldKnowSectionsFromDb?.safety_property && Array.isArray(whatYouShouldKnowSectionsFromDb.safety_property)) {
-            whatYouShouldKnowSectionsFromDb.safety_property.forEach((item: string) => {
-                // Assuming safety items don't have complex dynamic parts like house rules for now
-                // So, if the item from DB is one of the predefined SAFETY_PROPERTY_ITEMS, we add that predefined item.
-                if (SAFETY_PROPERTY_ITEMS.includes(item) && !processedSafetyPropertyForForm.includes(item)) {
-                    processedSafetyPropertyForForm.push(item);
-                }
-            });
-        }
-
-        // Process Cancellation Policy
-        const processedCancellationPolicyForForm: string[] = [];
-        if (whatYouShouldKnowSectionsFromDb?.cancellation_policy && Array.isArray(whatYouShouldKnowSectionsFromDb.cancellation_policy)) {
-            whatYouShouldKnowSectionsFromDb.cancellation_policy.forEach((item: string) => {
-                // Assuming cancellation policies don't have complex dynamic parts for now
-                if (CANCELLATION_POLICY_ITEMS.includes(item) && !processedCancellationPolicyForForm.includes(item)) {
-                    processedCancellationPolicyForForm.push(item);
-                }
-            });
-        }
-
-        setDynamicInputValues(initialDynamicValues);
-
-        const whatYouShouldKnowSectionsForForm = {
-            houseRules: processedHouseRulesForForm,
-            safetyProperty: processedSafetyPropertyForForm,
-            cancellationPolicy: processedCancellationPolicyForForm
-        };
-
-        console.log("[handleEditProperty] whatYouShouldKnowSectionsForForm:", JSON.stringify(whatYouShouldKnowSectionsForForm, null, 2));
-        console.log("[handleEditProperty] dynamicInputValues para ser setado:", JSON.stringify(initialDynamicValues, null, 2));
-
-        setFormData({
-            id: property.id,
-            title: property.title,
-            description: property.description || '',
-            type: property.type,
-            location: property.location,
-            coordinates: property.coordinates || null,
-            price: property.price,
-            bedrooms: property.bedrooms,
-            bathrooms: property.bathrooms,
-            beds: property.beds || 1,
-            guests: property.guests || 2,
-            area: property.area,
-            status: property.status,
-            featured: property.featured,
-            images, // Já normalizadas
-            amenities: property.amenities || [],
-            categorizedAmenities: property.categorizedAmenities || {},
-            houseRules: property.houseRules || {
-                checkIn: '15:00',
-                checkOut: '11:00',
-                maxGuests: 2,
-                additionalRules: [],
-            },
-            safety: property.safety || {
-                hasCoAlarm: false,
-                hasSmokeAlarm: false,
-                hasCameras: false,
-            },
-            cancellationPolicy: property.cancellationPolicy || 'Flexível',
-            rating: property.rating || {
-                value: 0,
-                count: 0
-            },
-            whatWeOffer: property.whatWeOffer || '',
-            whatYouShouldKnowRichText: (property as any).what_you_should_know_rich_text || '',
-            serviceFee: property.serviceFee || 0,
-            whatYouShouldKnowSections: whatYouShouldKnowSectionsForForm,
-            whatYouShouldKnowDynamic: property.whatYouShouldKnowDynamic || {
-                checkInTime: '14:00',
-                checkOutTime: '11:00',
-                maxGuests: property.guests || 2,
-                quietHours: '22:00 - 08:00'
-            },
-            discountSettings: {
-                amount: property.discountSettings?.amount ?? 0,
-                type: property.discountSettings?.type ?? 'fixed',
-                minNights: property.discountSettings?.minNights ?? 0,
-                // Garantir que as datas sejam strings no formato YYYY-MM-DD ou vazias
-                validFrom: property.discountSettings?.validFrom
-                    ? new Date(property.discountSettings.validFrom).toISOString().split('T')[0]
-                    : '',
-                validTo: property.discountSettings?.validTo
-                    ? new Date(property.discountSettings.validTo).toISOString().split('T')[0]
-                    : '',
-            },
-            pointsOfInterest: property.pointsOfInterest || [], // Corrigido para camelCase
-        });
-
-        setLocalImages(normalizeImages(property.images || [])); // Isso é para o modal antigo, pode não ser necessário para o novo se ele usar formData.images
-        // setShowEditModal(true); // Comentar ou remover esta linha (modal antigo)
-        setShowNewPropertyModal(true); // Adicionar esta linha para abrir o novo modal stepper
     };
 
     const handleUpdateProperty = async () => {
         if (!currentProperty) return;
 
-        // console.log("[FINAL DEBUG] FormData no início de handleUpdateProperty:", JSON.stringify(formData, null, 2));
-
-        // Log detalhado do estado antes do submit
-        // console.log("[DEBUG] Estado do formData no submit:", JSON.stringify(formData, null, 2));
-
-        // Blindagem: garantir que o campo whatYouShouldKnowSections está sempre populado corretamente
-        const whatYouShouldKnowSections = {
-            houseRules: Array.isArray(formData.whatYouShouldKnowSections?.houseRules) ? formData.whatYouShouldKnowSections.houseRules : [],
-            safetyProperty: Array.isArray(formData.whatYouShouldKnowSections?.safetyProperty) ? formData.whatYouShouldKnowSections.safetyProperty : [],
-            cancellationPolicy: Array.isArray(formData.whatYouShouldKnowSections?.cancellationPolicy) ? formData.whatYouShouldKnowSections.cancellationPolicy : []
-        };
-
-        const whatYouShouldKnowSectionsProcessed = {
-            houseRules: (formData.whatYouShouldKnowSections?.houseRules || []).map(rule => {
-                const placeholderDetails = getPlaceholderDetails(rule);
-                if (placeholderDetails && dynamicInputValues[rule]) {
-                    return placeholderDetails.base + dynamicInputValues[rule];
-                }
-                return rule;
-            }),
-            safetyProperty: formData.whatYouShouldKnowSections?.safetyProperty || [],
-            cancellationPolicy: formData.whatYouShouldKnowSections?.cancellationPolicy || []
-        };
-
         try {
-            // Log para debug
-            // console.log("DEBUG: whatYouShouldKnowSections antes de salvar:", JSON.stringify(formData.whatYouShouldKnowSections, null, 2));
-            // console.log("DEBUG: whatYouShouldKnowDynamic antes de salvar:", JSON.stringify(formData.whatYouShouldKnowDynamic, null, 2));
+            setIsUploadingImages(true);
+            setImageUploadProgress(0);
 
-            // Verificar se há itens selecionados
-            const hasSelectedItems =
-                whatYouShouldKnowSections.houseRules.length > 0 ||
-                whatYouShouldKnowSections.safetyProperty.length > 0 ||
-                whatYouShouldKnowSections.cancellationPolicy.length > 0;
+            const filesToUpload = formData.images
+                .map(imgEntry => imgEntry.file)
+                .filter(file => file instanceof File) as File[];
 
-            // Preparar os dados atualizados
-            // IMPORTANTE: Use formData.images que contém a ordem correta das imagens definida pelo usuário no NewPropertyStepperModal
-            const propertyData: any = {
+            let newlyUploadedImageUrls: string[] = [];
+
+            if (filesToUpload.length > 0) {
+                newlyUploadedImageUrls = await uploadMultiplePropertyImages(
+                    filesToUpload,
+                    currentProperty.id, // Use existing property ID for storage path
+                    (progress) => setImageUploadProgress(progress)
+                );
+            }
+
+            // Get existing image URLs that were not removed (i.e., don't have a .file property)
+            const existingKeptImageUrls = formData.images
+                .filter(imgEntry => !imgEntry.file && typeof imgEntry.url === 'string')
+                .map(imgEntry => imgEntry.url);
+
+            const finalImageUrls = [...existingKeptImageUrls, ...newlyUploadedImageUrls];
+
+            const propertyData: Partial<Property> = {
                 title: formData.title,
-                price: formData.price,
+                description: formData.description,
+                type: formData.type,
+                category: formData.category,
                 location: formData.location,
                 coordinates: formData.coordinates,
-                type: formData.type,
-                bedrooms: formData.bedrooms,
-                bathrooms: formData.bathrooms,
-                area: formData.area,
+                price: parseFloat(formData.price.toString()),
+                bedrooms: parseInt(formData.bedrooms.toString()),
+                bathrooms: parseInt(formData.bathrooms.toString()),
+                beds: parseInt(formData.beds.toString()),
+                guests: parseInt(formData.guests.toString()),
+                area: parseFloat(formData.area.toString()),
                 status: formData.status,
                 featured: formData.featured,
-                description: formData.description || '',
-                beds: formData.beds || 1,
-                guests: formData.guests || 2,
-                amenities: formData.amenities || [],
-                categorizedAmenities: formData.categorizedAmenities || {},
-                houseRules: formData.houseRules || {
-                    checkIn: '15:00',
-                    checkOut: '11:00',
-                    maxGuests: 2,
-                    additionalRules: [],
-                },
-                safety: formData.safety || {
-                    hasCoAlarm: false,
-                    hasSmokeAlarm: false,
-                    hasCameras: false,
-                },
-                cancellationPolicy: formData.cancellationPolicy || 'Flexível',
-                // Usamos formData.images.map para garantir que a ordem definida pelo usuário seja mantida
-                images: formData.images.map(img => img.url),
-                // CORREÇÃO: Usar a versão garantida das seções para evitar undefined
-                what_you_should_know_sections: whatYouShouldKnowSectionsProcessed, // Usar a variável processada aqui
-                whatYouShouldKnowDynamic: {
-                    checkInTime: formData.whatYouShouldKnowDynamic?.checkInTime,
-                    checkOutTime: formData.whatYouShouldKnowDynamic?.checkOutTime,
-                    maxGuests: formData.whatYouShouldKnowDynamic?.maxGuests,
-                    quietHours: formData.whatYouShouldKnowDynamic?.quietHours
-                },
-                // Também adicionamos os outros campos do frontend que podem ser úteis
+                images: finalImageUrls, // Array of final string URLs
+                amenities: formData.amenities,
+                categorizedAmenities: formData.categorizedAmenities,
+                houseRules: formData.houseRules,
+                safety: formData.safety,
+                cancellationPolicy: formData.cancellationPolicy,
                 rating: formData.rating,
                 whatWeOffer: formData.whatWeOffer,
-                whatYouShouldKnowRichText: formData.whatYouShouldKnowRichText, // Novo campo para o editor de texto rico
+                whatYouShouldKnowRichText: formData.whatYouShouldKnowRichText,
                 serviceFee: formData.serviceFee,
                 discountSettings: {
                     amount: formData.discountSettings.amount,
                     type: formData.discountSettings.type,
                     minNights: formData.discountSettings.minNights,
                     validFrom: formData.discountSettings.validFrom ? new Date(formData.discountSettings.validFrom) : undefined,
-                    validTo: formData.discountSettings.validTo ? new Date(formData.discountSettings.validTo) : undefined
+                    validTo: formData.discountSettings.validTo ? new Date(formData.discountSettings.validTo) : undefined,
                 },
-                pointsOfInterest: formData.pointsOfInterest, // Adicionado para pontos de interesse
+                whatYouShouldKnowSections: formData.whatYouShouldKnowSections,
+                pointsOfInterest: formData.pointsOfInterest,
+                // updated_at will be handled by Supabase
             };
 
-            // Log para debug do objeto final que será enviado
-            // console.log("DEBUG: Objeto propertyData enviado ao Supabase:", JSON.stringify(propertyData, null, 2));
-
-            // Processar as imagens, mantendo a ordem definida pelo usuário
-            const imageFiles: File[] = [];
-            const remoteUrls: string[] = []; // Este array pode ser simplificado ou removido se não for usado posteriormente
-            const imageIndexMap = new Map(); // Mapa para manter a ordem original (se ainda necessário)
-
-            if (formData.images && formData.images.length > 0) {
-                setIsUploadingImages(true);
-
-                // Primeiro passo: identificar e mapear todas as imagens com seu índice original
-                // (Esta parte pode precisar de ajuste se imageIndexMap não for crucial para a nova lógica)
-                formData.images.forEach((img, index) => {
-                    if (img.url.startsWith('blob:') || img.url.startsWith('data:')) {
-                        // Marca a posição das imagens locais para preservar a ordem
-                        imageIndexMap.set(img.id, { index, type: 'local' });
-                    } else {
-                        // Marca a posição das imagens remotas para preservar a ordem
-                        remoteUrls.push(img.url); // Coleta URLs remotas
-                        imageIndexMap.set(img.id, { index, type: 'remote', url: img.url });
-                    }
-                });
-
-                // Segundo passo: processar os uploads de imagens novas/locais
-                for (const img of formData.images) {
-                    if (img.url.startsWith('blob:') || img.url.startsWith('data:')) {
-                        try {
-                            const response = await fetch(img.url);
-                            const blob = await response.blob();
-                            const file = new File([blob], `image-${Date.now()}-${img.id}.jpg`, { type: 'image/jpeg' });
-                            imageFiles.push(file);
-                        } catch (error) {
-                            console.error('Erro ao processar imagem local:', error);
-                        }
-                    }
-                }
-
-                // Fazer upload apenas das novas imagens
-                if (imageFiles.length > 0) {
-                    const uploadedUrls = await uploadMultiplePropertyImages(
-                        imageFiles,
-                        currentProperty.id,
-                        (progress) => {
-                            setImageUploadProgress(progress);
-                        }
-                    );
-
-                    // Construir o array final de imagens na ordem correta de localImages
-                    let newImageUploadIndex = 0;
-                    propertyData.images = localImages.map(img => {
-                        if (img.url.startsWith('blob:')) {
-                            const uploadedUrl = uploadedUrls[newImageUploadIndex++];
-                            return { id: uuidv4(), url: uploadedUrl }; // Usar o ID do Supabase se disponível, ou gerar um novo
-                        }
-                        return img; // Manter imagem existente (com seu ID e URL originais)
-                    }).filter(img => img.url); // Remover quaisquer imagens com URLs vazias (caso de falha no upload)
-
-
-                } else {
-                    // Se não houver novas imagens, usar localImages que reflete a ordem atual e as remoções
-                    propertyData.images = localImages.map(img => ({ id: img.id, url: img.url }));
-                }
-
-                setIsUploadingImages(false);
-            } else {
-                // Se não houver imagens em formData.images (todas foram removidas, por exemplo)
-                propertyData.images = [];
-            }
-
-            // Verificar os dados sendo enviados para o Supabase
-            // console.log('DEBUG: Enviando para o Supabase:', JSON.stringify(propertyData, null, 2));
-
-            // Atualizar no Supabase
             await updateProperty(currentProperty.id, propertyData);
 
-            // Atualizar a lista localmente com a ordem correta das imagens
-            const updatedProperties = properties.map(p => {
-                if (p.id === currentProperty.id) {
-                    return {
+            // Update properties in local state with the new data, ensuring images are string URLs
+            setProperties(prevProperties =>
+                prevProperties.map(p =>
+                    p.id === currentProperty.id ? {
                         ...p,
                         ...propertyData,
-                        // Garantir que a propriedade images tenha o valor correto de propertyData.images
-                        // que contém a ordem definida pelo usuário
-                        images: propertyData.images || []
-                    };
-                }
-                return p;
-            });
+                        id: currentProperty.id, // Ensure ID is present
+                        images: finalImageUrls // Ensure images are the final string URLs
+                    } : p
+                )
+            );
+            setShowNewPropertyModal(false); // Assuming edit also uses this modal now
+            resetForm();
+            setNotification({ message: 'Propriedade atualizada com sucesso!', type: 'success' });
 
-            setProperties(updatedProperties);
-            // console.log("DEBUG: Propriedade atualizada com sucesso. Ordem das imagens salva:", propertyData.images);
-            setShowEditModal(false);
-
-            // Recarregar as propriedades para ter os dados atualizados
-            fetchProperties().then(data => setProperties(data)).catch(console.error);
         } catch (error) {
-            console.error('Erro ao atualizar propriedade:', error);
-            alert('Erro ao atualizar propriedade. Tente novamente.');
+            console.error("Erro ao atualizar propriedade:", error);
+            setNotification({ message: 'Erro ao atualizar propriedade. Tente novamente.', type: 'error' });
+        } finally {
+            setIsUploadingImages(false);
         }
     };
+
+    const handleEditProperty = (property: Property) => {
+        setCurrentProperty(property);
+
+        const normalizedExistingImages = (property.images || []).map(imgUrl => {
+            if (typeof imgUrl === 'string') {
+                return { id: uuidv4(), url: imgUrl, file: undefined };
+            } else if (imgUrl && typeof imgUrl === 'object' && 'url' in imgUrl) {
+                return { id: (imgUrl as any).id || uuidv4(), url: (imgUrl as any).url, file: undefined };
+            }
+            return { id: uuidv4(), url: '', file: undefined };
+        }).filter(img => img.url);
+
+        setFormData({
+            id: property.id,
+            title: property.title || '',
+            description: property.description || '',
+            type: property.type || '',
+            category: property.category || 'Business Ready',
+            location: property.location || '',
+            coordinates: property.coordinates || null,
+            price: property.price || 0,
+            bedrooms: property.bedrooms || 0,
+            bathrooms: property.bathrooms || 0,
+            beds: property.beds || 1,
+            guests: property.guests || 2,
+            area: property.area || 0,
+            status: property.status || 'available',
+            featured: property.featured || false,
+            images: normalizedExistingImages, // Correctly structured
+            amenities: property.amenities || [],
+            categorizedAmenities: property.categorizedAmenities || {},
+            houseRules: property.houseRules || initialFormData.houseRules,
+            safety: property.safety || initialFormData.safety,
+            cancellationPolicy: property.cancellationPolicy || initialFormData.cancellationPolicy,
+            rating: property.rating || initialFormData.rating,
+            whatWeOffer: property.whatWeOffer || '',
+            whatYouShouldKnowRichText: property.whatYouShouldKnowRichText || '',
+            serviceFee: property.serviceFee || 0,
+            discountSettings: property.discountSettings ? {
+                amount: property.discountSettings.amount,
+                type: property.discountSettings.type,
+                minNights: property.discountSettings.minNights !== undefined ? property.discountSettings.minNights : initialFormData.discountSettings.minNights,
+                validFrom: typeof property.discountSettings.validFrom === 'string' ? property.discountSettings.validFrom : (property.discountSettings.validFrom ? new Date(property.discountSettings.validFrom).toISOString().split('T')[0] : initialFormData.discountSettings.validFrom),
+                validTo: typeof property.discountSettings.validTo === 'string' ? property.discountSettings.validTo : (property.discountSettings.validTo ? new Date(property.discountSettings.validTo).toISOString().split('T')[0] : initialFormData.discountSettings.validTo),
+            } : initialFormData.discountSettings,
+            whatYouShouldKnowSections: property.whatYouShouldKnowSections || initialFormData.whatYouShouldKnowSections,
+            whatYouShouldKnowDynamic: property.whatYouShouldKnowDynamic || initialFormData.whatYouShouldKnowDynamic,
+            pointsOfInterest: property.pointsOfInterest || [],
+        });
+        setShowNewPropertyModal(true);
+    };
+
     const handleSaveFromStepperModal = async (): Promise<boolean> => {
         try {
             if (formData.id) { // Se tem ID, é uma edição
@@ -1226,6 +961,7 @@ export default function PropertiesPage() {
             return false; // Indica falha
         }
     };
+
     const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
 
@@ -1269,13 +1005,14 @@ export default function PropertiesPage() {
         input.onchange = (e: Event) => {
             const target = e.target as HTMLInputElement;
             if (target.files) {
-                const newImages = Array.from(target.files).map(file => ({
+                const newImageEntries = Array.from(target.files).map(file => ({
+                    file: file, // Store the actual File object
                     id: uuidv4(),
-                    url: URL.createObjectURL(file)
+                    url: URL.createObjectURL(file) // For preview
                 }));
                 setFormData(prev => ({
                     ...prev,
-                    images: [...prev.images, ...newImages]
+                    images: [...prev.images, ...newImageEntries]
                 }));
             }
         };
@@ -1588,6 +1325,7 @@ export default function PropertiesPage() {
             title: importedData.title || '',
             description: importedData.description || '',
             type: importedData.type || 'Apartamento',
+            category: importedData.category || 'Business Ready', // Added category
             location: importedData.address || importedData.location || '',
             coordinates: coordinates,
             price: importedData.pricePerNight || 0,
@@ -1785,15 +1523,8 @@ export default function PropertiesPage() {
                             </div>
                             <div className="flex space-x-2"> {/* Adicionado div para alinhar botões */}
                                 <button
-                                    onClick={() => setShowAddModal(true)}
-                                    className="inline-flex items-center px-4 py-2 bg-[#8BADA4] text-white rounded-lg hover:bg-opacity-90 transition-colors"
-                                >
-                                    <Plus className="mr-2 h-5 w-5" />
-                                    Adicionar Imóvel
-                                </button>
-                                <button
                                     onClick={() => setShowNewPropertyModal(true)} // Aciona o novo modal
-                                    className="inline-flex items-center px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                                    className="inline-flex items-center px-4 py-2 bg-[#8BADA4] text-white rounded-lg hover:bg-opacity-90 transition-colors"
                                 >
                                     <Plus className="mr-2 h-5 w-5" />
                                     Adicionar Imóvel (Novo)
@@ -1851,11 +1582,12 @@ export default function PropertiesPage() {
                                         <Image
                                             src={getValidImage(property.images, localPlaceholderImages[idx % localPlaceholderImages.length], 0)}
                                             alt={property.title}
-                                            width={500}
-                                            height={300}
-                                            className="w-full h-full object-cover"
+                                            fill
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                            className="object-cover" // w-full h-full is implicit with fill
                                             onError={handleImageError}
                                             data-property-id={property.id}
+                                            priority
                                         />
                                         {property.featured && (
                                             <div className="absolute top-2 left-2 bg-amber-500 text-white text-xs px-2 py-1 rounded">
@@ -2165,62 +1897,67 @@ export default function PropertiesPage() {
                                             <div className="mt-4 mb-10">
                                                 <h4 className="text-sm font-medium text-gray-700 mb-2">Organize a ordem das imagens:</h4>
                                                 <div className="grid grid-cols-3 gap-4">
-                                                    {formData.images.map((img, index) => (
-                                                        <div key={`image-${index}`} className="relative">
-                                                            <div className="h-20 w-full bg-gray-200 rounded-md overflow-hidden">
-                                                                <Image
-                                                                    src={img.url}
-                                                                    alt={`Imagem ${index + 1}`}
-                                                                    width={100}
-                                                                    height={80}
-                                                                    className="w-full h-full object-cover"
-                                                                    onError={handleImageError}
-                                                                    unoptimized={img.url && !img.url.startsWith('/') ? true : undefined}
-                                                                    priority={index === 0}
-                                                                    style={{ width: '100%', height: 'auto', aspectRatio: '5/4' }}
-                                                                />
-                                                            </div>
-                                                            <div className="absolute top-0 left-0 bg-black bg-opacity-50 text-white px-2 py-1 text-xs rounded-br">
-                                                                #{index + 1}
-                                                            </div>
-                                                            <div className="absolute right-1 top-1 flex flex-col space-y-1">
+                                                    {formData.images.map((img, index) => {
+                                                        // Determine src and unoptimized based on whether img is a File or an object with a URL
+                                                        const imgSrc = img.file ? URL.createObjectURL(img.file) : img.url;
+                                                        const isExternalOrBlob = !!img.file || (typeof img.url === 'string' && !img.url.startsWith('/'));
+
+                                                        return (
+                                                            <div key={img.id} className="relative"> {/* Use img.id for key */}
+                                                                <div className="h-20 w-full bg-gray-200 rounded-md overflow-hidden relative">
+                                                                    <Image
+                                                                        src={imgSrc}
+                                                                        alt={`Imagem ${index + 1}`}
+                                                                        fill
+                                                                        sizes="100px"
+                                                                        className="object-cover"
+                                                                        onError={handleImageError}
+                                                                        unoptimized={isExternalOrBlob ? true : undefined}
+                                                                        priority={index === 0}
+                                                                    />
+                                                                </div>
+                                                                <div className="absolute top-0 left-0 bg-black bg-opacity-50 text-white px-2 py-1 text-xs rounded-br">
+                                                                    #{index + 1}
+                                                                </div>
+                                                                <div className="absolute right-1 top-1 flex flex-col space-y-1">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => moveFormImageToFirst(index)}
+                                                                        disabled={index === 0}
+                                                                        className={`bg-white rounded-full p-1 shadow-sm ${index === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                                        title="Mover para primeiro"
+                                                                    >
+                                                                        <Star size={12} className="text-yellow-500" />
+                                                                    </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => moveFormImageUp(index)}
+                                                                        disabled={index === 0}
+                                                                        className={`bg-white rounded-full p-1 shadow-sm ${index === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                                        title="Mover para cima"
+                                                                    >
+                                                                        <ArrowUp size={12} className="text-gray-700" />
+                                                                    </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => moveFormImageDown(index)}
+                                                                        disabled={index === formData.images.length - 1}
+                                                                        className={`bg-white rounded-full p-1 shadow-sm ${index === formData.images.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                                        title="Mover para baixo"
+                                                                    >
+                                                                        <ArrowDown size={12} className="text-gray-700" />
+                                                                    </button>
+                                                                </div>
                                                                 <button
                                                                     type="button"
-                                                                    onClick={() => moveFormImageToFirst(index)}
-                                                                    disabled={index === 0}
-                                                                    className={`bg-white rounded-full p-1 shadow-sm ${index === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                                    title="Mover para primeiro"
+                                                                    onClick={() => handleRemoveImage(index)} // This should be handleRemoveImage, not handleRemoveImageLocal for formData.images
+                                                                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
                                                                 >
-                                                                    <Star size={12} className="text-yellow-500" />
-                                                                </button>
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => moveFormImageUp(index)}
-                                                                    disabled={index === 0}
-                                                                    className={`bg-white rounded-full p-1 shadow-sm ${index === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                                    title="Mover para cima"
-                                                                >
-                                                                    <ArrowUp size={12} className="text-gray-700" />
-                                                                </button>
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => moveFormImageDown(index)}
-                                                                    disabled={index === formData.images.length - 1}
-                                                                    className={`bg-white rounded-full p-1 shadow-sm ${index === formData.images.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                                    title="Mover para baixo"
-                                                                >
-                                                                    <ArrowDown size={12} className="text-gray-700" />
+                                                                    &times;
                                                                 </button>
                                                             </div>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleRemoveImage(index)}
-                                                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
-                                                            >
-                                                                &times;
-                                                            </button>
-                                                        </div>
-                                                    ))}
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
                                         )}
@@ -2567,19 +2304,25 @@ export default function PropertiesPage() {
                                         <div className="mb-6">
                                             <h4 className="text-md font-medium mb-2">Imagens encontradas: {importedData.images.length}</h4>
                                             <div className="grid grid-cols-3 gap-2 mt-2">
-                                                {importedData.images.slice(0, 6).map((img: string, index: number) => (
-                                                    <div key={index} className="relative h-20 bg-gray-200 rounded-md overflow-hidden">
-                                                        <Image
-                                                            src={getValidImage(importedData.images, localPlaceholderImages[index % localPlaceholderImages.length], index)}
-                                                            alt={`Imagem ${index + 1}`}
-                                                            width={100}
-                                                            height={80}
-                                                            className="w-full h-full object-cover"
-                                                            onError={handleImageError}
-                                                            unoptimized={img && !img.startsWith('/') ? true : undefined}
-                                                        />
-                                                    </div>
-                                                ))}
+                                                {importedData.images.slice(0, 6).map((imgStr: string, index: number) => {
+                                                    const isValidUrl = typeof imgStr === 'string' && imgStr.startsWith('http');
+                                                    const imgSrc = isValidUrl ? imgStr : getValidImage(undefined, localPlaceholderImages[index % localPlaceholderImages.length]);
+                                                    const isExternal = isValidUrl && !imgStr.startsWith('/');
+                                                    return (
+                                                        <div key={index} className="relative h-20 bg-gray-200 rounded-md overflow-hidden">
+                                                            <Image
+                                                                src={imgSrc}
+                                                                alt={`Imagem importada ${index + 1}`}
+                                                                fill
+                                                                sizes="100px"
+                                                                className="object-cover"
+                                                                onError={handleImageError}
+                                                                unoptimized={isExternal ? true : undefined}
+                                                                priority={index === 0}
+                                                            />
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
                                             {importedData.images.length > 6 && (
                                                 <p className="text-xs text-gray-500 mt-2">
@@ -2881,62 +2624,67 @@ export default function PropertiesPage() {
                                             <div className="mt-4 mb-10">
                                                 <h4 className="text-sm font-medium text-gray-700 mb-2">Organize a ordem das imagens:</h4>
                                                 <div className="grid grid-cols-3 gap-4">
-                                                    {formData.images.map((img, index) => (
-                                                        <div key={`image-${index}`} className="relative">
-                                                            <div className="h-20 w-full bg-gray-200 rounded-md overflow-hidden">
-                                                                <Image
-                                                                    src={img.url}
-                                                                    alt={`Imagem ${index + 1}`}
-                                                                    width={100}
-                                                                    height={80}
-                                                                    className="w-full h-full object-cover"
-                                                                    onError={handleImageError}
-                                                                    unoptimized={img.url && !img.url.startsWith('/') ? true : undefined}
-                                                                    priority={index === 0}
-                                                                    style={{ width: '100%', height: 'auto', aspectRatio: '5/4' }}
-                                                                />
-                                                            </div>
-                                                            <div className="absolute top-0 left-0 bg-black bg-opacity-50 text-white px-2 py-1 text-xs rounded-br">
-                                                                #{index + 1}
-                                                            </div>
-                                                            <div className="absolute right-1 top-1 flex flex-col space-y-1">
+                                                    {formData.images.map((img, index) => {
+                                                        // Determine src and unoptimized based on whether img is a File or an object with a URL
+                                                        const imgSrc = img.file ? URL.createObjectURL(img.file) : img.url;
+                                                        const isExternalOrBlob = !!img.file || (typeof img.url === 'string' && !img.url.startsWith('/'));
+
+                                                        return (
+                                                            <div key={img.id} className="relative"> {/* Use img.id for key */}
+                                                                <div className="h-20 w-full bg-gray-200 rounded-md overflow-hidden relative">
+                                                                    <Image
+                                                                        src={imgSrc}
+                                                                        alt={`Imagem ${index + 1}`}
+                                                                        fill
+                                                                        sizes="100px"
+                                                                        className="object-cover"
+                                                                        onError={handleImageError}
+                                                                        unoptimized={isExternalOrBlob ? true : undefined}
+                                                                        priority={index === 0}
+                                                                    />
+                                                                </div>
+                                                                <div className="absolute top-0 left-0 bg-black bg-opacity-50 text-white px-2 py-1 text-xs rounded-br">
+                                                                    #{index + 1}
+                                                                </div>
+                                                                <div className="absolute right-1 top-1 flex flex-col space-y-1">
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => moveFormImageToFirst(index)}
+                                                                        disabled={index === 0}
+                                                                        className={`bg-white rounded-full p-1 shadow-sm ${index === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                                        title="Mover para primeiro"
+                                                                    >
+                                                                        <Star size={12} className="text-yellow-500" />
+                                                                    </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => moveFormImageUp(index)}
+                                                                        disabled={index === 0}
+                                                                        className={`bg-white rounded-full p-1 shadow-sm ${index === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                                        title="Mover para cima"
+                                                                    >
+                                                                        <ArrowUp size={12} className="text-gray-700" />
+                                                                    </button>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => moveFormImageDown(index)}
+                                                                        disabled={index === formData.images.length - 1}
+                                                                        className={`bg-white rounded-full p-1 shadow-sm ${index === formData.images.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                                        title="Mover para baixo"
+                                                                    >
+                                                                        <ArrowDown size={12} className="text-gray-700" />
+                                                                    </button>
+                                                                </div>
                                                                 <button
                                                                     type="button"
-                                                                    onClick={() => moveImageToFirst(index)}
-                                                                    disabled={index === 0}
-                                                                    className={`bg-white rounded-full p-1 shadow-sm ${index === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                                    title="Mover para primeiro"
+                                                                    onClick={() => handleRemoveImage(index)} // This should be handleRemoveImage, not handleRemoveImageLocal for formData.images
+                                                                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
                                                                 >
-                                                                    <Star size={12} className="text-yellow-500" />
-                                                                </button>
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => moveImageUp(index)}
-                                                                    disabled={index === 0}
-                                                                    className={`bg-white rounded-full p-1 shadow-sm ${index === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                                    title="Mover para cima"
-                                                                >
-                                                                    <ArrowUp size={12} className="text-gray-700" />
-                                                                </button>
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => moveImageDown(index)}
-                                                                    disabled={index === formData.images.length - 1}
-                                                                    className={`bg-white rounded-full p-1 shadow-sm ${index === formData.images.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                                    title="Mover para baixo"
-                                                                >
-                                                                    <ArrowDown size={12} className="text-gray-700" />
+                                                                    &times;
                                                                 </button>
                                                             </div>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleRemoveImageLocal(index)}
-                                                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
-                                                            >
-                                                                &times;
-                                                            </button>
-                                                        </div>
-                                                    ))}
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
                                         )}
@@ -3187,223 +2935,6 @@ export default function PropertiesPage() {
                                         {/* O campo "O que você deve saber (aba do imóvel)" foi removido */}
 
                                     </div>
-                                </div>
-                            </div>
-
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    O que você deve saber (aba do imóvel)
-                                </label>
-                                <div className="relative" ref={whatYouShouldKnowDropdownRef}>
-                                    <button
-                                        type="button"
-                                        className="w-full flex flex-wrap items-center gap-2 px-3 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-[#8BADA4] text-left min-h-[44px]"
-                                        onClick={() => setWhatYouShouldKnowDropdownOpen((open) => !open)}
-                                        aria-haspopup="listbox"
-                                        aria-expanded={whatYouShouldKnowDropdownOpen}
-                                    >
-                                        {formData.whatYouShouldKnowSections.houseRules.length === 0 &&
-                                            formData.whatYouShouldKnowSections.safetyProperty.length === 0 &&
-                                            formData.whatYouShouldKnowSections.cancellationPolicy.length === 0 ? (
-                                            <span className="text-gray-400">Selecione regras, segurança e políticas...</span>
-                                        ) : (
-                                            <div className="flex flex-wrap gap-2">
-                                                {formData.whatYouShouldKnowSections.houseRules.map((rule) => (
-                                                    <span key={rule} className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-xs text-gray-700">
-                                                        <Clock className="w-3 h-3" />
-                                                        {rule}
-                                                    </span>
-                                                ))}
-                                                {formData.whatYouShouldKnowSections.safetyProperty.map((item) => (
-                                                    <span key={item} className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-xs text-gray-700">
-                                                        <Shield className="w-3 h-3" />
-                                                        {item}
-                                                    </span>
-                                                ))}
-                                                {formData.whatYouShouldKnowSections.cancellationPolicy.map((policy) => (
-                                                    <span key={policy} className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-xs text-gray-700">
-                                                        <Calendar className="w-3 h-3" />
-                                                        {typeof policy === 'string' && policy.length > 30 ? policy.substring(0, 30) + '...' : policy}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        )}
-                                        <svg className={`ml-auto w-4 h-4 transition-transform ${whatYouShouldKnowDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
-                                    </button>
-                                    {whatYouShouldKnowDropdownOpen && (
-                                        <div className="absolute z-50 mt-2 w-full bg-white border border-gray-200 rounded-md shadow-lg p-3 max-h-72 overflow-y-auto animate-fade-in">
-                                            {(formData.whatYouShouldKnowSections.houseRules.length > 0 ||
-                                                formData.whatYouShouldKnowSections.safetyProperty.length > 0 ||
-                                                formData.whatYouShouldKnowSections.cancellationPolicy.length > 0) && (
-                                                    <button
-                                                        type="button"
-                                                        className="mb-2 text-xs text-[#8BADA4] hover:underline focus:outline-none"
-                                                        onClick={() => setFormData(prev => ({
-                                                            ...prev,
-                                                            whatYouShouldKnowSections: {
-                                                                houseRules: [],
-                                                                safetyProperty: [],
-                                                                cancellationPolicy: []
-                                                            }
-                                                        }))}
-                                                    >
-                                                        Limpar seleções
-                                                    </button>
-                                                )}
-
-                                            {/* Regras da Casa */}
-                                            <div className="mb-6">
-                                                <h4 className="font-semibold mb-2 text-gray-700">Regras da Casa</h4>
-                                                <div className="space-y-1">
-                                                    {HOUSE_RULES_ITEMS.map((ruleItem) => {
-                                                        // Correctly check if the item is in the houseRules array
-                                                        const isChecked = formData.whatYouShouldKnowSections.houseRules.includes(ruleItem);
-                                                        const placeholderDetails = getPlaceholderDetails(ruleItem);
-
-                                                        return (
-                                                            <div key={ruleItem} className="p-2 border rounded-md bg-gray-50">
-                                                                <div className="flex items-center justify-between">
-                                                                    <div className="flex items-center">
-                                                                        <Checkbox
-                                                                            id={`hr-${ruleItem}`}
-                                                                            checked={isChecked}
-                                                                            onCheckedChange={(checkedState: boolean | 'indeterminate') => {
-                                                                                handleWYSLCheckboxChange(ruleItem, !!checkedState, 'houseRules');
-                                                                            }}
-                                                                            className="mr-3 flex-shrink-0"
-                                                                        />
-                                                                        {isChecked && <Check className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" />}
-                                                                        <label htmlFor={`hr-${ruleItem}`} className="text-sm text-gray-800 cursor-pointer">
-                                                                            {placeholderDetails ? placeholderDetails.base : ruleItem}
-                                                                            {placeholderDetails && !isChecked && (
-                                                                                <span className="ml-1 text-xs text-gray-400 italic">
-                                                                                    {placeholderDetails.placeholder} (customizável ao marcar)
-                                                                                </span>
-                                                                            )}
-                                                                        </label>
-                                                                    </div>
-                                                                </div>
-                                                                {isChecked && placeholderDetails && (
-                                                                    <div className="mt-2 pl-8 flex items-center space-x-2">
-                                                                        <Input
-                                                                            type={placeholderDetails.inputType}
-                                                                            placeholder={placeholderDetails.placeholderKey}
-                                                                            value={dynamicInputValues[ruleItem] || ""}
-                                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDynamicInputValues(prev => ({ // Tipado explicitamente
-                                                                                ...prev,
-                                                                                [ruleItem]: e.target.value
-                                                                            }))}
-                                                                            className="p-1.5 border rounded-md text-sm h-9 flex-grow min-w-0"
-                                                                        />
-                                                                        {dynamicInputValues[ruleItem] && (
-                                                                            <span className="text-xs text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis flex items-center">
-                                                                                <Check className="w-4 h-4 text-green-500 mr-1 flex-shrink-0" />
-                                                                                Final: {placeholderDetails.base}<span className="font-medium">{dynamicInputValues[ruleItem]}</span>
-                                                                            </span>
-                                                                        )}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-
-                                            {/* Segurança e Propriedade */}
-                                            <div className="mb-3">
-                                                <div className="font-semibold text-xs text-gray-500 mb-1 uppercase tracking-wide">SEGURANÇA E PROPRIEDADE</div>
-                                                <ul className="space-y-1">
-                                                    {SAFETY_PROPERTY_ITEMS.map((item) => {
-                                                        const isChecked = formData.whatYouShouldKnowSections.safetyProperty.includes(item);
-                                                        return (
-                                                            <li key={item}>
-                                                                <label className="flex items-center space-x-2 cursor-pointer px-2 py-1 rounded hover:bg-gray-50">
-                                                                    <Checkbox // Usando o componente Checkbox
-                                                                        id={`safety-${item}`}
-                                                                        checked={isChecked}
-                                                                        onCheckedChange={(checkedState: boolean | 'indeterminate') => {
-                                                                            handleWYSLCheckboxChange(item, !!checkedState, 'safetyProperty');
-                                                                        }}
-                                                                        className="mr-1 flex-shrink-0" // Ajustado mr-1 e adicionado flex-shrink-0
-                                                                    />
-                                                                    {isChecked && <Check className="w-4 h-4 text-green-500 mr-1 flex-shrink-0" />}
-                                                                    <Shield className="w-4 h-4 text-gray-500 mr-1 flex-shrink-0" />
-                                                                    <span className="text-sm text-gray-700">{item}</span>
-                                                                </label>
-                                                            </li>
-                                                        );
-                                                    })}
-                                                </ul>
-                                            </div>
-
-                                            {/* Política de Cancelamento */}
-                                            <div className="mb-3">
-                                                <div className="font-semibold text-xs text-gray-500 mb-1 uppercase tracking-wide">POLÍTICA DE CANCELAMENTO</div>
-                                                <ul className="space-y-1">
-                                                    {CANCELLATION_POLICY_ITEMS.map((policy) => {
-                                                        const isChecked = formData.whatYouShouldKnowSections.cancellationPolicy.includes(policy);
-                                                        return (
-                                                            <li key={policy}>
-                                                                <label className="flex items-center space-x-2 cursor-pointer px-2 py-1 rounded hover:bg-gray-50">
-                                                                    <Checkbox // Usando o componente Checkbox
-                                                                        id={`cancel-${policy}`}
-                                                                        checked={isChecked}
-                                                                        onCheckedChange={(checkedState: boolean | 'indeterminate') => {
-                                                                            handleWYSLCheckboxChange(policy, !!checkedState, 'cancellationPolicy');
-                                                                        }}
-                                                                        className="mr-1 flex-shrink-0"
-                                                                    />
-                                                                    {isChecked && <Check className="w-4 h-4 text-green-500 mr-1 flex-shrink-0" />}
-                                                                    <Calendar className="w-4 h-4 text-gray-500 mr-1 flex-shrink-0" />
-                                                                    <span className="text-sm text-gray-700">{policy}</span>
-                                                                </label>
-                                                            </li>
-                                                        );
-                                                    })}
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Novo campo: Editor de Texto Rico para "O que você deve saber" */}
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Conteúdo Adicional - O que você deve saber (Editor Rico)
-                                </label>
-                                <div className="text-xs text-gray-500 mb-2">
-                                    Use este editor para adicionar informações personalizadas e formatadas que aparecerão na aba "O que você deve saber" do frontend.
-                                </div>
-                                <div className="border border-gray-300 rounded-md overflow-hidden">
-                                    <ReactQuill
-                                        theme="snow"
-                                        value={formData.whatYouShouldKnowRichText}
-                                        onChange={(content, delta, source, editor) => {
-                                            // console.log("ReactQuill content:", content);
-                                            setFormData(prev => ({
-                                                ...prev,
-                                                whatYouShouldKnowRichText: content
-                                            }));
-                                        }}
-                                        modules={{
-                                            toolbar: [
-                                                [{ 'header': [1, 2, 3, false] }],
-                                                ['bold', 'italic', 'underline'],
-                                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                                                ['link'],
-                                                ['clean']
-                                            ],
-                                        }}
-                                        formats={[
-                                            'header',
-                                            'bold', 'italic', 'underline',
-                                            'list', 'bullet',
-                                            'link'
-                                        ]}
-                                        placeholder="Digite informações adicionais que os hóspedes devem saber..."
-                                        style={{ minHeight: '150px' }}
-                                    />
                                 </div>
                             </div>
 

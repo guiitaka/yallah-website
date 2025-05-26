@@ -4,6 +4,7 @@ export interface Property {
     title: string;
     description?: string;
     type: string;
+    category: string;
     location: string;
     price: number;
     bedrooms: number;
@@ -70,6 +71,7 @@ export const sampleProperties: Property[] = [
         price: 350,
         location: 'Brooklin, São Paulo',
         type: 'Apartamento',
+        category: 'Estadia Familiar',
         bedrooms: 2,
         bathrooms: 2,
         beds: 2,
@@ -98,6 +100,7 @@ export const sampleProperties: Property[] = [
         price: 500,
         location: 'Vila Mariana, São Paulo',
         type: 'Casa',
+        category: 'Refúgio & Relaxamento',
         bedrooms: 3,
         bathrooms: 2,
         beds: 3,
@@ -126,6 +129,7 @@ export const sampleProperties: Property[] = [
         price: 280,
         location: 'Centro, São Paulo',
         type: 'Studio',
+        category: 'Business Ready',
         bedrooms: 1,
         bathrooms: 1,
         beds: 1,
@@ -154,6 +158,7 @@ export const sampleProperties: Property[] = [
         price: 320,
         location: 'Pinheiros, São Paulo',
         type: 'Flat',
+        category: 'Vida Universitária',
         bedrooms: 1,
         bathrooms: 1,
         beds: 1,
@@ -182,6 +187,7 @@ export const sampleProperties: Property[] = [
         price: 650,
         location: 'Moema, São Paulo',
         type: 'Cobertura',
+        category: 'Espaço para Eventos',
         bedrooms: 3,
         bathrooms: 3,
         beds: 3,
