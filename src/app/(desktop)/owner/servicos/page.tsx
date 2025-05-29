@@ -6,8 +6,8 @@ import Footer from '@/components/layout/Footer'
 
 export default function ServicosPage() {
     return (
-        <div className="min-h-screen">
-            <div className="pt-40">
+        <div className="min-h-screen pt-[60px]">
+            <div>
                 <SwitchableContentSection />
             </div>
             <Footer />

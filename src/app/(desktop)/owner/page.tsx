@@ -23,7 +23,7 @@ export const viewport: Viewport = {
 
 export default function OwnerPage() {
   return (
-    <main className="pt-[60px] md:pt-[180px]">
+    <main className="pt-[60px]">
       <Header userType="owner" />
       <div className="space-y-12 md:space-y-20">
         <Banner userType="owner" />

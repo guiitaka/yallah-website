@@ -16,10 +16,13 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
   const isTenantPage = userType === 'tenant' && (pathname === '/tenant' || pathname.startsWith('/tenant/'))
   const showHeader = !isHome && !isTenantPage
 
+  // Determine top padding based on whether the header is shown
+  const mainPaddingTopClass = showHeader ? 'pt-28 md:pt-36' : (isTenantPage ? 'pt-0' : 'pt-16 md:pt-24'); // Adjusted pt-36 for desktop header, pt-28 for mobile (needs verification)
+
   return (
     <>
       {showHeader && <Header userType={userType} />}
-      <main className={`min-h-screen pb-20 md:pb-0 ${isTenantPage ? 'pt-0' : ''}`}>
+      <main className={`min-h-screen pb-20 md:pb-0 ${mainPaddingTopClass}`}>
         {children}
       </main>
       {!isHome && <MobileNavigation userType={userType} />}

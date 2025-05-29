@@ -4,6 +4,7 @@ import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { House, Trophy, ChartLineUp, Users, Star, ArrowRight } from '@phosphor-icons/react'
+import { NossoMetodoTimeline } from '@/components/NossoMetodoTimeline'
 
 export default function MobileAboutUs() {
     return (
@@ -108,117 +109,9 @@ export default function MobileAboutUs() {
 
                 {/* Main Content */}
                 <div className="px-6">
-                    {/* Navigation Tabs */}
-                    <div className="flex gap-6 mb-8 text-sm">
-                        <button className="text-[#8BADA4] border-b-2 border-[#8BADA4] pb-2">Processo</button>
-                        <button className="text-[#1C1C1C]/50 pb-2">Resultados</button>
-                        <button className="text-[#1C1C1C]/50 pb-2">Avaliações</button>
-                    </div>
-
-                    {/* Process Steps */}
-                    <div className="space-y-6">
-                        {/* Step 1 */}
-                        <div className="bg-[#1C1C1C] backdrop-blur-sm rounded-3xl p-6 text-white">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-[#8BADA4]/20 flex items-center justify-center">
-                                        <House weight="fill" className="w-5 h-5 text-[#8BADA4]" />
-                                    </div>
-                                    <h3 className="text-xl">Avaliação Inicial</h3>
-                                </div>
-                                <span className="text-sm text-[#8BADA4]">01</span>
-                            </div>
-                            <p className="text-sm opacity-90 mb-4">
-                                Análise completa do seu imóvel e seu potencial no mercado de aluguel por temporada
-                            </p>
-                            <div className="grid grid-cols-2 gap-3 text-sm">
-                                <div className="bg-white/5 rounded-xl p-3">
-                                    <p className="text-[#8BADA4] mb-1">Tempo Médio</p>
-                                    <p>7 dias</p>
-                                </div>
-                                <div className="bg-white/5 rounded-xl p-3">
-                                    <p className="text-[#8BADA4] mb-1">Precisão</p>
-                                    <p>98%</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Step 2 */}
-                        <div className="bg-[#8BADA4] backdrop-blur-sm rounded-3xl p-6 text-white">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                                        <Trophy weight="fill" className="w-5 h-5 text-white" />
-                                    </div>
-                                    <h3 className="text-xl">Preparação</h3>
-                                </div>
-                                <span className="text-sm text-white">02</span>
-                            </div>
-                            <p className="text-sm opacity-90 mb-4">
-                                Otimização completa do espaço para maximizar o potencial de receita
-                            </p>
-                            <div className="flex flex-wrap gap-2">
-                                <span className="px-3 py-1 bg-white/20 rounded-full text-sm">Manutenção</span>
-                                <span className="px-3 py-1 bg-white/20 rounded-full text-sm">Decoração</span>
-                                <span className="px-3 py-1 bg-white/20 rounded-full text-sm">Fotografia</span>
-                            </div>
-                        </div>
-
-                        {/* Step 3 */}
-                        <div className="bg-[#1C1C1C] backdrop-blur-sm rounded-3xl p-6 text-white">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-[#8BADA4]/20 flex items-center justify-center">
-                                        <ChartLineUp weight="fill" className="w-5 h-5 text-[#8BADA4]" />
-                                    </div>
-                                    <h3 className="text-xl">Marketing</h3>
-                                </div>
-                                <span className="text-sm text-[#8BADA4]">03</span>
-                            </div>
-                            <p className="text-sm opacity-90 mb-4">
-                                Estratégia digital completa para maximizar visibilidade e ocupação
-                            </p>
-                            <div className="bg-white/5 rounded-xl p-4">
-                                <p className="text-[#8BADA4] text-sm mb-2">Presença Digital</p>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 rounded-lg bg-white/10" />
-                                    <div className="w-8 h-8 rounded-lg bg-white/10" />
-                                    <div className="w-8 h-8 rounded-lg bg-white/10" />
-                                    <div className="w-8 h-8 rounded-lg bg-white/10" />
-                                    <div className="w-8 h-8 rounded-lg bg-white/10" />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Step 4 */}
-                        <div className="bg-[#8BADA4] backdrop-blur-sm rounded-3xl p-6 text-white">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                                        <Users weight="fill" className="w-5 h-5 text-white" />
-                                    </div>
-                                    <h3 className="text-xl">Gestão</h3>
-                                </div>
-                                <span className="text-sm text-white">04</span>
-                            </div>
-                            <p className="text-sm opacity-90 mb-4">
-                                Cuidamos de todo o processo, da reserva ao check-out
-                            </p>
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-3 bg-white/10 rounded-xl p-3">
-                                    <Star weight="fill" className="w-4 h-4 text-white" />
-                                    <p className="text-sm">Atendimento 24/7</p>
-                                </div>
-                                <div className="flex items-center gap-3 bg-white/10 rounded-xl p-3">
-                                    <Star weight="fill" className="w-4 h-4 text-white" />
-                                    <p className="text-sm">Limpeza Premium</p>
-                                </div>
-                                <div className="flex items-center gap-3 bg-white/10 rounded-xl p-3">
-                                    <Star weight="fill" className="w-4 h-4 text-white" />
-                                    <p className="text-sm">Manutenção Regular</p>
-                                </div>
-                            </div>
-                        </div>
+                    {/* Process Steps - REPLACED WITH TIMELINE */}
+                    <div className="py-8">
+                        <NossoMetodoTimeline />
                     </div>
 
                     {/* CTA Section */}

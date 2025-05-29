@@ -157,8 +157,8 @@ export default function TimelineSection() {
     }, [isHovering, isTransitioning, accumulatedDelta, canScrollPage]);
 
     return (
-        <div className="w-full bg-white relative pt-40">
-            <h2 className="absolute top-52 left-1/2 -translate-x-1/2 text-[64px] font-medium text-center text-white z-10 w-full tracking-wide">
+        <div className="w-full bg-white relative">
+            <h2 className="absolute top-20 left-1/2 -translate-x-1/2 text-[64px] font-medium text-center text-white z-10 w-full tracking-wide">
                 Como a <span className="text-[#8BADA4] font-semibold">Yallah</span> funciona
             </h2>
 

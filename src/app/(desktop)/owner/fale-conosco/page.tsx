@@ -13,7 +13,7 @@ export default function ContactPage() {
     return (
         <ClientLayout>
             {/* Main Content */}
-            <div className="pt-16 lg:pt-24"></div>
+            <div className="pt-[60px]"></div>
             <ContactSection />
             <ContactForm />
             <Footer />
