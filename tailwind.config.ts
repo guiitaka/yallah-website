@@ -55,6 +55,19 @@ const config: Config = {
       },
       animation: {
         'spin-slow': 'spin 8s linear infinite',
+        'fadeIn': 'fadeIn 1s ease-in-out forwards',
+        'success': 'success 0.5s ease-in-out',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        success: {
+          '0%': { backgroundColor: '#8BADA4', transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.05)' },
+          '100%': { backgroundColor: '#7A9C90', transform: 'scale(1)' },
+        },
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

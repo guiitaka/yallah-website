@@ -2,109 +2,118 @@
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import Head from 'next/head';
+import { ArrowRight, Building2, User } from 'lucide-react';
 
 export default function SplashScreen() {
-  const router = useRouter();
   const [show, setShow] = useState(true);
+  const [hoveredOption, setHoveredOption] = useState<'owner' | 'tenant' | null>(null);
 
   useEffect(() => {
-    // Adiciona meta tags para modo tela cheia
-    document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
-
-    const handleResize = () => {
-      document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    // Verifica se já existe uma escolha salva
     const userChoice = localStorage.getItem('userType');
     if (userChoice) {
-      router.push(`/mobile/${userChoice}`);
+      const isMobile = window.innerWidth <= 768;
+      // Ensure redirection for mobile stays within the /mobile path
+      const basePath = '/mobile'; // Force mobile path for mobile component
+      window.location.href = `${basePath}/${userChoice}`;
       setShow(false);
     }
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [router]);
+  }, []);
 
   const handleChoice = (choice: 'owner' | 'tenant') => {
-    // Salva a escolha do usuário
     localStorage.setItem('userType', choice);
-    // Navega para a rota apropriada
-    router.push(`/mobile/${choice}`);
+    const isMobile = window.innerWidth <= 768;
+    // Ensure redirection for mobile stays within the /mobile path
+    const basePath = '/mobile'; // Force mobile path for mobile component
+    window.location.href = `${basePath}/${choice}`;
     setShow(false);
   };
 
   if (!show) return null;
 
   return (
-    <>
-      <Head>
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-      </Head>
-      <div className="fixed inset-0 bg-white z-50 flex flex-col" style={{ height: 'calc(var(--vh, 1vh) * 100)' }}>
-        {/* Top Half */}
-        <div className="relative h-[50vh] bg-gray-900" style={{ height: 'calc(var(--vh, 1vh) * 50)' }}>
+    <div className="fixed inset-0 bg-background z-50 flex flex-col items-center justify-center overflow-hidden">
+      {/* Logo Header */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30">
+        {/* Adjusted logo size for mobile, ensuring visibility with white background */}
+        <div className="w-[120px] h-[120px] relative bg-white rounded-full p-6 shadow-lg">
+          <Image
+            src="/logo-yallah-nobg.png"
+            alt="Yallah"
+            fill
+            priority
+            sizes="80px" // Simplified size for mobile consistency
+            className="object-contain"
+          />
+        </div>
+      </div>
+
+      {/* Options Container */}
+      {/* For mobile, options will stack vertically due to flex-col and h-1/2 on children */}
+      <div className="w-full h-full flex flex-col">
+        {/* Owner Option */}
+        <div
+          className={`relative w-full h-1/2 transition-all duration-500 ease-in-out`}
+        // Hover effects managed by hoveredOption are less relevant on mobile, but structure is kept
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/30 z-10" />
           <Image
             src="/owner-bg.jpg"
             alt="Proprietário Background"
             fill
-            className="object-cover brightness-50"
-            priority
+            className="object-cover transition-transform duration-700 ease-in-out scale-100"
           />
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-6">
+            <div className="w-16 h-16 rounded-full bg-primary/20 backdrop-blur-md flex items-center justify-center mb-4">
+              <Building2 className="w-8 h-8 text-white" />
+            </div>
+            <h2 className="text-3xl font-bold mb-2 text-white text-center">Sou Proprietário</h2>
+            <p className="text-lg font-medium text-white/80 text-center mb-6">
+              Maximize o retorno do seu imóvel
+            </p>
             <button
               onClick={() => handleChoice('owner')}
-              className="text-center"
+              className="group flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-6 py-3 rounded-full transition-all duration-300 border border-white/30 hover:border-white/50"
             >
-              <h2 className="text-4xl font-bold mb-3">Sou Proprietário</h2>
-              <p className="text-xl font-medium opacity-90">Maximize o retorno do seu imóvel</p>
+              <span>Continuar</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Bottom Half */}
-        <div className="relative h-[50vh]" style={{ height: 'calc(var(--vh, 1vh) * 50)' }}>
+        {/* Tenant Option */}
+        <div
+          className={`relative w-full h-1/2 transition-all duration-500 ease-in-out`}
+        >
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/30 z-10" />
           <Image
             src="/tenant-bg.jpg"
             alt="Locatário Background"
             fill
-            className="object-cover brightness-50"
-            priority
+            className="object-cover transition-transform duration-700 ease-in-out scale-100"
           />
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-6">
+            <div className="w-16 h-16 rounded-full bg-primary/20 backdrop-blur-md flex items-center justify-center mb-4">
+              <User className="w-8 h-8 text-white" />
+            </div>
+            <h2 className="text-3xl font-bold mb-2 text-white text-center">Busco um Imóvel</h2>
+            <p className="text-lg font-medium text-white/80 text-center mb-6">
+              Encontre o lugar perfeito para sua estadia
+            </p>
             <button
               onClick={() => handleChoice('tenant')}
-              className="text-center"
+              className="group flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-6 py-3 rounded-full transition-all duration-300 border border-white/30 hover:border-white/50"
             >
-              <h2 className="text-4xl font-bold mb-3">Busco um Imóvel</h2>
-              <p className="text-xl font-medium opacity-90">Encontre o lugar perfeito para sua estadia</p>
+              <span>Continuar</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
-
-        {/* Centered Logo */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-[240px] h-[240px] relative bg-white rounded-full p-8">
-            <div className="w-[180px] h-[180px] relative mx-auto">
-              <Image
-                src="/logo-yallah-nobg.png"
-                alt="Yallah"
-                fill
-                priority
-                sizes="180px"
-                className="object-contain"
-              />
-            </div>
-          </div>
-        </div>
       </div>
-    </>
+
+      {/* Footer - Simplified for mobile if necessary, but current one is already minimal */}
+      <div className="absolute bottom-4 z-30 text-white/50 text-xs px-4 text-center">
+        © {new Date().getFullYear()} Yallah - Escolha sua experiência
+      </div>
+    </div>
   );
 } 
