@@ -310,14 +310,94 @@ const CANCELLATION_POLICY_ITEMS = [
 // Helper para identificar placeholders
 const getPlaceholderDetails = (rule: string) => {
     const match = rule.match(/\{([^}]+)\}/);
-    if (!match) return null;
+    if (!match || typeof match.index === 'undefined') return null; // Check if match or match.index is null/undefined
     const placeholder = match[0]; // e.g., "{time}"
     const placeholderKey = match[1]; // e.g., "time"
     const base = rule.substring(0, match.index); // e.g., "Check-in após "
+    const suffix = rule.substring(match.index + placeholder.length); // ADDED: e.g., "" or " hóspedes"
     let inputType = "text";
     if (placeholderKey === "time" || placeholderKey === "hours") inputType = "time"; // Ajustado para hours também
     if (placeholderKey === "guests") inputType = "number";
-    return { placeholder, placeholderKey, base, inputType };
+    return { placeholder, placeholderKey, base, suffix, inputType }; // MODIFIED: return suffix
+};
+
+// ADDED: MASTER_RULES_MAP to centralize master rule lists
+const MASTER_RULES_MAP = {
+    houseRules: HOUSE_RULES_ITEMS,
+    safetyProperty: SAFETY_PROPERTY_ITEMS,
+    cancellationPolicy: CANCELLATION_POLICY_ITEMS,
+};
+
+// ADDED: Helper function to reconstruct whatYouShouldKnowSections and dynamicInputValues for editing
+const reconstructWhatYouShouldKnowForEdit = (
+    savedSections: FormData['whatYouShouldKnowSections'] | undefined,
+    masterRulesMap: typeof MASTER_RULES_MAP,
+    getDetailsFn: typeof getPlaceholderDetails
+) => {
+    const sectionsForFormData: FormData['whatYouShouldKnowSections'] = {
+        houseRules: [],
+        safetyProperty: [],
+        cancellationPolicy: [],
+    };
+    const parsedDynamicValues: Record<string, string> = {};
+
+    if (!savedSections) {
+        return { sectionsForFormData, parsedDynamicValues };
+    }
+
+    for (const sectionKey of Object.keys(savedSections) as Array<keyof FormData['whatYouShouldKnowSections']>) {
+        const savedRulesInSection = savedSections[sectionKey] || [];
+        // Ensure masterRulesForSection is treated as readonly string array or regular string array
+        const masterRulesForSection = masterRulesMap[sectionKey] as readonly string[] || [];
+
+        const currentSectionForFormData: string[] = [];
+
+        for (const savedRule of savedRulesInSection) {
+            let matchedMasterRule = null;
+            let extractedValue = null;
+
+            for (const masterRule of masterRulesForSection) {
+                const details = getDetailsFn(masterRule);
+                if (details) { // masterRule has a placeholder
+                    // MODIFIED: Improved logic to handle base and suffix
+                    if (savedRule.startsWith(details.base) && savedRule.endsWith(details.suffix) && savedRule.length >= details.base.length + details.suffix.length) {
+                        const dynamicPart = savedRule.substring(details.base.length, savedRule.length - details.suffix.length);
+                        // Check if the extracted part is not empty or just whitespace if it's a required part of the placeholder rule
+                        // For example, if a rule absolutely needs a value for the placeholder
+                        if (dynamicPart.trim() !== '' || details.placeholderKey) { // Allow empty if placeholderKey implies optionality (not handled here, but good to note)
+                            matchedMasterRule = masterRule;
+                            extractedValue = dynamicPart;
+                            break;
+                        }
+                    }
+                } else if (savedRule === masterRule) { // Static rule match
+                    matchedMasterRule = masterRule;
+                    break;
+                }
+            }
+
+            if (matchedMasterRule) {
+                currentSectionForFormData.push(matchedMasterRule); // Add the template rule
+                if (extractedValue !== null && getDetailsFn(matchedMasterRule)) {
+                    parsedDynamicValues[matchedMasterRule] = extractedValue;
+                }
+            } else {
+                // If a saved rule doesn't match any master template, it might be a custom static rule
+                // or an old rule. For now, only add it if it's a known static rule.
+                // This assumes custom rules not in master lists are not editable via this dynamic system.
+                // If it's a static rule present in the master list, it should have been matched above.
+                // This console.warn can help identify rules that are stored but not mapping back.
+                console.warn(`Rule from DB "${savedRule}" in section "${sectionKey}" did not map to a master template with placeholder or a static master rule.`);
+                // Optionally, decide if unmapped saved rules should still be added to sectionsForFormData
+                // For example, if it's a static rule that should just be checked:
+                if (!getDetailsFn(savedRule) && masterRulesForSection.includes(savedRule)) {
+                    currentSectionForFormData.push(savedRule);
+                }
+            }
+        }
+        sectionsForFormData[sectionKey] = currentSectionForFormData;
+    }
+    return { sectionsForFormData, parsedDynamicValues };
 };
 
 interface ImportProgress {
@@ -380,6 +460,31 @@ type PropertyWithList = Property & { whatYouShouldKnowList?: string[] };
 
 // Adicione no topo do arquivo, após os imports principais
 import './quill-overrides.css';
+
+// Helper function to process dynamic values in whatYouShouldKnowSections
+const processDynamicKnowSections = (
+    sections: FormData['whatYouShouldKnowSections'],
+    dynamicValues: Record<string, string>,
+    getDetailsFn: typeof getPlaceholderDetails // Pass getPlaceholderDetails as an argument
+): FormData['whatYouShouldKnowSections'] => {
+    // Deep copy to avoid mutating the original formData state directly
+    const processedSections = JSON.parse(JSON.stringify(sections));
+
+    for (const sectionKey in processedSections) {
+        if (Object.prototype.hasOwnProperty.call(processedSections, sectionKey)) {
+            const key = sectionKey as keyof FormData['whatYouShouldKnowSections'];
+            processedSections[key] = processedSections[key].map((rule: string) => {
+                const details = getDetailsFn(rule);
+                // Check if the rule itself is a key in dynamicValues
+                if (details && typeof dynamicValues[rule] === 'string') {
+                    return rule.replace(details.placeholder, dynamicValues[rule]);
+                }
+                return rule;
+            });
+        }
+    }
+    return processedSections;
+};
 
 export default function PropertiesPage() {
     const { user, loading, signOut } = useAuthContext();
@@ -481,31 +586,21 @@ export default function PropertiesPage() {
             category: 'Cozinha',
             items: [
                 'Cafeteira',
-                'Produtos de limpeza',
-                'Cozinha',
+                'Cozinha', // Corrected: 'Cozinha (espaço)' can be simplified to 'Cozinha' if it refers to the space
                 'Microondas',
                 'Louças e talheres',
                 'Frigobar',
                 'Fogão por indução',
-                'Móveis externos',
             ],
         },
         {
             category: 'Banheiro',
             items: [
-                'Xampu',
+                'Shampoo', // Changed from Xampu and included here
                 'Condicionador',
                 'Sabonete para o corpo',
                 'Água quente',
-                'Secadora',
                 'Básico (Toalhas, lençóis, sabonete e papel higiênico)',
-                'Roupas de cama',
-                'Cobertores e travesseiros extras',
-                'Blackout nas cortinas',
-                'Detector de fumaça',
-                'Alarme de monóxido de carbono',
-                'Extintor de incêndio',
-                'Kit de primeiros socorros',
             ],
         },
         {
@@ -513,11 +608,9 @@ export default function PropertiesPage() {
             items: [
                 'Cabides',
                 'Local para guardar as roupas: guarda-roupa',
-                'Ar-condicionado',
-                'Ar-condicionado central',
-                'Aquecimento central',
-                'Máquina de lavar',
-                'Espaço de trabalho exclusivo',
+                'Roupas de cama',
+                'Cobertores e travesseiros extras',
+                'Blackout nas cortinas',
             ],
         },
         {
@@ -527,16 +620,12 @@ export default function PropertiesPage() {
                 'Wi-Fi',
                 'Pátio ou varanda (Privativa)',
                 'Cadeira espreguiçadeira',
-                'Estacionamento gratuito na rua',
-                'Elevador',
-                'Academia compartilhada (no prédio)',
-                'Estacionamento pago fora da propriedade',
+                'Espaço de trabalho exclusivo',
             ],
         },
         {
             category: 'Segurança',
             items: [
-                'Produtos de limpeza',
                 'Detector de fumaça',
                 'Alarme de monóxido de carbono',
                 'Extintor de incêndio',
@@ -546,10 +635,17 @@ export default function PropertiesPage() {
         {
             category: 'Outros',
             items: [
-                'Sabonete para o corpo',
-                'Cobertores e travesseiros extras',
+                'Produtos de limpeza',
+                'Secadora',
+                'Máquina de lavar',
                 'Móveis externos',
-                'Cadeira espreguiçadeira',
+                'Estacionamento gratuito na rua',
+                'Elevador',
+                'Academia compartilhada (no prédio)',
+                'Estacionamento pago fora da propriedade',
+                'Ar-condicionado', // Moved from Quarto
+                'Ar-condicionado central', // Moved from Quarto
+                'Aquecimento central', // Moved from Quarto
             ],
         },
     ];
@@ -703,6 +799,13 @@ export default function PropertiesPage() {
             return;
         }
 
+        // Process dynamic sections before saving
+        const processedWhatYouShouldKnowSections = processDynamicKnowSections(
+            formData.whatYouShouldKnowSections,
+            dynamicInputValues,
+            getPlaceholderDetails // Pass the actual getPlaceholderDetails function
+        );
+
         try {
             setIsUploadingImages(true); // Indicate upload start
             setImageUploadProgress(0); // Reset progress
@@ -774,8 +877,8 @@ export default function PropertiesPage() {
                     validFrom: formData.discountSettings.validFrom ? new Date(formData.discountSettings.validFrom) : undefined,
                     validTo: formData.discountSettings.validTo ? new Date(formData.discountSettings.validTo) : undefined,
                 },
-                whatYouShouldKnowSections: formData.whatYouShouldKnowSections,
-                whatYouShouldKnowDynamic: formData.whatYouShouldKnowDynamic,
+                whatYouShouldKnowSections: processedWhatYouShouldKnowSections, // Use processed data
+                whatYouShouldKnowDynamic: formData.whatYouShouldKnowDynamic, // Keep as is, or enhance later
                 pointsOfInterest: formData.pointsOfInterest,
                 // additionalFeatures: formData.additionalFeatures,
                 // created_at and updated_at will be handled by Supabase
@@ -806,6 +909,13 @@ export default function PropertiesPage() {
 
     const handleUpdateProperty = async () => {
         if (!currentProperty) return;
+
+        // Process dynamic sections before saving
+        const processedWhatYouShouldKnowSections = processDynamicKnowSections(
+            formData.whatYouShouldKnowSections,
+            dynamicInputValues,
+            getPlaceholderDetails // Pass the actual getPlaceholderDetails function
+        );
 
         try {
             setIsUploadingImages(true);
@@ -864,7 +974,7 @@ export default function PropertiesPage() {
                     validFrom: formData.discountSettings.validFrom ? new Date(formData.discountSettings.validFrom) : undefined,
                     validTo: formData.discountSettings.validTo ? new Date(formData.discountSettings.validTo) : undefined,
                 },
-                whatYouShouldKnowSections: formData.whatYouShouldKnowSections,
+                whatYouShouldKnowSections: processedWhatYouShouldKnowSections, // Use processed data
                 pointsOfInterest: formData.pointsOfInterest,
                 // additionalFeatures: formData.additionalFeatures,
                 // updated_at will be handled by Supabase
@@ -897,6 +1007,14 @@ export default function PropertiesPage() {
 
     const handleEditProperty = (property: Property) => {
         setCurrentProperty(property);
+
+        // MODIFIED: Use reconstructWhatYouShouldKnowForEdit
+        const { sectionsForFormData, parsedDynamicValues } = reconstructWhatYouShouldKnowForEdit(
+            property.whatYouShouldKnowSections,
+            MASTER_RULES_MAP,
+            getPlaceholderDetails
+        );
+        setDynamicInputValues(parsedDynamicValues);
 
         const normalizedExistingImages = (property.images || []).map(imgUrl => {
             if (typeof imgUrl === 'string') {
@@ -940,8 +1058,8 @@ export default function PropertiesPage() {
                 validFrom: typeof property.discountSettings.validFrom === 'string' ? property.discountSettings.validFrom : (property.discountSettings.validFrom ? new Date(property.discountSettings.validFrom).toISOString().split('T')[0] : initialFormData.discountSettings.validFrom),
                 validTo: typeof property.discountSettings.validTo === 'string' ? property.discountSettings.validTo : (property.discountSettings.validTo ? new Date(property.discountSettings.validTo).toISOString().split('T')[0] : initialFormData.discountSettings.validTo),
             } : initialFormData.discountSettings,
-            whatYouShouldKnowSections: property.whatYouShouldKnowSections || initialFormData.whatYouShouldKnowSections,
-            whatYouShouldKnowDynamic: property.whatYouShouldKnowDynamic || initialFormData.whatYouShouldKnowDynamic,
+            whatYouShouldKnowSections: sectionsForFormData, // MODIFIED: Use sectionsForFormData
+            whatYouShouldKnowDynamic: property.whatYouShouldKnowDynamic || initialFormData.whatYouShouldKnowDynamic, // This might need review if it's used for similar dynamic inputs
             pointsOfInterest: property.pointsOfInterest || [],
             // additionalFeatures: property.additionalFeatures || [],
         });

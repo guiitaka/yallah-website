@@ -619,13 +619,6 @@ const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
     if (!properties || properties.length === 0) return staticAllProperties;
 
     return properties.map(property => {
-        // Debug para verificar estrutura dos dados - REMOVIDO
-        // console.log("[MAPPER DEBUG] Dados originais da propriedade recebidos:", JSON.stringify(property, null, 2)); 
-        // console.log("[MAPPER DEBUG] property.what_you_should_know_rich_text (snake):", property.what_you_should_know_rich_text);
-        // console.log("[MAPPER DEBUG] property.whatYouShouldKnowRichText (camel):", property.whatYouShouldKnowRichText);
-        // console.log("[MAPPER DEBUG] property.what_you_should_know_sections (snake):", JSON.stringify(property.what_you_should_know_sections, null, 2));
-        // console.log("[MAPPER DEBUG] property.whatYouShouldKnowSections (camel):", JSON.stringify(property.whatYouShouldKnowSections, null, 2));
-
         // Verificar qual campo de preço está disponível
         const price = property.price || property.pricePerNight || 0;
 
@@ -639,7 +632,6 @@ const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
         let featuresString = "";
         if (guests > 0) featuresString += `${guests} ${guests === 1 ? 'hóspede' : 'hóspedes'}`;
 
-        // If it's a studio, use "Studio" instead of "0 quartos"
         if (property.type === 'Studio' || property.type === 'Estúdio' || !rooms) {
             featuresString += featuresString ? ' · Studio' : 'Studio';
         } else {
@@ -649,7 +641,6 @@ const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
         if (beds > 0) featuresString += featuresString ? ` · ${beds} ${beds === 1 ? 'cama' : 'camas'}` : `${beds} ${beds === 1 ? 'cama' : 'camas'}`;
         if (bathrooms > 0) featuresString += featuresString ? ` · ${bathrooms} ${bathrooms === 1 ? 'banheiro' : 'banheiros'}` : `${bathrooms} ${bathrooms === 1 ? 'banheiro' : 'banheiros'}`;
 
-        // If no details are available, use a default string
         if (!featuresString) {
             featuresString = property.features || "Detalhes não disponíveis";
         }
@@ -662,13 +653,11 @@ const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
             features: featuresString,
             pricePerNight: price,
             rating: property.rating || { value: 4.5, count: 0 },
-            // reviewCount: property.reviewCount || 0, // This line is effectively removed
             image: property.image || "/card1.jpg",
             coordinates: property.coordinates || [-46.6333, -23.5505],
             description: property.description || "",
             whatWeOffer: property.whatWeOffer || "",
-            whatYouShouldKnow: property.what_you_should_know || "",
-            whatYouShouldKnowRichText: property.what_you_should_know_rich_text || "",
+            whatYouShouldKnowRichText: property.whatYouShouldKnowRichText || property.what_you_should_know_rich_text || "",
             type: property.type || "",
             images: property.images || [],
             rooms: rooms,
@@ -676,7 +665,7 @@ const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
             beds: beds,
             guests: guests,
             amenities: property.amenities || [],
-            houseRules: property.house_rules || {
+            houseRules: property.houseRules || property.house_rules || {
                 checkIn: '15:00',
                 checkOut: '11:00',
                 maxGuests: property.guests || 2,
@@ -687,14 +676,14 @@ const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
                 hasSmokeAlarm: false,
                 hasCameras: false
             },
-            whatYouShouldKnowSections: property.what_you_should_know_sections || {
+            whatYouShouldKnowSections: property.whatYouShouldKnowSections || property.what_you_should_know_sections || {
                 houseRules: [],
                 safetyProperty: [],
                 cancellationPolicy: []
             },
-            pointsOfInterest: property.points_of_interest || [],
-            serviceFee: property.serviceFee, // Added serviceFee from property data
-            discountSettings: property.discountSettings, // Added full discountSettings object
+            pointsOfInterest: property.pointsOfInterest || [],
+            serviceFee: property.serviceFee,
+            discountSettings: property.discountSettings,
         };
     });
 };
@@ -721,31 +710,21 @@ const AMENITIES_BY_CATEGORY = [
         category: 'Cozinha',
         items: [
             'Cafeteira',
-            'Produtos de limpeza',
             'Cozinha',
             'Microondas',
             'Louças e talheres',
             'Frigobar',
             'Fogão por indução',
-            'Móveis externos',
         ],
     },
     {
         category: 'Banheiro',
         items: [
-            'Xampu',
+            'Shampoo',
             'Condicionador',
             'Sabonete para o corpo',
             'Água quente',
-            'Secadora',
             'Básico (Toalhas, lençóis, sabonete e papel higiênico)',
-            'Roupas de cama',
-            'Cobertores e travesseiros extras',
-            'Blackout nas cortinas',
-            'Detector de fumaça',
-            'Alarme de monóxido de carbono',
-            'Extintor de incêndio',
-            'Kit de primeiros socorros',
         ],
     },
     {
@@ -753,11 +732,9 @@ const AMENITIES_BY_CATEGORY = [
         items: [
             'Cabides',
             'Local para guardar as roupas: guarda-roupa',
-            'Ar-condicionado',
-            'Ar-condicionado central',
-            'Aquecimento central',
-            'Máquina de lavar',
-            'Espaço de trabalho exclusivo',
+            'Roupas de cama',
+            'Cobertores e travesseiros extras',
+            'Blackout nas cortinas',
         ],
     },
     {
@@ -767,16 +744,12 @@ const AMENITIES_BY_CATEGORY = [
             'Wi-Fi',
             'Pátio ou varanda (Privativa)',
             'Cadeira espreguiçadeira',
-            'Estacionamento gratuito na rua',
-            'Elevador',
-            'Academia compartilhada (no prédio)',
-            'Estacionamento pago fora da propriedade',
+            'Espaço de trabalho exclusivo',
         ],
     },
     {
         category: 'Segurança',
         items: [
-            'Produtos de limpeza',
             'Detector de fumaça',
             'Alarme de monóxido de carbono',
             'Extintor de incêndio',
@@ -786,10 +759,17 @@ const AMENITIES_BY_CATEGORY = [
     {
         category: 'Outros',
         items: [
-            'Sabonete para o corpo',
-            'Cobertores e travesseiros extras',
+            'Produtos de limpeza',
+            'Secadora',
+            'Máquina de lavar',
             'Móveis externos',
-            'Cadeira espreguiçadeira',
+            'Estacionamento gratuito na rua',
+            'Elevador',
+            'Academia compartilhada (no prédio)',
+            'Estacionamento pago fora da propriedade',
+            'Ar-condicionado',
+            'Ar-condicionado central',
+            'Aquecimento central',
         ],
     },
 ];
@@ -1721,7 +1701,7 @@ export default function AllProperties() {
                                                     {/* Seções dinâmicas (toggles) */}
                                                     <div className="space-y-6">
                                                         {/* Regras da Casa */}
-                                                        {((property as any).whatYouShouldKnowSections?.house_rules?.length > 0 ||  // Acessar com snake_case
+                                                        {((property as any).whatYouShouldKnowSections?.houseRules?.length > 0 ||
                                                             (property as any).houseRules?.checkIn ||
                                                             (property as any).houseRules?.checkOut) && (
                                                                 <div className="mb-6">
@@ -1740,8 +1720,8 @@ export default function AllProperties() {
                                                                                 <span>Check-out: Até {(property as any).houseRules.checkOut}</span>
                                                                             </li>
                                                                         )}
-                                                                        {/* Itens de whatYouShouldKnowSections.house_rules */}
-                                                                        {(property as any).whatYouShouldKnowSections?.house_rules?.map((rule: string, index: number) => ( // Acessar com snake_case
+                                                                        {/* Itens de whatYouShouldKnowSections.houseRules */}
+                                                                        {(property as any).whatYouShouldKnowSections?.houseRules?.map((rule: string, index: number) => (
                                                                             <li key={`house-rule-${index}`} className="flex items-center space-x-2 text-gray-700">
                                                                                 <CheckCircle className="h-5 w-5 text-[#8BADA4] flex-shrink-0" />
                                                                                 <span>{rule.replace("{time}", "").replace("{guests}", "").replace("{hours}", "")}</span>
@@ -1752,11 +1732,11 @@ export default function AllProperties() {
                                                             )}
 
                                                         {/* Segurança e Propriedade */}
-                                                        {(property as any).whatYouShouldKnowSections?.safety_property?.length > 0 && (
+                                                        {(property as any).whatYouShouldKnowSections?.safetyProperty?.length > 0 && (
                                                             <div className="mb-6">
                                                                 <h4 className="font-semibold text-base text-gray-800 mb-3 uppercase tracking-wide">Segurança e propriedade</h4>
                                                                 <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
-                                                                    {(property as any).whatYouShouldKnowSections.safety_property.map((item: string, index: number) => ( // Acessar com snake_case
+                                                                    {(property as any).whatYouShouldKnowSections.safetyProperty.map((item: string, index: number) => (
                                                                         <li key={`safety-${index}`} className="flex items-center space-x-2 text-gray-700">
                                                                             <Shield className="h-5 w-5 text-[#8BADA4] flex-shrink-0" />
                                                                             <span>{item}</span>
@@ -1767,12 +1747,12 @@ export default function AllProperties() {
                                                         )}
 
                                                         {/* Política de Cancelamento */}
-                                                        {((property as any).whatYouShouldKnowSections?.cancellation_policy?.length > 0 || (property as any).cancellationPolicy) && ( // Acessar com snake_case
+                                                        {((property as any).whatYouShouldKnowSections?.cancellationPolicy?.length > 0 || (property as any).cancellationPolicy) && (
                                                             <div className="mb-6">
                                                                 <h4 className="font-semibold text-base text-gray-800 mb-3 uppercase tracking-wide">Política de Cancelamento</h4>
-                                                                {(property as any).whatYouShouldKnowSections?.cancellation_policy?.length > 0 ? ( // Acessar com snake_case
+                                                                {(property as any).whatYouShouldKnowSections?.cancellationPolicy?.length > 0 ? (
                                                                     <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
-                                                                        {(property as any).whatYouShouldKnowSections.cancellation_policy.map((policy: string, index: number) => ( // Acessar com snake_case
+                                                                        {(property as any).whatYouShouldKnowSections.cancellationPolicy.map((policy: string, index: number) => (
                                                                             <li key={`cancel-policy-${index}`} className="flex items-center space-x-2 text-gray-700">
                                                                                 <Calendar className="h-5 w-5 text-[#8BADA4] flex-shrink-0" />
                                                                                 <span>{policy}</span>
