@@ -55,7 +55,7 @@ const StepOne: React.FC<{
                 <input
                     type="text"
                     placeholder="Nome"
-                    className="w-full px-6 py-4 bg-white/10 border border-white/20 text-white placeholder-white/60 rounded-full focus:outline-none focus:ring-0 focus:border-white/40 text-base transition-colors"
+                    className="w-full px-6 py-4 bg-white/10 border border-white/20 text-white placeholder-white/60 rounded-full focus:outline-none focus:ring-0 focus:border-white/40 text-base transition-colors name-input-force-white-text"
                     onChange={(e) => onInputChange('nome', e.target.value)}
                     value={formData.nome || ''}
                 />
@@ -65,8 +65,11 @@ const StepOne: React.FC<{
                     country={'br'}
                     value={formData.telefone || ''}
                     onChange={(phone) => onInputChange('telefone', phone)}
+                    inputProps={{
+                        style: { color: 'white' }
+                    }}
                     inputClass="!w-full !px-6 !py-4 !bg-transparent !text-white !border-0 !text-base"
-                    containerClass="!bg-white/10 !rounded-full !border !border-white/20 hover:!border-white/40 transition-colors"
+                    containerClass="!bg-white/10 !rounded-full !border !border-white/20 hover:!border-white/40 transition-colors phone-input-force-white-text"
                     buttonClass="!hidden"
                     disableDropdown={true}
                     countryCodeEditable={false}
@@ -76,6 +79,39 @@ const StepOne: React.FC<{
                 />
             </div>
         </div>
+        <style jsx>{`
+          /* For the actual input element's text */
+          :global(.phone-input-force-white-text input.form-control),
+          :global(.phone-input-force-white-text input) {
+            color: white !important;
+            -webkit-text-fill-color: white !important; /* For WebKit browsers */
+          }
+          /* For the placeholder text */
+          :global(.phone-input-force-white-text input.form-control)::placeholder,
+          :global(.phone-input-force-white-text input)::placeholder {
+            color: rgba(255, 255, 255, 0.6) !important;
+            -webkit-text-fill-color: rgba(255, 255, 255, 0.6) !important; /* For WebKit browsers */
+          }
+          
+          /* For the country dial code (e.g., +55) */
+          :global(.phone-input-force-white-text .dial-code) {
+            color: white !important;
+          }
+          /* In case the container for the selected flag itself has a color property affecting the dial code */
+          :global(.phone-input-force-white-text .selected-flag) {
+             color: white !important; /* This might affect more than just text, but prioritizes white text */
+          }
+
+          /* Force styles for the Name input */
+          :global(.name-input-force-white-text) {
+            color: white !important;
+            -webkit-text-fill-color: white !important;
+          }
+          :global(.name-input-force-white-text)::placeholder {
+            color: rgba(255, 255, 255, 0.6) !important;
+            -webkit-text-fill-color: rgba(255, 255, 255, 0.6) !important;
+          }
+        `}</style>
     </div>
 );
 
@@ -153,7 +189,7 @@ const StepThree: React.FC<{
                         type="text"
                         value={formatCurrency(formData.valorEstimado || 200000)}
                         onChange={handleValueChange}
-                        className="w-[300px] text-[32px] text-center bg-transparent text-white/80 focus:outline-none focus:ring-0 cursor-pointer"
+                        className="w-[300px] text-[32px] text-center bg-transparent text-white/80 focus:outline-none focus:ring-0 cursor-pointer price-input-force-white-text"
                     />
                     <div className="absolute -bottom-0.5 left-0 right-0 h-px bg-white/20 group-hover:bg-white/40 transition-colors" />
                 </div>
@@ -175,6 +211,12 @@ const StepThree: React.FC<{
                     <span>R$ 10 milhões</span>
                 </div>
             </div>
+            <style jsx>{`
+              :global(.price-input-force-white-text) {
+                color: white !important;
+                -webkit-text-fill-color: white !important; /* For WebKit browsers */
+              }
+            `}</style>
         </div>
     );
 };
@@ -220,11 +262,21 @@ const StepFour: React.FC<{
                         inputMode="numeric"
                         value={formData.valorDiaria ? formatCurrency(String(formData.valorDiaria * 100)) : ''}
                         onChange={handleValueChange}
-                        className="w-[300px] text-[48px] px-4 py-2 bg-white/10 border border-white/20 text-white placeholder-white/60 rounded-xl focus:outline-none focus:ring-0 focus:border-white/40 text-center font-light"
+                        className="w-[300px] text-[48px] px-4 py-2 bg-white/10 border border-white/20 text-white placeholder-white/60 rounded-xl focus:outline-none focus:ring-0 focus:border-white/40 text-center font-light daily-rate-input-force-white-text"
                         placeholder="0,00"
                     />
                 </div>
             </div>
+            <style jsx>{`
+              :global(.daily-rate-input-force-white-text) {
+                color: white !important;
+                -webkit-text-fill-color: white !important; /* For WebKit browsers */
+              }
+              :global(.daily-rate-input-force-white-text)::placeholder {
+                color: rgba(255, 255, 255, 0.6) !important;
+                -webkit-text-fill-color: rgba(255, 255, 255, 0.6) !important; /* For WebKit browsers */
+              }
+            `}</style>
         </div>
     );
 };

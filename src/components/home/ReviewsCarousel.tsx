@@ -207,20 +207,69 @@ const Ticker: React.FC<TickerProps> = ({ activeIndex }) => {
     );
 };
 
-export default function ReviewsCarousel() {
+interface ReviewsCarouselProps {
+    onCycleComplete?: () => void;
+    isActiveService: boolean;
+}
+
+export default function ReviewsCarousel({ onCycleComplete, isActiveService }: ReviewsCarouselProps) {
     const [activeIndex, setActiveIndex] = React.useState(0);
     const [direction, setDirection] = React.useState<'left' | 'right'>('right');
     const controls = useAnimation();
     const dragX = useMotionValue(0);
+    const autoplayTimerRef = React.useRef<NodeJS.Timeout | null>(null);
 
     React.useEffect(() => {
-        const timer = setInterval(() => {
-            setDirection('right');
-            setActiveIndex((prev) => (prev + 1) % data.length);
-        }, 5000);
+        const startCarouselAutoplay = () => {
+            if (autoplayTimerRef.current) {
+                clearInterval(autoplayTimerRef.current);
+            }
+            autoplayTimerRef.current = setInterval(() => {
+                setActiveIndex((prev) => {
+                    const next = (prev + 1) % data.length;
+                    if (prev === data.length - 1) { // Just completed a full cycle
+                        onCycleComplete?.();
+                    }
+                    return next;
+                });
+                setDirection('right');
+            }, 5000);
+        };
 
-        return () => clearInterval(timer);
-    }, []);
+        if (isActiveService) {
+            startCarouselAutoplay();
+        } else {
+            if (autoplayTimerRef.current) {
+                clearInterval(autoplayTimerRef.current);
+                autoplayTimerRef.current = null;
+            }
+        }
+
+        return () => {
+            if (autoplayTimerRef.current) {
+                clearInterval(autoplayTimerRef.current);
+            }
+        };
+    }, [isActiveService, onCycleComplete]);
+
+    const handlePaginationClick = (index: number) => {
+        setDirection(index > activeIndex ? 'right' : 'left');
+        setActiveIndex(index);
+        // Optional: Reset its own autoplay timer upon manual pagination interaction
+        if (isActiveService) {
+            if (autoplayTimerRef.current) clearInterval(autoplayTimerRef.current);
+            autoplayTimerRef.current = setInterval(() => {
+                setActiveIndex((prev) => {
+                    const next = (prev + 1) % data.length;
+                    if (prev === data.length - 1) {
+                        onCycleComplete?.();
+                    }
+                    return next;
+                });
+                setDirection('right');
+            }, 5000);
+        }
+    };
 
     const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
         const threshold = 50;
@@ -258,7 +307,7 @@ export default function ReviewsCarousel() {
                 </AnimatePresence>
             </motion.div>
 
-            <Pagination activeIndex={activeIndex} setActiveIndex={setActiveIndex} />
+            <Pagination activeIndex={activeIndex} setActiveIndex={handlePaginationClick} />
             <Ticker activeIndex={activeIndex} />
         </div>
     );

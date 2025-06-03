@@ -26,15 +26,21 @@ const ContactSection = () => {
         <section className="w-full bg-white pt-0 pb-16 md:pb-24">
             <div className="container mx-auto px-4 md:px-6">
                 <div className="flex flex-col md:flex-row items-start justify-between gap-8 md:gap-12">
-                    {/* Lottie animation à esquerda */}
-                    <div className="w-full md:w-1/2 flex justify-center">
-                        <div className="relative w-full max-w-[500px] aspect-[4/3]">
+                    {/* Visual element container */}
+                    <div className="w-full md:w-1/2 flex justify-center items-center">
+                        {/* Lottie for medium screens and up */}
+                        <div className="hidden md:flex justify-center items-center w-full max-w-[500px] aspect-[4/3]">
                             <DotLottieReact
                                 src="/e-mail-yallah.lottie"
                                 autoplay
                                 loop
                                 className="w-full h-full"
                             />
+                        </div>
+
+                        {/* Static Fallback for small screens */}
+                        <div className="flex md:hidden justify-center items-center w-full h-64"> {/* Explicit height for mobile */}
+                            <EnvelopeSimple size={96} className="text-[#8BADA4]" />
                         </div>
                     </div>
 

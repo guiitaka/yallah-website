@@ -127,10 +127,22 @@ export const deleteProperty = async (id: string): Promise<void> => {
 export const fetchProperties = async (): Promise<Property[]> => {
     const { data, error } = await supabase
         .from('properties')
-        .select('*, what_you_should_know_sections, what_you_should_know_rich_text')
+        .select('*, what_you_should_know_sections, what_you_should_know_rich_text, points_of_interest')
         .order('created_at', { ascending: false });
     if (error) throw error;
-    return data.map(item => toCamelCase(item)) as Property[];
+
+    // DEBUG: Log raw data from Supabase
+    // console.log('DEBUG fetchProperties - Raw data from Supabase:', data);
+
+    const result = data.map(item => {
+        const converted = toCamelCase(item);
+        // DEBUG: Log each conversion
+        // console.log('DEBUG fetchProperties - Original item:', item);
+        // console.log('DEBUG fetchProperties - After toCamelCase:', converted);
+        return converted;
+    }) as Property[];
+
+    return result;
 };
 
 // Busca propriedades com filtros
@@ -140,7 +152,7 @@ export const fetchFilteredProperties = async (
     sortDirection: 'asc' | 'desc' = 'desc',
     limitCount: number = 20
 ): Promise<Property[]> => {
-    let query = supabase.from('properties').select('*, what_you_should_know_sections, what_you_should_know_rich_text');
+    let query = supabase.from('properties').select('*, what_you_should_know_sections, what_you_should_know_rich_text, points_of_interest');
     Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
             query = query.eq(key, value);
@@ -159,7 +171,7 @@ export const fetchFilteredProperties = async (
 export const fetchPropertyById = async (id: string): Promise<Property | null> => {
     const { data, error } = await supabase
         .from('properties')
-        .select('*, what_you_should_know_sections, what_you_should_know_rich_text')
+        .select('*, what_you_should_know_sections, what_you_should_know_rich_text, points_of_interest')
         .eq('id', id)
         .single();
     if (error) {

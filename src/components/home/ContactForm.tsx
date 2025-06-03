@@ -23,8 +23,8 @@ export default function ContactForm() {
           {/* Left side - Form */}
           <div className="col-span-1 bg-white rounded-[20px] md:rounded-[32px] p-6 md:p-12 shadow-xl order-last md:order-first">
             <h2 className="text-3xl md:text-4xl font-light text-[#405A53] mb-2">Entre em Contato</h2>
-            <p className="text-gray-500 mb-6 md:mb-8">24/7 Estamos aqui para ajudar você</p>
-            
+            <p className="text-gray-500 mb-6 md:mb-8">Estamos aqui para ajudar você</p>
+
             <form className="space-y-4 md:space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="relative">

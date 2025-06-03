@@ -217,6 +217,7 @@ interface FormData {
         quietHours?: string;
     };
     pointsOfInterest: string[]; // Adicionado para pontos de interesse
+    // additionalFeatures?: string[]; // Optional additional features
 }
 
 // Define os valores iniciais para o formulário
@@ -269,6 +270,7 @@ const initialFormData: FormData = {
     },
     whatYouShouldKnowDynamic: {},
     pointsOfInterest: [], // Adicionado para pontos de interesse
+    // additionalFeatures: [], // Optional additional features
 };
 
 // Itens para "O que você deve saber" (aba do imóvel)
@@ -457,6 +459,7 @@ export default function PropertiesPage() {
         },
         whatYouShouldKnowDynamic: {},
         pointsOfInterest: [], // Adicionado para pontos de interesse
+        // additionalFeatures: [], // Optional additional features
     });
 
     const [dynamicInputValues, setDynamicInputValues] = useState<Record<string, string>>({});
@@ -687,6 +690,7 @@ export default function PropertiesPage() {
                 quietHours: '22:00 - 08:00'
             },
             pointsOfInterest: [], // Adicionado para pontos de interesse
+            // additionalFeatures: [], // Optional additional features
         });
         setLocalImages([]);
         setImageUploadProgress(0);
@@ -773,6 +777,7 @@ export default function PropertiesPage() {
                 whatYouShouldKnowSections: formData.whatYouShouldKnowSections,
                 whatYouShouldKnowDynamic: formData.whatYouShouldKnowDynamic,
                 pointsOfInterest: formData.pointsOfInterest,
+                // additionalFeatures: formData.additionalFeatures,
                 // created_at and updated_at will be handled by Supabase
             };
 
@@ -861,6 +866,7 @@ export default function PropertiesPage() {
                 },
                 whatYouShouldKnowSections: formData.whatYouShouldKnowSections,
                 pointsOfInterest: formData.pointsOfInterest,
+                // additionalFeatures: formData.additionalFeatures,
                 // updated_at will be handled by Supabase
             };
 
@@ -937,7 +943,11 @@ export default function PropertiesPage() {
             whatYouShouldKnowSections: property.whatYouShouldKnowSections || initialFormData.whatYouShouldKnowSections,
             whatYouShouldKnowDynamic: property.whatYouShouldKnowDynamic || initialFormData.whatYouShouldKnowDynamic,
             pointsOfInterest: property.pointsOfInterest || [],
+            // additionalFeatures: property.additionalFeatures || [],
         });
+        // console.log('DEBUG: formData.pointsOfInterest set to:', property.pointsOfInterest || []);
+
+        // Resetar o estado do editor para o conteúdo atualizado
         setShowNewPropertyModal(true);
     };
 
@@ -1373,6 +1383,7 @@ export default function PropertiesPage() {
             },
             whatYouShouldKnowDynamic: {},
             pointsOfInterest: importedData.pointsOfInterest || [], // Adicionado e mapeado de pointsOfInterest
+            // additionalFeatures: importedData.additionalFeatures || [], // Optional additional features
         });
 
         // Close modal and clear data
@@ -1384,10 +1395,9 @@ export default function PropertiesPage() {
     // Carregar propriedades do Firebase ao iniciar
     useEffect(() => {
         if (!loading && user) {
-            // loadPropertiesFromFirebase(); // Comentado ou removido
             fetchProperties().then(data => {
                 // Aplicar o mesmo processamento que existia em loadPropertiesFromFirebase
-                const processedProperties = data.map(propertyDataFromDb => {
+                const processedProperties: Property[] = data.map(propertyDataFromDb => {
                     const propertyForFrontend: any = { ...propertyDataFromDb };
 
                     // @ts-ignore // Manter ts-ignore existente se necessário para a lógica antiga
@@ -1414,17 +1424,12 @@ export default function PropertiesPage() {
                         propertyForFrontend.whatYouShouldKnowSections.cancellationPolicy = [];
                     }
 
-                    // NOVO MAPEAMENTO: points_of_interest para pointsOfInterest
-                    if (propertyForFrontend.points_of_interest) {
-                        propertyForFrontend.pointsOfInterest = propertyForFrontend.points_of_interest;
-                        delete propertyForFrontend.points_of_interest; // Remove o campo antigo com snake_case
-                    } else {
-                        propertyForFrontend.pointsOfInterest = []; // Garante que o campo exista como array vazio
-                    }
-
                     // Mapear what_you_should_know_rich_text (existente, mas pode precisar de ajuste)
+                    // @ts-ignore
                     if (propertyForFrontend.what_you_should_know_rich_text) {
+                        // @ts-ignore
                         propertyForFrontend.whatYouShouldKnowRichText = propertyForFrontend.what_you_should_know_rich_text;
+                        // @ts-ignore
                         delete propertyForFrontend.what_you_should_know_rich_text; // Consistência ao remover snake_case
                     } else {
                         propertyForFrontend.whatYouShouldKnowRichText = '';
