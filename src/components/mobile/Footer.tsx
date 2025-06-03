@@ -10,7 +10,7 @@ export default function Footer() {
             <div className="container mx-auto">
                 {/* Logo */}
                 <div className="flex justify-center mb-8">
-                    <div className="w-[180px] h-[60px] relative">
+                    <Link href="/mobile" className="w-[180px] h-[60px] relative">
                         <Image
                             src="/logo-yallah-nobg.png"
                             alt="Yallah"
@@ -18,7 +18,7 @@ export default function Footer() {
                             className="object-contain brightness-0 invert"
                             priority
                         />
-                    </div>
+                    </Link>
                 </div>
 
                 {/* Links */}

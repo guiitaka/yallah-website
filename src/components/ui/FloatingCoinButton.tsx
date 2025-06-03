@@ -6,31 +6,58 @@ export default function FloatingCoinButton() {
   const router = useRouter()
   const pathname = usePathname()
   const [isFlipped, setIsFlipped] = useState(false)
-  const [userType, setUserType] = useState<'owner' | 'tenant'>('tenant')
   const [isHovered, setIsHovered] = useState(false)
-  const intervalRef = useRef<NodeJS.Timeout>()
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
+  // Effect 1: Set flip state based on pathname, or reset on unhover.
   useEffect(() => {
+    if (!isHovered) { // Only apply if not hovered (i.e., on initial load, path change, or unhover)
+      if (pathname.includes('/owner')) {
+        setIsFlipped(true)
+      } else {
+        setIsFlipped(false)
+      }
+    }
+  }, [pathname, isHovered]) // Re-run when path changes or hover state changes
+
+  // Effect 2: Manage the auto-flipping interval.
+  useEffect(() => {
+    // Always clear the existing interval when this effect re-runs.
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+
     if (!isHovered) {
+      // If not hovered, start the interval.
+      // The interval will flip from whatever state isFlipped is in (set by Effect 1 on unhover/load, or by previous flip).
       intervalRef.current = setInterval(() => {
-        setIsFlipped(prev => !prev)
+        setIsFlipped(prevIsFlipped => !prevIsFlipped)
       }, 3000)
     }
 
+    // Cleanup function: clear interval when component unmounts or dependencies change.
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
+        intervalRef.current = null
       }
     }
-  }, [isHovered])
+  }, [isHovered]) // This effect specifically reacts to hover state changes to manage the interval.
 
   const handleClick = () => {
-    const newUserType = userType === 'owner' ? 'tenant' : 'owner'
-    setUserType(newUserType)
-    // Verifica se está na versão mobile ou desktop
     const isMobile = pathname.includes('/mobile')
     const basePath = isMobile ? '/mobile' : ''
-    router.push(`${basePath}/${newUserType}`)
+    let targetUserType: 'owner' | 'tenant'
+
+    if (isFlipped) { // Owner face is showing
+      targetUserType = 'owner'
+    } else { // Tenant face is showing
+      targetUserType = 'tenant'
+    }
+
+    router.push(`${basePath}/${targetUserType}`)
+    // After navigation, Effect 1 will run due to pathname change, setting the correct initial isFlipped state for the new page.
   }
 
   return (
@@ -51,7 +78,7 @@ export default function FloatingCoinButton() {
           }}
         >
           {/* Front face - Tenant */}
-          <div 
+          <div
             className="absolute inset-0 w-full h-full backface-hidden flex items-center justify-center rounded-full 
                      bg-gradient-to-br from-[#8BADA4] to-[#7A9C93] text-white shadow-[0_8px_32px_rgba(139,173,164,0.4)]
                      group-hover:shadow-[0_12px_40px_rgba(139,173,164,0.5)] transition-shadow duration-300 overflow-hidden"
@@ -65,7 +92,7 @@ export default function FloatingCoinButton() {
           </div>
 
           {/* Back face - Owner */}
-          <div 
+          <div
             className="absolute inset-0 w-full h-full backface-hidden flex items-center justify-center rounded-full 
                      bg-gradient-to-br from-[#3E5A54] to-[#2D4640] text-white shadow-[0_8px_32px_rgba(62,90,84,0.4)]
                      group-hover:shadow-[0_12px_40px_rgba(62,90,84,0.5)] transition-shadow duration-300 rotate-y-180 overflow-hidden"

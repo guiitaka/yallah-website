@@ -6,6 +6,7 @@ import MobileNavigation from './MobileNavigation';
 import FloatingCoinButton from '../ui/FloatingCoinButton';
 import Footer from '../mobile/Footer';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const MobileLayout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
@@ -19,18 +20,20 @@ const MobileLayout = ({ children }: { children: React.ReactNode }) => {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 bg-white px-4 py-4 flex items-center justify-center border-b z-[20]">
         <div className="w-[200px] h-[60px] relative">
-          <Image
-            src={'/logo-yallah-nobg.png'}
-            alt="Yallah"
-            fill
-            style={{ objectFit: 'contain' }}
-            priority
-          />
+          <Link href="/mobile">
+            <Image
+              src={'/logo-yallah-nobg.png'}
+              alt="Yallah"
+              fill
+              style={{ objectFit: 'contain' }}
+              priority
+            />
+          </Link>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 pt-[84px] pb-20">
+      <main className="flex-1 pt-[96px] pb-20">
         {children}
       </main>
 

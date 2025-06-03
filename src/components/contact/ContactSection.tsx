@@ -23,9 +23,9 @@ const ContactSection = () => {
     };
 
     return (
-        <section className="w-full bg-white py-16 md:py-24">
+        <section className="w-full bg-white pt-0 pb-16 md:pb-24">
             <div className="container mx-auto px-4 md:px-6">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
+                <div className="flex flex-col md:flex-row items-start justify-between gap-8 md:gap-12">
                     {/* Lottie animation à esquerda */}
                     <div className="w-full md:w-1/2 flex justify-center">
                         <div className="relative w-full max-w-[500px] aspect-[4/3]">

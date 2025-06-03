@@ -9,17 +9,10 @@ export default function SplashScreen() {
   const [hoveredOption, setHoveredOption] = useState<'owner' | 'tenant' | null>(null);
 
   useEffect(() => {
-    const userChoice = localStorage.getItem('userType');
-    if (userChoice) {
-      const isMobile = window.innerWidth <= 768;
-      const basePath = isMobile ? '/mobile' : '';
-      window.location.href = `${basePath}/${userChoice}`;
-      setShow(false);
-    }
+
   }, []);
 
   const handleChoice = (choice: 'owner' | 'tenant') => {
-    localStorage.setItem('userType', choice);
     const isMobile = window.innerWidth <= 768;
     const basePath = isMobile ? '/mobile' : '';
     window.location.href = `${basePath}/${choice}`;

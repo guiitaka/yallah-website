@@ -32,7 +32,6 @@ import {
   Warehouse,
   Desktop
 } from '@phosphor-icons/react'
-import ReactFlagsSelect from 'react-flags-select'
 import AnimatedSearch from '../ui/AnimatedSearch'
 
 type HeaderProps = {
@@ -251,51 +250,8 @@ export default function Header({ userType }: HeaderProps) {
         </nav>
       )
     }
-
-    return (
-      <>
-        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full whitespace-nowrap">
-          <BuildingsIcon size={20} />
-          Apartamentos
-        </button>
-        <button className="flex items-center gap-2 px-4 py-2 bg-[#8BADA4] text-white rounded-full whitespace-nowrap">
-          <House weight="fill" size={20} />
-          Chalés
-        </button>
-        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full whitespace-nowrap">
-          <SquaresFour size={20} />
-          Kitnets
-        </button>
-        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full whitespace-nowrap">
-          <Warehouse size={20} />
-          Lofts
-        </button>
-        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full whitespace-nowrap">
-          <MapPin size={20} />
-          Perto do centro
-        </button>
-        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full whitespace-nowrap">
-          <SwimmingPool size={20} />
-          Piscinas incríveis
-        </button>
-        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full whitespace-nowrap">
-          <Bed size={20} />
-          Pousadas
-        </button>
-        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full whitespace-nowrap">
-          <Train size={20} />
-          Próximos à estações
-        </button>
-        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full whitespace-nowrap">
-          <Desktop size={20} />
-          Studios
-        </button>
-        <button className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-full whitespace-nowrap">
-          <Binoculars size={20} />
-          Vistas incríveis
-        </button>
-      </>
-    )
+    // If userType is not 'owner', return null to remove the other navigation type
+    return null;
   }
 
   return (
@@ -369,7 +325,7 @@ export default function Header({ userType }: HeaderProps) {
               {/* Profile Selection Button */}
               <div className="flex items-center justify-end">
                 <div className="flex items-center gap-4">
-                  <ReactFlagsSelect
+                  {/* <ReactFlagsSelect
                     selected={selected}
                     onSelect={onSelectFlag}
                     countries={["BR", "US", "ES"]}
@@ -377,7 +333,7 @@ export default function Header({ userType }: HeaderProps) {
                     placeholder="Selecione o idioma"
                     className="!min-w-0 !w-[100px]"
                     selectButtonClassName="!px-3 !py-2.5 !border-0 !bg-gray-100 !rounded-full !text-sm"
-                  />
+                  /> */}
                 </div>
               </div>
             </div>
@@ -387,11 +343,11 @@ export default function Header({ userType }: HeaderProps) {
         {/* Mobile Header */}
         <div className="md:hidden w-full border-b bg-white">
           <div className="container mx-auto px-4 py-2">
-            <div className="flex items-center justify-between">
-              {/* Empty div to help with centering */}
-              <div className="w-[80px]" />
-
-              <Link href="/" className="w-[160px] h-[60px] relative">
+            <div className="relative w-full h-[60px]">
+              <Link
+                href="/"
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[160px] h-[60px]"
+              >
                 <Image
                   src="/logo-yallah-nobg.png"
                   alt="Yallah"
@@ -400,16 +356,6 @@ export default function Header({ userType }: HeaderProps) {
                   priority
                 />
               </Link>
-
-              <ReactFlagsSelect
-                selected={selected}
-                onSelect={onSelectFlag}
-                countries={["BR", "US", "ES"]}
-                customLabels={{ BR: "PT", US: "EN", ES: "ES" }}
-                placeholder="Idioma"
-                className="!min-w-0 !w-[80px]"
-                selectButtonClassName="!px-2 !py-1.5 !border-0 !bg-gray-100 !rounded-full !text-sm"
-              />
             </div>
           </div>
         </div>
@@ -417,23 +363,9 @@ export default function Header({ userType }: HeaderProps) {
         {/* Category Navigation */}
         <div className="w-full bg-gray-50 md:block hidden">
           <div className="container mx-auto px-6">
-            {userType === 'owner' ? (
+            {userType === 'owner' && ( // Only render this section if userType is 'owner'
               <div className="py-4">
                 {renderNavigation()}
-              </div>
-            ) : (
-              <div className="flex items-center gap-6 py-4">
-                {/* Search Bar - Only show for tenants */}
-                <div className="w-[300px] flex-shrink-0">
-                  <AnimatedSearch />
-                </div>
-
-                {/* Navigation Container */}
-                <div className="flex-1 overflow-x-auto">
-                  <div className="flex items-center gap-6 py-2">
-                    {renderNavigation()}
-                  </div>
-                </div>
               </div>
             )}
           </div>

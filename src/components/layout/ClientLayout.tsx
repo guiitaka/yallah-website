@@ -17,7 +17,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
   const showHeader = !isHome && !isTenantPage
 
   // Determine top padding based on whether the header is shown
-  const mainPaddingTopClass = showHeader ? 'pt-28 md:pt-36' : (isTenantPage ? 'pt-0' : 'pt-16 md:pt-24'); // Adjusted pt-36 for desktop header, pt-28 for mobile (needs verification)
+  const mainPaddingTopClass = showHeader ? 'pt-20 md:pt-28' : (isTenantPage ? 'pt-0' : 'pt-16 md:pt-24');
 
   return (
     <>

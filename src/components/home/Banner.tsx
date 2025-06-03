@@ -8,12 +8,14 @@ import DatePicker from 'react-datepicker'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import "react-datepicker/dist/react-datepicker.css"
+import { usePathname } from 'next/navigation'
 
 type BannerProps = {
   userType: 'owner' | 'tenant'
 }
 
 export default function Banner({ userType }: BannerProps) {
+  const pathname = usePathname()
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null])
   const [startDate, endDate] = dateRange
   const [activeCategory, setActiveCategory] = useState<string | null>(null)
@@ -54,13 +56,15 @@ export default function Banner({ userType }: BannerProps) {
           <div className="relative h-full w-full max-w-[1400px] mx-auto px-4 md:px-8 flex flex-col">
             {/* Header section with logo centered and larger */}
             <div className="mt-8 flex justify-center items-center">
-              <Image
-                src="/logo-yallah-nobg.png"
-                alt="Yallah"
-                width={220}
-                height={55}
-                className="brightness-0 invert"
-              />
+              <Link href={pathname.includes('/mobile') ? '/mobile' : '/'}>
+                <Image
+                  src="/logo-yallah-nobg.png"
+                  alt="Yallah"
+                  width={220}
+                  height={55}
+                  className="brightness-0 invert"
+                />
+              </Link>
             </div>
 
             {/* Mobile Menu para Categorias */}

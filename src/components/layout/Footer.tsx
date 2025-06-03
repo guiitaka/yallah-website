@@ -10,7 +10,7 @@ export default function Footer() {
       <div className="max-w-[1200px] mx-auto">
         {/* Logo Title */}
         <div className="flex justify-center mb-20">
-          <div className="h-[120px] w-[400px] relative">
+          <Link href="/" className="h-[120px] w-[400px] relative">
             <Image
               src="/logo-yallah-nobg.png"
               alt="Yallah"
@@ -18,13 +18,13 @@ export default function Footer() {
               className="object-contain brightness-0 invert"
               priority
             />
-          </div>
+          </Link>
         </div>
 
         {/* Content Grid */}
-        <div className="grid grid-cols-5 gap-8 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-20">
           {/* About Column */}
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2 lg:col-span-2">
             <h3 className="text-lg mb-4 font-bold">YALLAH.</h3>
             <p className="text-lg opacity-80">
               Na YALLAH, acreditamos que cada imóvel é uma oportunidade para
@@ -33,7 +33,7 @@ export default function Footer() {
           </div>
 
           {/* Navigation Column */}
-          <div>
+          <div className="col-span-1 md:col-span-2 lg:col-span-1">
             <h3 className="text-lg mb-4 font-bold">Navegação</h3>
             <ul className="space-y-3">
               <li><Link href="#" className="text-white/80 hover:text-white transition-colors">Serviços</Link></li>
@@ -43,7 +43,7 @@ export default function Footer() {
           </div>
 
           {/* Tools Column */}
-          <div>
+          <div className="col-span-1 md:col-span-2 lg:col-span-1">
             <h3 className="text-lg mb-4 font-bold">Ferramentas</h3>
             <ul className="space-y-3">
               <li><Link href="#" className="text-white/80 hover:text-white transition-colors">Gestão de Imóveis</Link></li>
@@ -54,7 +54,7 @@ export default function Footer() {
           </div>
 
           {/* Contact Column */}
-          <div>
+          <div className="col-span-1 md:col-span-2 lg:col-span-1">
             <h3 className="text-lg mb-4 font-bold">Contato</h3>
             <ul className="space-y-3">
               <li><a href="mailto:contato@yallah.com" className="text-white/80 hover:text-white transition-colors">contato@yallah.com</a></li>
@@ -64,9 +64,9 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="flex justify-between items-center pt-8 border-t border-white/10">
+        <div className="flex flex-col sm:flex-row justify-between items-center text-center sm:text-left pt-8 border-t border-white/10 gap-4 sm:gap-0">
           <p className="text-white/60">Copyright © YALLAH {new Date().getFullYear()}</p>
-          <div className="flex gap-8">
+          <div className="flex flex-col xs:flex-row gap-4 sm:gap-8 items-center">
             <Link href="#" className="text-white/80 hover:text-white transition-colors">
               Política de Privacidade
             </Link>
