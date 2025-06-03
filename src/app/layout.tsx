@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Montserrat, Playfair_Display } from 'next/font/google'
 import '@/app/globals.css'
 import BodyWrapper from '@/components/layout/BodyWrapper'
+import ChatbotScript from '@components/layout/ChatbotScript'
 
 const montserrat = Montserrat({ subsets: ['latin'] })
 const playfair = Playfair_Display({
@@ -41,6 +42,7 @@ export default function RootLayout({
       </head>
       <BodyWrapper>
         {children}
+        <ChatbotScript />
 
         {/* Script para remover endereços completos de cards não expandidos */}
         <script dangerouslySetInnerHTML={{
