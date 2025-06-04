@@ -8,12 +8,13 @@
     "start": "next start",
     "lint": "next lint",
     "clean": "rm -rf dist node_modules",
-    "postinstall": "test -d /tmp && chmod -R 777 /tmp || echo 'No /tmp directory'",
+    "postinstall": "test -d /tmp && chmod -R 777 /tmp || echo 'No /tmp directory' && npx update-browserslist-db@latest --yes",
     "firebase:deploy-rules": "node deploy-firebase-rules.js",
     "firebase:populate": "node scripts/populate-firebase.js",
     "firebase:install-admin": "npm install firebase-admin --save-dev",
     "cloudinary:test": "node scripts/test-cloudinary.js",
-    "cloudinary:upload-test": "node scripts/test-cloudinary-upload.js"
+    "cloudinary:upload-test": "node scripts/test-cloudinary-upload.js",
+    "update-browserslist": "npx update-browserslist-db@latest"
   },
   "dependencies": {
     "@lottiefiles/dotlottie-react": "^0.13.2",

@@ -54,7 +54,7 @@ export default function InstitutionalHero() {
             <div className="max-w-[1400px] mx-auto px-4 md:px-6 relative z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
                     {/* Left column - Content */}
-                    <div className={`bg-white/90 p-6 md:p-8 rounded-2xl shadow-xl transition-all duration-[2000ms] ${isVisible ? 'opacity-100 transform-none' : 'opacity-0 -translate-x-10'}`}>
+                    <div className={`bg-white/90 p-6 md:p-8 rounded-2xl shadow-xl transition-all duration-[2000] ${isVisible ? 'opacity-100 transform-none' : 'opacity-0 -translate-x-10'}`}>
                         <div className="inline-block mb-3 md:mb-4 px-3 py-1.5 md:px-4 md:py-2 bg-[#8BADA4]/10 rounded-full">
                             <span className="text-sm md:text-base text-[#8BADA4] font-medium">Experiência Yallah</span>
                         </div>
@@ -145,7 +145,7 @@ export default function InstitutionalHero() {
                     </div>
 
                     {/* Right column - Cards */}
-                    <div className={`relative transition-all duration-[2500ms] delay-[1000ms] ${isVisible ? 'opacity-100 transform-none' : 'opacity-0 translate-x-10'}`}>
+                    <div className={`relative transition-all duration-[2500] delay-1000 ${isVisible ? 'opacity-100 transform-none' : 'opacity-0 translate-x-10'}`}>
                         {/* Floating Card - Classification */}
                         <div className="hidden md:block absolute left-0 top-0 md:top-10 lg:top-20 bg-white rounded-2xl p-4 shadow-xl w-60 md:w-64 lg:w-72 transform -rotate-3 transition-all duration-500 hover:rotate-0 hover:shadow-2xl z-20">
                             <div className="flex items-center gap-2 lg:gap-3 mb-2">
