@@ -663,20 +663,23 @@ export default function FeaturedProperties() {
 
                     {/* Carrossel */}
                     <div className="relative">
-                        <div className="hidden md:flex gap-2 absolute -right-4 top-1/2 -translate-y-1/2 z-10">
-                            <button
-                                onClick={prevSlide}
-                                className="p-2 rounded-full border border-gray-200 bg-white shadow-md hover:bg-gray-50 transition-colors"
-                            >
-                                <CaretLeft className="w-5 h-5 text-gray-600" />
-                            </button>
-                            <button
-                                onClick={nextSlide}
-                                className="p-2 rounded-full border border-gray-200 bg-white shadow-md hover:bg-gray-50 transition-colors"
-                            >
-                                <CaretRight className="w-5 h-5 text-gray-600" />
-                            </button>
-                        </div>
+                        {/* Previous Button */}
+                        <button
+                            onClick={prevSlide}
+                            className="hidden md:block absolute -left-16 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full border border-gray-200 bg-white shadow-md hover:bg-gray-50 transition-colors"
+                            aria-label="Slide anterior"
+                        >
+                            <CaretLeft className="w-8 h-8 text-gray-600" />
+                        </button>
+
+                        {/* Next Button */}
+                        <button
+                            onClick={nextSlide}
+                            className="hidden md:block absolute -right-16 top-1/2 -translate-y-1/2 z-10 p-3 rounded-full border border-gray-200 bg-white shadow-md hover:bg-gray-50 transition-colors"
+                            aria-label="Próximo slide"
+                        >
+                            <CaretRight className="w-8 h-8 text-gray-600" />
+                        </button>
 
                         {/* Cards do Carrossel - Apenas 1 visível no mobile, 2 no desktop */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
