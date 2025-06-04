@@ -83,26 +83,26 @@ export default function Recommended() {
   return (
     <div id="recommended-section" className="w-full py-12 md:py-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden relative">
       {/* Animated decorative elements in the background */}
-      <div className={`absolute -top-20 -left-20 w-40 h-40 rounded-full bg-[#8BADA4]/10 blur-3xl transition-all duration-[1200] ease-out ${isVisible ? 'opacity-100' : 'opacity-0 -translate-x-10'}`}></div>
-      <div className={`absolute top-1/2 -right-40 w-80 h-80 rounded-full bg-[#8BADA4]/5 blur-3xl transition-all duration-[1400] delay-500 ease-out ${isVisible ? 'opacity-100' : 'opacity-0 translate-x-10'}`}></div>
-      <div className={`absolute bottom-20 left-1/4 w-60 h-60 rounded-full bg-[#FFD700]/5 blur-3xl transition-all duration-[1600] delay-600 ease-out ${isVisible ? 'opacity-100' : 'opacity-0 translate-y-10'}`}></div>
+      <div className={`absolute -top-20 -left-20 w-40 h-40 rounded-full bg-[#8BADA4]/10 blur-3xl transition-all duration-1200 ease-out ${isVisible ? 'opacity-100' : 'opacity-0 -translate-x-10'}`}></div>
+      <div className={`absolute top-1/2 -right-40 w-80 h-80 rounded-full bg-[#8BADA4]/5 blur-3xl transition-all duration-1400 delay-500 ease-out ${isVisible ? 'opacity-100' : 'opacity-0 translate-x-10'}`}></div>
+      <div className={`absolute bottom-20 left-1/4 w-60 h-60 rounded-full bg-[#FFD700]/5 blur-3xl transition-all duration-1600 delay-600 ease-out ${isVisible ? 'opacity-100' : 'opacity-0 translate-y-10'}`}></div>
 
       <div className="max-w-[1600px] mx-auto px-4">
         {/* Hero Title Section */}
         <div className="mb-12 md:mb-16 text-center">
-          <div className={`inline-block mb-4 px-6 py-2 bg-[#8BADA4]/10 rounded-full transition-all duration-[1200] ${isVisible ? 'opacity-100 transform-none' : 'opacity-0 -translate-y-8'}`}>
+          <div className={`inline-block mb-4 px-6 py-2 bg-[#8BADA4]/10 rounded-full transition-all duration-1200 ${isVisible ? 'opacity-100 transform-none' : 'opacity-0 -translate-y-8'}`}>
             <span className="text-[#8BADA4] font-medium">Escolhas Sob Medida</span>
           </div>
 
-          <h2 className={`text-4xl md:text-5xl lg:text-6xl font-bold text-black leading-[1.1] max-w-6xl mx-auto transition-all duration-[1500] ${isVisible ? 'opacity-100 transform-none' : 'opacity-0 -translate-y-12'}`}>
+          <h2 className={`text-4xl md:text-5xl lg:text-6xl font-bold text-black leading-[1.1] max-w-6xl mx-auto transition-all duration-1500 ${isVisible ? 'opacity-100 transform-none' : 'opacity-0 -translate-y-12'}`}>
             <div className="md:mb-2">Selecionamos os melhores imóveis</div>
             <div className="relative inline-block">
               <span className="relative z-10">que <span className="text-[#8BADA4]">combinam com o seu perfil!</span></span>
-              <span className={`absolute bottom-[-5px] md:bottom-[-8px] left-0 h-3 bg-[#8BADA4]/20 w-0 transition-all duration-[2000] ease-out ${isVisible ? 'w-full' : 'w-0'}`}></span>
+              <span className={`absolute bottom-[-5px] md:bottom-[-8px] left-0 h-3 bg-[#8BADA4]/20 w-0 transition-all duration-2000 ease-out ${isVisible ? 'w-full' : 'w-0'}`}></span>
             </div>
           </h2>
 
-          <p className={`text-lg md:text-xl text-gray-600 max-w-2xl mx-auto transition-all duration-[1300] delay-400 ${isVisible ? 'opacity-100 transform-none' : 'opacity-0 -translate-y-8'}`}>
+          <p className={`text-lg md:text-xl text-gray-600 max-w-2xl mx-auto transition-all duration-1300 delay-400 ${isVisible ? 'opacity-100 transform-none' : 'opacity-0 -translate-y-8'}`}>
             Descubra acomodações que refletem seu estilo de vida e necessidades específicas
           </p>
         </div>
@@ -112,7 +112,7 @@ export default function Recommended() {
           {categories.map((category, index) => (
             <div
               key={index}
-              className={`group relative rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-[900] transform hover:-translate-y-2 ${isVisible ? 'opacity-100 transform-none' : 'opacity-0 translate-y-12'}`}
+              className={`group relative rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-900 transform hover:-translate-y-2 ${isVisible ? 'opacity-100 transform-none' : 'opacity-0 translate-y-12'}`}
               style={{
                 transitionDelay: `${index * 150}ms`,
                 transitionProperty: 'transform, opacity, box-shadow',

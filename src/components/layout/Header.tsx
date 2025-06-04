@@ -111,7 +111,7 @@ export default function Header({ userType }: HeaderProps) {
           {/* Container com flip */}
           <div
             className={`
-              absolute inset-0 transition-all duration-[2000] transform
+              absolute inset-0 transition-all duration-2000 transform
               ${isFlipping ? 'animate-flip-y' : ''}
             `}
             style={{
@@ -122,7 +122,7 @@ export default function Header({ userType }: HeaderProps) {
             {/* Primeiro ícone */}
             <div
               className={`
-                absolute inset-0 transition-all duration-[1000] backface-hidden
+                absolute inset-0 transition-all duration-1000 backface-hidden
                 ${isFlipping ? 'opacity-0' : 'opacity-100'}
               `}
             >
@@ -132,7 +132,7 @@ export default function Header({ userType }: HeaderProps) {
             {/* Segundo ícone */}
             <div
               className={`
-                absolute inset-0 transition-all duration-[1000] backface-hidden rotate-y-180
+                absolute inset-0 transition-all duration-1000 backface-hidden rotate-y-180
                 ${isFlipping ? 'opacity-100' : 'opacity-0'}
               `}
             >
