@@ -1,4 +1,4 @@
-export { Button, buttonVariants } from "./button";
+export { Button, buttonVariants } from "./appButton";
 export { Popover, PopoverContent, PopoverTrigger } from "./popover";
 export { Label } from "./label";
 export { Checkbox } from "./checkbox";
