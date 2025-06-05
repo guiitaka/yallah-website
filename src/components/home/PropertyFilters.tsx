@@ -8,16 +8,16 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@components/ui/select";
-import { Slider } from "@components/ui/slider";
-import { Checkbox } from "@components/ui/checkbox";
-import { Label } from "@components/ui/label";
+} from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@components/ui/popover"; // Import Popover components
-import { Button } from "@components/ui/button"; // For the PopoverTrigger
+} from "@/components/ui/popover"; // Import Popover components
+import { Button } from "@/components/ui/button"; // For the PopoverTrigger
 import { formatCurrency } from '@/utils/format';
 
 // TODO: Import ShadCN components as needed (e.g., Select, Slider, Checkbox, etc.)
