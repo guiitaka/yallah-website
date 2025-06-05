@@ -649,4 +649,4 @@ export default function PropertyDetailModal({ isOpen, onClose, property }: Prope
 // CheckCircle - YES
 // All used icons seem to be in the import list.
 
-</rewritten_file > 
+ 
