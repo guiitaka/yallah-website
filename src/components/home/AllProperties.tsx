@@ -831,7 +831,7 @@ export default function AllProperties() {
     const [activeTab, setActiveTab] = useState('descricao');
     // Estado para controlar o slide atual
     const [currentSlide, setCurrentSlide] = useState(0);
-    const itemsPerPage = 10; // 5 cards por linha, 2 linhas
+    const itemsPerPage = 8; // 4 cards por linha, 2 linhas
     // Adicionar novos estados para o controle da galeria
     const [showFullGallery, setShowFullGallery] = useState(false);
     const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
@@ -1192,7 +1192,7 @@ export default function AllProperties() {
                     {/* Botão Anterior */}
                     <button
                         onClick={prevSlide}
-                        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-6 z-10 w-12 h-12 rounded-full bg-[#8BADA4] shadow-lg flex items-center justify-center hover:bg-[#7A9D94] transition-colors"
+                        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 z-10 w-12 h-12 rounded-full bg-[#8BADA4] shadow-lg flex items-center justify-center hover:bg-[#7A9D94] transition-colors"
                         aria-label="Slide anterior"
                     >
                         <CaretLeft className="w-6 h-6 text-white" />
@@ -1208,9 +1208,9 @@ export default function AllProperties() {
                                 {Array.from({ length: totalSlides }).map((_, slideIndex) => (
                                     <div key={`slide-${slideIndex}`} className="w-full flex-none">
                                         <div className="grid grid-rows-2 gap-6">
-                                            <div className="grid grid-cols-5 gap-4">
+                                            <div className="grid grid-cols-4 gap-4">
                                                 {filteredProperties
-                                                    .slice(slideIndex * itemsPerPage, slideIndex * itemsPerPage + 5)
+                                                    .slice(slideIndex * itemsPerPage, slideIndex * itemsPerPage + 4)
                                                     .map((property) => (
                                                         <div
                                                             key={property.id}
@@ -1219,7 +1219,7 @@ export default function AllProperties() {
                                                             onClick={() => expandCard(property.id)}
                                                             style={{ borderRadius: '1.5rem' }}
                                                         >
-                                                            <div className="relative aspect-[3/4] rounded-3xl overflow-hidden">
+                                                            <div className="relative aspect-[4/3] rounded-3xl overflow-hidden">
                                                                 <Image
                                                                     src={getValidImage((property as any).images, property.image)}
                                                                     alt={property.title}
@@ -1275,24 +1275,22 @@ export default function AllProperties() {
                                                                     </div>
 
                                                                     {/* Botão de ação */}
-                                                                    <button
-                                                                        className="w-full flex items-center justify-center gap-2 bg-white text-black px-4 py-2 rounded-full hover:bg-[#8BADA4] hover:text-white transition-colors duration-300 text-sm"
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            expandCard(property.id);
-                                                                        }}
-                                                                    >
-                                                                        Ver detalhes
-                                                                        <ArrowRight className="w-4 h-4" weight="bold" />
-                                                                    </button>
+                                                                    <div className="mt-6">
+                                                                        <button
+                                                                            onClick={(e) => { e.stopPropagation(); expandCard(property.id); }}
+                                                                            className="w-full justify-center text-sm font-medium bg-white text-gray-800 py-2 px-4 rounded-full hover:bg-gray-100 transition-all duration-300 shadow-sm flex items-center"
+                                                                        >
+                                                                            Ver detalhes <ArrowRight size={16} className="ml-1" />
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     ))}
                                             </div>
-                                            <div className="grid grid-cols-5 gap-4">
+                                            <div className="grid grid-cols-4 gap-4">
                                                 {filteredProperties
-                                                    .slice(slideIndex * itemsPerPage + 5, slideIndex * itemsPerPage + 10)
+                                                    .slice(slideIndex * itemsPerPage + 4, slideIndex * itemsPerPage + 8)
                                                     .map((property) => (
                                                         <div
                                                             key={property.id}
@@ -1301,7 +1299,7 @@ export default function AllProperties() {
                                                             onClick={() => expandCard(property.id)}
                                                             style={{ borderRadius: '1.5rem' }}
                                                         >
-                                                            <div className="relative aspect-[3/4] rounded-3xl overflow-hidden">
+                                                            <div className="relative aspect-[4/3] rounded-3xl overflow-hidden">
                                                                 <Image
                                                                     src={getValidImage((property as any).images, property.image)}
                                                                     alt={property.title}
@@ -1357,13 +1355,14 @@ export default function AllProperties() {
                                                                     </div>
 
                                                                     {/* Botão de ação */}
-                                                                    <button
-                                                                        className="w-full py-3 px-4 bg-[#8BADA4] hover:bg-[#7A9D94] text-white font-medium rounded-full transition-colors flex items-center justify-center gap-2 text-sm whitespace-nowrap" onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            expandCard(property.id);
-                                                                        }}>
-                                                                        Consultar disponibilidade <ArrowRight weight="bold" className="min-w-4 min-h-4" />
-                                                                    </button>
+                                                                    <div className="mt-6">
+                                                                        <button
+                                                                            onClick={(e) => { e.stopPropagation(); expandCard(property.id); }}
+                                                                            className="w-full justify-center text-sm font-medium bg-white text-gray-800 py-2 px-4 rounded-full hover:bg-gray-100 transition-all duration-300 shadow-sm flex items-center"
+                                                                        >
+                                                                            Ver detalhes <ArrowRight size={16} className="ml-1" />
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1379,7 +1378,7 @@ export default function AllProperties() {
                     {/* Botão Próximo */}
                     <button
                         onClick={nextSlide}
-                        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 z-10 w-12 h-12 rounded-full bg-[#8BADA4] shadow-lg flex items-center justify-center hover:bg-[#7A9D94] transition-colors"
+                        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 z-10 w-12 h-12 rounded-full bg-[#8BADA4] shadow-lg flex items-center justify-center hover:bg-[#7A9D94] transition-colors"
                         aria-label="Próximo slide"
                     >
                         <CaretRight className="w-6 h-6 text-white" />

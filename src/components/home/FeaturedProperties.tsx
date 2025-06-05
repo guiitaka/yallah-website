@@ -506,16 +506,17 @@ export default function FeaturedProperties() {
                                     <p className="text-xs text-gray-500 mb-3 flex-grow line-clamp-2" title={property.features}>
                                         {property.features}
                                     </p>
-                                    <div className="flex justify-between items-center mt-auto">
-                                        <p className="text-lg font-bold text-[#8BADA4]">
+                                    <div className="mt-4 flex justify-between items-center">
+                                        <p className="text-lg font-semibold text-gray-800">
                                             {formatCurrency(property.pricePerNight)} <span className="text-sm font-normal text-gray-500">/noite</span>
                                         </p>
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); expandCard(property.id); }}
-                                            className="text-sm font-medium text-[#8BADA4] hover:text-[#7A9A8D] flex items-center transition-colors"
-                                        >
-                                            Ver detalhes <ArrowRight size={16} className="ml-1" />
-                                        </button>
+                                        <div className="mt-6">
+                                            <Link href={`/imoveis/${property.id}`} target="_blank" rel="noopener noreferrer" className="inline-block w-full">
+                                                <button className="w-full text-center bg-white text-gray-800 py-3 px-6 rounded-full font-semibold hover:bg-gray-100 transition-all duration-300 shadow-md">
+                                                    Ver detalhes
+                                                </button>
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
