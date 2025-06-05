@@ -2,20 +2,12 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { PropertyCard } from './AllProperties'; // Assuming PropertyCard is exported or defined elsewhere accessible
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Slider,
-  Checkbox,
-  Label,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  Button
-} from "@/components/ui"; // Import all UI components from barrel file
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Slider } from "../ui/slider";
+import { Checkbox } from "../ui/checkbox";
+import { Label } from "../ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Button } from "../ui/button";
 import { formatCurrency } from '@/utils/format';
 
 // TODO: Import ShadCN components as needed (e.g., Select, Slider, Checkbox, etc.)
