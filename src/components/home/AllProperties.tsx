@@ -17,6 +17,7 @@ import { format, parseISO } from 'date-fns';
 import { useProperties } from '@/hooks/useProperties';
 import { Property } from '@/data/sampleProperties';
 import { formatCurrency } from '@/utils/format';
+import PropertyFilters from './PropertyFilters'; // Import the new component
 
 // Importação dinâmica do componente de mapa para evitar erros de SSR
 const MapComponent = dynamic(() => import('../MapComponent'), { ssr: false })
@@ -69,7 +70,7 @@ const FavoriteButton = ({ propertyId }: { propertyId: number | string }) => {
 };
 
 // Define a type for the property data structure
-interface PropertyCard {
+export interface PropertyCard {
     id: number | string;
     title: string;
     location: string;
@@ -95,6 +96,7 @@ interface PropertyCard {
         validTo: string;
     };
     type?: string;
+    category?: string; // Categoria do Imóvel (Business Ready, etc.)
     images?: string[];
     rooms?: number;      // Adicionar campo para quartos
     bathrooms?: number;  // Adicionar campo para banheiros
@@ -659,6 +661,7 @@ const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
             whatWeOffer: property.whatWeOffer || "",
             whatYouShouldKnowRichText: property.whatYouShouldKnowRichText || property.what_you_should_know_rich_text || "",
             type: property.type || "",
+            category: property.category || undefined, // Add category here
             images: property.images || [],
             rooms: rooms,
             bathrooms: bathrooms,
@@ -817,9 +820,9 @@ const getIconComponent = (amenityText: string) => {
 
 export default function AllProperties() {
     // Estados para controlar a expansão de cards
-    const [expandedCard, setExpandedCard] = useState<number | string | null>(null)
-    const [isTransitioning, setIsTransitioning] = useState(false)
-    const [isClosing, setIsClosing] = useState(false)
+    const [expandedCard, setExpandedCard] = useState<number | string | null>(null);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
     // Estados para inputs de data
     const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
     const [startDate, endDate] = dateRange;
@@ -829,14 +832,21 @@ export default function AllProperties() {
     // Estado para controlar o slide atual
     const [currentSlide, setCurrentSlide] = useState(0);
     const itemsPerPage = 10; // 5 cards por linha, 2 linhas
-    const totalSlides = Math.ceil(staticAllProperties.length / itemsPerPage);
     // Adicionar novos estados para o controle da galeria
     const [showFullGallery, setShowFullGallery] = useState(false);
     const [currentGalleryIndex, setCurrentGalleryIndex] = useState(0);
     const [selectedProperty, setSelectedProperty] = useState<PropertyCard | null>(null);
-    // Estado para controlar a direção da transição de slide
     const [slideDirection, setSlideDirection] = useState<'next' | 'prev' | null>(null);
     const [isAnimating, setIsAnimating] = useState(false);
+
+    // Estado para filtros
+    const [activeFilters, setActiveFilters] = useState<any>({}); // Define a more specific type later
+    const [filteredProperties, setFilteredProperties] = useState<PropertyCard[]>([]);
+
+    // O restante do seu componente (hooks como useProperties, funções, useEffects, e o return statement) deve seguir este bloco.
+
+    // Usar o hook useProperties (Este já deve existir abaixo, esta linha é para contexto)
+    // const { properties, loading, error } = useProperties(...);
 
     // Função para atualizar o intervalo de datas
     const updateDateRange = (update: [Date | null, Date | null]) => {
@@ -854,19 +864,92 @@ export default function AllProperties() {
         properties && properties.length > 0 ? mapFirebaseToPropertyCard(properties) : [],
         [properties]);
 
+    // Initialize filteredProperties and update when allProperties or activeFilters changes
+    useEffect(() => {
+        let propertiesToFilter = [...allProperties];
+
+        // Apply type filter
+        if (activeFilters.type) {
+            propertiesToFilter = propertiesToFilter.filter(p => p.type === activeFilters.type);
+        }
+
+        // Apply category filter
+        if (activeFilters.category) {
+            propertiesToFilter = propertiesToFilter.filter(p => p.category === activeFilters.category);
+        }
+
+        // Apply rooms filter
+        if (typeof activeFilters.rooms === 'number') {
+            propertiesToFilter = propertiesToFilter.filter(p => p.rooms === activeFilters.rooms);
+        }
+
+        // Apply bathrooms filter
+        if (typeof activeFilters.bathrooms === 'number') {
+            propertiesToFilter = propertiesToFilter.filter(p => p.bathrooms === activeFilters.bathrooms);
+        }
+
+        // Apply beds filter
+        if (typeof activeFilters.beds === 'number') {
+            propertiesToFilter = propertiesToFilter.filter(p => p.beds === activeFilters.beds);
+        }
+
+        // Apply guests filter
+        if (typeof activeFilters.guests === 'number' && activeFilters.guests > 0) {
+            propertiesToFilter = propertiesToFilter.filter(p => p.guests !== undefined && p.guests >= activeFilters.guests);
+        }
+
+        // Apply rating filter
+        if (typeof activeFilters.minRating === 'number') {
+            propertiesToFilter = propertiesToFilter.filter(p => p.rating && p.rating.value >= activeFilters.minRating);
+        }
+
+        // Apply promotion filter
+        if (activeFilters.hasPromotion === true) {
+            propertiesToFilter = propertiesToFilter.filter(p => p.discountSettings && p.discountSettings.amount > 0);
+            // We could also add date validation here: 
+            // const today = new Date();
+            // const validFrom = p.discountSettings.validFrom ? parseISO(p.discountSettings.validFrom) : null;
+            // const validTo = p.discountSettings.validTo ? parseISO(p.discountSettings.validTo) : null;
+            // return validFrom && validTo && today >= validFrom && today <= validTo;
+        }
+
+        // Apply price filter
+        if (typeof activeFilters.minPrice === 'number') {
+            propertiesToFilter = propertiesToFilter.filter(p => p.pricePerNight >= activeFilters.minPrice);
+        }
+        if (typeof activeFilters.maxPrice === 'number') {
+            propertiesToFilter = propertiesToFilter.filter(p => p.pricePerNight <= activeFilters.maxPrice);
+        }
+
+        // TODO: Add more filter logic here for other filter types (rooms, etc.)
+
+        setFilteredProperties(propertiesToFilter);
+    }, [allProperties, activeFilters]);
+
+    // The applyFilters function is called by PropertyFilters when a filter changes.
+    // Its main role now is to update activeFilters, which then triggers the useEffect above.
+    const applyFilters = (newFilters: any) => {
+        console.log("Updating activeFilters: ", newFilters);
+        setActiveFilters(newFilters);
+        // The actual filtering logic is now in the useEffect that watches activeFilters
+    };
+
+    // Calculate total slides based on filtered properties
+    const totalSlides = Math.ceil(filteredProperties.length / itemsPerPage);
+
     // Função para navegar para o próximo slide
     const nextSlide = () => {
-        setCurrentSlide((prev) => (prev + 1) % totalSlides);
+        setCurrentSlide((prev) => (prev + 1) % totalSlides); // Should use the new totalSlides
     };
 
     // Função para navegar para o slide anterior
     const prevSlide = () => {
-        setCurrentSlide((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
+        setCurrentSlide((prev) => (prev === 0 ? totalSlides - 1 : prev - 1)); // Should use the new totalSlides
     };
 
     // Função para ir para um slide específico
     const goToSlide = (slideIndex: number) => {
-        setCurrentSlide(slideIndex);
+        setCurrentSlide(slideIndex); // totalSlides usage in this context is for bounds, usually checked by caller or UI
     };
 
     // Função para expandir um card
@@ -912,30 +995,6 @@ export default function AllProperties() {
             }, 300);
         }
     };
-
-    // Função para lidar com o pressionamento da tecla ESC para fechar o card expandido
-    useEffect(() => {
-        const handleEscKey = (event: KeyboardEvent) => {
-            if (event.key === 'Escape' && expandedCard !== null) {
-                setIsClosing(true);
-                setIsTransitioning(true);
-                setTimeout(() => {
-                    setExpandedCard(null);
-                    setIsTransitioning(false);
-                    setIsClosing(false);
-                    // Resetar campos de formulário
-                    updateDateRange([null, null]);
-                    setConsultationMessage('');
-                }, 300);
-            }
-        };
-
-        // Adicionar listener para a tecla ESC
-        document.addEventListener('keydown', handleEscKey);
-
-        // Remover listener quando o componente for desmontado
-        return () => document.removeEventListener('keydown', handleEscKey);
-    }, [expandedCard]); // Re-adiciona o listener quando o expandedCard mudar
 
     // Adicionar controle de teclado para navegação da galeria
     useEffect(() => {
@@ -1088,12 +1147,12 @@ export default function AllProperties() {
         );
     }
 
-    // Handle empty state
-    if (allProperties.length === 0) {
+    // Handle empty state (now checks filteredProperties)
+    if (filteredProperties.length === 0 && !loading) { // Check loading to prevent flash of 'No properties'
         return (
             <div className="container mx-auto py-16">
                 <div className="text-center">
-                    <p className="text-gray-500">Nenhum imóvel encontrado.</p>
+                    <p className="text-gray-500">Nenhum imóvel encontrado com os filtros selecionados.</p>
                 </div>
             </div>
         );
@@ -1111,9 +1170,23 @@ export default function AllProperties() {
                             Nossa coleção completa de propriedades premium em localizações estratégicas com excelente custo-benefício
                         </p>
                     </div>
-                    <Link href="/imoveis" className="hidden md:flex items-center text-[#8BADA4] hover:text-[#6d8a84] font-medium">
+                    {/* <Link href="/imoveis" className="hidden md:flex items-center text-[#8BADA4] hover:text-[#6d8a84] font-medium">
                         Ver catálogo completo <ArrowRight className="ml-2 w-5 h-5" />
-                    </Link>
+                    </Link> */}
+                    {/* The filter placeholder was here, it will be removed from here */}
+                </div>
+
+                {/* Centered Filter Section - New Position */}
+                <div id="property-filters-container" className="my-8 flex justify-center px-4"> {/* Added px-4 for padding on small screens */}
+                    {/* Apply floating pill styles here */}
+                    <div className="w-full max-w-fit bg-[#8BADA4] rounded-full shadow-xl py-2 px-6 md:py-3 md:px-8"> {/* Changed padding */}
+                        <PropertyFilters
+                            properties={allProperties}
+                            activeFilters={activeFilters}
+                            setActiveFilters={setActiveFilters}
+                            onFilterChange={applyFilters}
+                        />
+                    </div>
                 </div>
 
                 {/* Container dos slides com controles de navegação */}
@@ -1138,7 +1211,7 @@ export default function AllProperties() {
                                     <div key={`slide-${slideIndex}`} className="w-full flex-none">
                                         <div className="grid grid-rows-2 gap-6">
                                             <div className="grid grid-cols-5 gap-4">
-                                                {allProperties
+                                                {filteredProperties
                                                     .slice(slideIndex * itemsPerPage, slideIndex * itemsPerPage + 5)
                                                     .map((property) => (
                                                         <div
@@ -1220,7 +1293,7 @@ export default function AllProperties() {
                                                     ))}
                                             </div>
                                             <div className="grid grid-cols-5 gap-4">
-                                                {allProperties
+                                                {filteredProperties
                                                     .slice(slideIndex * itemsPerPage + 5, slideIndex * itemsPerPage + 10)
                                                     .map((property) => (
                                                         <div
@@ -1316,7 +1389,7 @@ export default function AllProperties() {
 
                     {/* Dots de navegação */}
                     <div className="flex justify-center items-center gap-2 mt-6">
-                        {Array.from({ length: totalSlides }).map((_, index) => (
+                        {Array.from({ length: totalSlides }).map((_, index) => ( // Should use the new totalSlides
                             <button
                                 key={index}
                                 onClick={() => goToSlide(index)}
@@ -1331,7 +1404,7 @@ export default function AllProperties() {
                 </div>
 
                 {/* Botão móvel */}
-                <div className="flex md:hidden justify-center mt-4">
+                {/* <div className="flex md:hidden justify-center mt-4">
                     <Link
                         href="/imoveis"
                         className="flex items-center justify-center gap-2 bg-[#8BADA4] text-white px-6 py-3 rounded-full hover:bg-[#6d8a84] transition-colors duration-300 w-full sm:w-auto"
@@ -1339,7 +1412,7 @@ export default function AllProperties() {
                         Ver catálogo completo
                         <ArrowRight className="w-5 h-5" weight="bold" />
                     </Link>
-                </div>
+                </div> */}
 
                 {/* Card Expandido Overlay */}
                 {expandedCard !== null && (
@@ -1349,7 +1422,7 @@ export default function AllProperties() {
                                   ${isClosing ? 'animate-fade-out' : ''}`}
                         onClick={closeExpandedCard}
                     >
-                        {allProperties.filter(p => p.id === expandedCard).map(property => (
+                        {filteredProperties.filter(p => p.id === expandedCard).map(property => ( // Also check filteredProperties for expanded card
                             <div
                                 key={`expanded-${property.id}`}
                                 className={`bg-white rounded-3xl max-w-6xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl rounded-scroll-container

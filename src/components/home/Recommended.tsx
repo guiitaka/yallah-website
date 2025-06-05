@@ -94,15 +94,18 @@ export default function Recommended() {
             <span className="text-[#8BADA4] font-medium">Escolhas Sob Medida</span>
           </div>
 
-          <h2 className={`text-4xl md:text-5xl lg:text-6xl font-bold text-black leading-[1.1] max-w-6xl mx-auto transition-all duration-1500 ${isVisible ? 'opacity-100 transform-none' : 'opacity-0 -translate-y-12'}`}>
-            <div className="md:mb-2">Selecionamos os melhores imóveis</div>
+          <h2 className={`text-6xl md:text-7xl lg:text-8xl font-bold text-black leading-tight max-w-6xl mx-auto transition-all duration-1500 ${isVisible ? 'opacity-100 transform-none' : 'opacity-0 -translate-y-12'}`}>
+            Selecionamos os
+            <br />
+            melhores imóveis
+            <br />
             <div className="relative inline-block">
               <span className="relative z-10">que <span className="text-[#8BADA4]">combinam com o seu perfil!</span></span>
-              <span className={`absolute bottom-[-5px] md:bottom-[-8px] left-0 h-3 bg-[#8BADA4]/20 w-0 transition-all duration-2000 ease-out ${isVisible ? 'w-full' : 'w-0'}`}></span>
+              <span className={`absolute bottom-[-8px] md:bottom-[-12px] left-0 h-4 md:h-5 bg-[#8BADA4]/30 w-0 transition-all duration-1500 ease-out ${isVisible ? 'w-full' : 'w-0'}`}></span>
             </div>
           </h2>
 
-          <p className={`text-lg md:text-xl text-gray-600 max-w-2xl mx-auto transition-all duration-1300 delay-400 ${isVisible ? 'opacity-100 transform-none' : 'opacity-0 -translate-y-8'}`}>
+          <p className={`mt-12 text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto transition-all duration-1300 delay-400 ${isVisible ? 'opacity-100 transform-none' : 'opacity-0 -translate-y-8'}`}>
             Descubra acomodações que refletem seu estilo de vida e necessidades específicas
           </p>
         </div>

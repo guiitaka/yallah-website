@@ -7,6 +7,7 @@ import Footer from '@/components/layout/Footer'
 import FeaturedProperties from '@/components/home/FeaturedProperties'
 import AllProperties from '@/components/home/AllProperties'
 import InstitutionalHero from '@/components/home/InstitutionalHero'
+import { Hero } from '@components/ui/animated-hero'
 
 // Componente de depuração (remova após resolver o problema)
 const FirebaseDebug = () => {
@@ -25,6 +26,7 @@ export default function TenantPage() {
     <main className="pt-0">
       <FirebaseDebug />
       <Banner userType="tenant" />
+      <Hero />
       <Recommended />
       <FeaturedProperties />
       <AllProperties />

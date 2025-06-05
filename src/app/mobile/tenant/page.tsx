@@ -7,12 +7,16 @@ import MobileBanner from '@/components/home/MobileBanner';
 import FeaturedProperties from '@/components/home/FeaturedProperties';
 import Footer from '@/components/mobile/Footer';
 import { formatCurrency } from '@/utils/format';
+import { Hero } from '@components/ui/animated-hero';
 
 export default function MobileTenantPage() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       {/* Banner Section */}
       <MobileBanner />
+
+      {/* Hero Section */}
+      <Hero />
 
       {/* Popular Destinations */}
       <PopularDestinations />
