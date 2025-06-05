@@ -11,27 +11,27 @@ import { Hero } from '@components/ui/animated-hero'
 
 // Componente de depuração (remova após resolver o problema)
 const FirebaseDebug = () => {
-  useEffect(() => {
-    console.log('Firebase env vars:', {
-      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
-    });
-  }, []);
+    useEffect(() => {
+        console.log('Firebase env vars:', {
+            apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+            projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+        });
+    }, []);
 
-  return null;
+    return null;
 };
 
 export default function TenantPage() {
-  return (
-    <main className="pt-0">
-      <FirebaseDebug />
-      <Banner userType="tenant" />
-      <Hero />
-      <Recommended />
-      <FeaturedProperties />
-      <AllProperties />
-      <InstitutionalHero />
-      <Footer />
-    </main>
-  )
+    return (
+        <main className="pt-0">
+            <FirebaseDebug />
+            <Banner userType="tenant" />
+            <Hero />
+            <Recommended />
+            <FeaturedProperties />
+            <AllProperties />
+            <InstitutionalHero />
+            <Footer />
+        </main>
+    )
 } 

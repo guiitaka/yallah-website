@@ -6,11 +6,12 @@ import { PropertyCard } from './AllProperties'; // Assuming PropertyCard is expo
 // Import directly from the ui directory that's in the same directory
 import { Button } from "./ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "../../components/ui/command";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // For other components, continue to use the original imports
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { Slider } from "../../components/ui/slider";
-import { Checkbox } from "../../components/ui/checkbox";
 import { Label } from "../../components/ui/label";
 import { formatCurrency } from '@/utils/format';
 
@@ -30,6 +31,65 @@ interface PropertyFiltersProps {
   setActiveFilters: React.Dispatch<React.SetStateAction<any>>; // Replace 'any'
   onFilterChange: (filters: any) => void; // Callback to apply filters // Replace 'any'
 }
+
+const FilterPopover: React.FC<{
+  label: string;
+  value: string | undefined;
+  options: { value: string; label: string }[];
+  onValueChange: (value: string) => void;
+  placeholder: string;
+  className?: string;
+}> = ({ label, value, options, onValueChange, placeholder, className }) => {
+  const [open, setOpen] = useState(false);
+  const selectedOption = options.find(option => option.value === value);
+
+  return (
+    <div className={cn("flex flex-col items-center space-y-2", className)}>
+      <Label className="text-sm font-semibold text-[#8BADA4]">{label}</Label>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            role="combobox"
+            aria-expanded={open}
+            className="w-auto justify-center text-gray-800 font-medium text-base p-1 h-auto hover:bg-stone-200 rounded-md"
+          >
+            {selectedOption ? selectedOption.label : placeholder}
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[200px] p-0">
+          <Command>
+            <CommandInput placeholder={`Buscar ${label.toLowerCase()}...`} />
+            <CommandList>
+              <CommandEmpty>Nenhuma opção encontrada.</CommandEmpty>
+              <CommandGroup>
+                {options.map((option) => (
+                  <CommandItem
+                    key={option.value}
+                    value={option.value}
+                    onSelect={(currentValue: string) => {
+                      onValueChange(currentValue === value ? '' : currentValue);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value === option.value ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {option.label}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+};
 
 const PropertyFilters: React.FC<PropertyFiltersProps> = ({
   properties,
@@ -51,101 +111,60 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
     setCurrentPriceRange([activeFilters.minPrice ?? minPrice, activeFilters.maxPrice ?? maxPrice]);
   }, [minPrice, maxPrice, activeFilters.minPrice, activeFilters.maxPrice]);
 
-  const availableTypes = useMemo(() => {
-    const types = new Set(properties.map(p => p.type).filter(Boolean) as string[]);
-    return Array.from(types).sort();
-  }, [properties]);
+  const createOptions = (keys: (string | number | undefined)[]) => {
+    const uniqueKeys = Array.from(new Set(keys.filter(Boolean))) as string[];
+    const options = uniqueKeys.sort().map(key => ({ value: key, label: key }));
+    options.unshift({ value: 'all', label: `Todos os Tipos` });
+    return options;
+  };
 
-  const availableCategories = useMemo(() => {
-    const categories = new Set(properties.map(p => p.category).filter(Boolean) as string[]);
-    return Array.from(categories).sort();
-  }, [properties]);
+  const createNumericOptions = (keys: (number | undefined)[], singular: string, plural: string) => {
+    const uniqueKeys = Array.from(new Set(keys.filter(k => typeof k === 'number' && k > 0))) as number[];
+    const options = uniqueKeys.sort((a, b) => a - b).map(key => ({ value: key.toString(), label: `${key}` }));
+    options.unshift({ value: 'all', label: `Todos` });
+    return options;
+  }
 
-  const availableRoomCounts = useMemo(() => {
-    if (!properties || properties.length === 0) return [];
-    const counts = new Set(properties.map(p => p.rooms).filter(r => typeof r === 'number' && r > 0) as number[]);
-    const sortedCounts = Array.from(counts).sort((a, b) => a - b);
-    // Group larger room counts into a "X+" option if needed, e.g., 5+
-    // For now, let's list all unique counts. Can be refined later.
-    return sortedCounts;
-  }, [properties]);
+  const availableTypes = createOptions(properties.map(p => p.type));
+  availableTypes[0].label = "Todos os Tipos";
+  const availableCategories = createOptions(properties.map(p => p.category));
+  availableCategories[0].label = "Todas as Categorias";
+  const availableRoomCounts = createNumericOptions(properties.map(p => p.rooms), 'quarto', 'quartos');
+  const availableBathroomCounts = createNumericOptions(properties.map(p => p.bathrooms), 'banheiro', 'banheiros');
+  const availableBedCounts = createNumericOptions(properties.map(p => p.beds), 'cama', 'camas');
+  const availableGuestCounts = createNumericOptions(properties.map(p => p.guests), 'hóspede', 'hóspedes');
 
-  const availableBathroomCounts = useMemo(() => {
-    if (!properties || properties.length === 0) return [];
-    const counts = new Set(properties.map(p => p.bathrooms).filter(b => typeof b === 'number' && b > 0) as number[]);
-    return Array.from(counts).sort((a, b) => a - b);
-  }, [properties]);
-
-  const availableBedCounts = useMemo(() => {
-    if (!properties || properties.length === 0) return [];
-    const counts = new Set(properties.map(p => p.beds).filter(b => typeof b === 'number' && b > 0) as number[]);
-    return Array.from(counts).sort((a, b) => a - b);
-  }, [properties]);
-
-  const availableGuestCounts = useMemo(() => {
-    if (!properties || properties.length === 0) return [];
-    const counts = new Set(properties.map(p => p.guests).filter(g => typeof g === 'number' && g > 0) as number[]);
-    return Array.from(counts).sort((a, b) => a - b);
-  }, [properties]);
-
-  // Define rating options
   const ratingOptions = [
-    { value: 5, label: "5 estrelas" },
-    { value: 4.5, label: "4.5 estrelas ou mais" },
-    { value: 4, label: "4 estrelas ou mais" },
-    { value: 3.5, label: "3.5 estrelas ou mais" },
-    { value: 3, label: "3 estrelas ou mais" },
+    { value: 'all', label: "Todas" },
+    { value: '5', label: "5" },
+    { value: '4.5', label: "4.5+" },
+    { value: '4', label: "4+" },
+    { value: '3.5', label: "3.5+" },
+    { value: '3', label: "3+" },
   ];
 
-  const handleTypeChange = (value: string) => {
-    const newFilters = { ...activeFilters, type: value === 'all' ? undefined : value };
-    setActiveFilters(newFilters);
-    onFilterChange(newFilters);
-  };
+  const promotionOptions = [
+    { value: 'all', label: 'Todas' },
+    { value: 'true', label: 'Sim' }
+  ]
 
-  const handleCategoryChange = (value: string) => {
-    const newFilters = { ...activeFilters, category: value === 'all' ? undefined : value };
-    setActiveFilters(newFilters);
-    onFilterChange(newFilters);
-  };
+  const handleFilterChange = (filterKey: string, value: string) => {
+    const isAll = value === 'all' || value === '';
+    let processedValue;
+    if (isAll) {
+      processedValue = undefined;
+    } else if (filterKey === 'hasPromotion') {
+      processedValue = (value === 'true');
+    } else if (filterKey.match(/rooms|bathrooms|beds|guests|minRating/)) {
+      processedValue = parseFloat(value);
+    } else {
+      processedValue = value;
+    }
 
-  const handleRoomsChange = (value: string) => {
-    const roomValue = value === 'all' ? undefined : parseInt(value, 10);
-    const newFilters = { ...activeFilters, rooms: roomValue };
-    setActiveFilters(newFilters);
-    onFilterChange(newFilters);
-  };
-
-  const handleBathroomChange = (value: string) => {
-    const bathroomValue = value === 'all' ? undefined : parseInt(value, 10);
-    const newFilters = { ...activeFilters, bathrooms: bathroomValue };
-    setActiveFilters(newFilters);
-    onFilterChange(newFilters);
-  };
-
-  const handleBedChange = (value: string) => {
-    const bedValue = value === 'all' ? undefined : parseInt(value, 10);
-    const newFilters = { ...activeFilters, beds: bedValue };
-    setActiveFilters(newFilters);
-    onFilterChange(newFilters);
-  };
-
-  const handleGuestChange = (value: string) => {
-    const guestValue = value === 'all' ? undefined : parseInt(value, 10);
-    const newFilters = { ...activeFilters, guests: guestValue };
-    setActiveFilters(newFilters);
-    onFilterChange(newFilters);
-  };
-
-  const handleRatingChange = (value: string) => {
-    const ratingValue = value === 'all' ? undefined : parseFloat(value);
-    const newFilters = { ...activeFilters, minRating: ratingValue };
-    setActiveFilters(newFilters);
-    onFilterChange(newFilters);
-  };
-
-  const handlePromotionChange = (value: string) => {
-    const newFilters = { ...activeFilters, hasPromotion: value === 'true' ? true : undefined };
+    const newFilters = {
+      ...activeFilters,
+      [filterKey]: processedValue
+    };
     setActiveFilters(newFilters);
     onFilterChange(newFilters);
   };
@@ -162,183 +181,36 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
   };
 
   return (
-    <div className="space-y-4 md:space-y-0">
-      <div className="flex flex-wrap items-end justify-center gap-x-3 gap-y-3 md:gap-x-4 md:gap-y-4">
-        {/* Filtro Tipo de Imóvel */}
-        <div className="space-y-1 flex-shrink-0">
-          <Label htmlFor="property-type-select" className="text-xs font-semibold text-white text-center w-full">Tipo de Imóvel</Label>
-          <Select
-            onValueChange={handleTypeChange}
-            value={activeFilters.type || 'all'}
-            name="property-type-select"
-            aria-label="Selecionar tipo de imóvel"
-          >
-            <SelectTrigger className="w-full bg-transparent text-white font-semibold border-white/70 hover:border-white focus:ring-white/50">
-              <SelectValue placeholder="Selecione um tipo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os Tipos</SelectItem>
-              {availableTypes.map(type => (
-                <SelectItem key={type} value={type}>{type}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Filtro Categoria do Imóvel */}
-        <div className="space-y-1 flex-shrink-0">
-          <Label htmlFor="property-category-select" className="text-xs font-semibold text-white text-center w-full">Categoria</Label>
-          <Select
-            onValueChange={handleCategoryChange}
-            value={activeFilters.category || 'all'}
-            name="property-category-select"
-            aria-label="Selecionar categoria do imóvel"
-          >
-            <SelectTrigger className="w-full bg-transparent text-white font-semibold border-white/70 hover:border-white focus:ring-white/50">
-              <SelectValue placeholder="Selecione uma categoria" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas as Categorias</SelectItem>
-              {availableCategories.map(cat => (
-                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Filtro Quartos */}
-        <div className="space-y-1 flex-shrink-0">
-          <Label htmlFor="property-rooms-select" className="text-xs font-semibold text-white text-center w-full">Quartos</Label>
-          <Select
-            onValueChange={handleRoomsChange}
-            value={activeFilters.rooms?.toString() || 'all'}
-            name="property-rooms-select"
-            aria-label="Selecionar número de quartos"
-          >
-            <SelectTrigger className="w-full bg-transparent text-white font-semibold border-white/70 hover:border-white focus:ring-white/50">
-              <SelectValue placeholder="Nº de Quartos" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              {availableRoomCounts.map(count => (
-                <SelectItem key={count} value={count.toString()}>{count} {count === 1 ? 'quarto' : 'quartos'}</SelectItem>
-              ))}
-              {/* Optionally, add a X+ option, e.g., if max rooms is high */}
-              {/* <SelectItem value="5+">5+ quartos</SelectItem> */}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Filtro Banheiros */}
-        <div className="space-y-1 flex-shrink-0">
-          <Label htmlFor="property-bathrooms-select" className="text-xs font-semibold text-white text-center w-full">Banheiros</Label>
-          <Select
-            onValueChange={handleBathroomChange}
-            value={activeFilters.bathrooms?.toString() || 'all'}
-            name="property-bathrooms-select"
-            aria-label="Selecionar número de banheiros"
-          >
-            <SelectTrigger className="w-full bg-transparent text-white font-semibold border-white/70 hover:border-white focus:ring-white/50">
-              <SelectValue placeholder="Nº de Banheiros" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              {availableBathroomCounts.map(count => (
-                <SelectItem key={count} value={count.toString()}>{count} {count === 1 ? 'banheiro' : 'banheiros'}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Filtro Camas */}
-        <div className="space-y-1 flex-shrink-0">
-          <Label htmlFor="property-beds-select" className="text-xs font-semibold text-white text-center w-full">Camas</Label>
-          <Select
-            onValueChange={handleBedChange}
-            value={activeFilters.beds?.toString() || 'all'}
-            name="property-beds-select"
-            aria-label="Selecionar número de camas"
-          >
-            <SelectTrigger className="w-full bg-transparent text-white font-semibold border-white/70 hover:border-white focus:ring-white/50">
-              <SelectValue placeholder="Nº de Camas" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas</SelectItem>
-              {availableBedCounts.map(count => (
-                <SelectItem key={count} value={count.toString()}>{count} {count === 1 ? 'cama' : 'camas'}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Filtro Hóspedes */}
-        <div className="space-y-1 flex-shrink-0">
-          <Label htmlFor="property-guests-select" className="text-xs font-semibold text-white text-center w-full">Hóspedes</Label>
-          <Select
-            onValueChange={handleGuestChange}
-            value={activeFilters.guests?.toString() || 'all'}
-            name="property-guests-select"
-            aria-label="Selecionar número de hóspedes"
-          >
-            <SelectTrigger className="w-full bg-transparent text-white font-semibold border-white/70 hover:border-white focus:ring-white/50">
-              <SelectValue placeholder="Nº de Hóspedes" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos</SelectItem>
-              {availableGuestCounts.map(count => (
-                <SelectItem key={count} value={count.toString()}>{count} {count === 1 ? 'hóspede' : 'hóspedes'}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Filtro Avaliações */}
-        <div className="space-y-1 flex-shrink-0">
-          <Label htmlFor="property-rating-select" className="text-xs font-semibold text-white text-center w-full">Avaliações</Label>
-          <Select
-            onValueChange={handleRatingChange}
-            value={activeFilters.minRating?.toString() || 'all'}
-            name="property-rating-select"
-            aria-label="Selecionar avaliação mínima"
-          >
-            <SelectTrigger className="w-full bg-transparent text-white font-semibold border-white/70 hover:border-white focus:ring-white/50">
-              <SelectValue placeholder="Avaliação Mínima" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas</SelectItem>
-              {ratingOptions.map(option => (
-                <SelectItem key={option.value} value={option.value.toString()}>{option.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Filtro Preço por Noite with Popover */}
-        <div className="space-y-1 flex-shrink-0">
-          <Label htmlFor="property-price-popover-trigger" className="text-xs font-semibold text-white text-center w-full">Preço por Noite</Label>
+    <div className="w-full">
+      <div className="flex flex-wrap items-center justify-around gap-x-4 gap-y-4">
+        <FilterPopover label="Tipo de Imóvel" value={activeFilters.type} options={availableTypes} onValueChange={(v) => handleFilterChange('type', v)} placeholder="Todos os Tipos" />
+        <FilterPopover label="Categorias" value={activeFilters.category} options={availableCategories} onValueChange={(v) => handleFilterChange('category', v)} placeholder="Todas as Categorias" />
+        <FilterPopover label="Quartos" value={activeFilters.rooms?.toString()} options={availableRoomCounts} onValueChange={(v) => handleFilterChange('rooms', v)} placeholder="Todos" />
+        <FilterPopover label="Banheiros" value={activeFilters.bathrooms?.toString()} options={availableBathroomCounts} onValueChange={(v) => handleFilterChange('bathrooms', v)} placeholder="Todos" />
+        <FilterPopover label="Camas" value={activeFilters.beds?.toString()} options={availableBedCounts} onValueChange={(v) => handleFilterChange('beds', v)} placeholder="Todos" />
+        <FilterPopover label="Hóspedes" value={activeFilters.guests?.toString()} options={availableGuestCounts} onValueChange={(v) => handleFilterChange('guests', v)} placeholder="Todos" />
+        <FilterPopover label="Avaliações" value={activeFilters.minRating?.toString()} options={ratingOptions} onValueChange={(v) => handleFilterChange('minRating', v)} placeholder="Todas" />
+        {/* Price Range Slider */}
+        <div className="flex flex-col items-center space-y-2">
+          <Label htmlFor="price-range-slider" className="text-sm font-semibold text-[#8BADA4]">Preço por Noite</Label>
           <Popover>
             <PopoverTrigger asChild>
-              <Button
-                id="property-price-popover-trigger"
-                variant="outline"
-                className="w-full justify-start text-left font-semibold text-white bg-transparent border-white/70 hover:border-white hover:bg-white/10 focus:ring-white/50 min-w-[180px]"
-              >
-                {formatCurrency(currentPriceRange[0])} - {formatCurrency(currentPriceRange[1])}
+              <Button variant="ghost" className="w-auto justify-center text-gray-800 font-medium text-base p-1 h-auto hover:bg-stone-200 rounded-md">
+                {`${formatCurrency(currentPriceRange[0])} - ${formatCurrency(currentPriceRange[1])}`}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[300px] p-4 bg-white" align="start">
+            <PopoverContent className="w-[250px] p-4">
               <div className="space-y-4">
+                <Label>Selecione o intervalo de preço</Label>
                 <Slider
-                  id="property-price-range"
+                  id="price-range-slider"
                   min={minPrice}
                   max={maxPrice}
                   step={10}
                   value={currentPriceRange}
                   onValueChange={handlePriceChange}
-                  className="w-full"
-                  aria-label="Selecionar faixa de preço por noite"
                 />
-                <div className="flex justify-between text-xs text-gray-600">
+                <div className="flex justify-between text-xs text-gray-500">
                   <span>{formatCurrency(currentPriceRange[0])}</span>
                   <span>{formatCurrency(currentPriceRange[1])}</span>
                 </div>
@@ -346,25 +218,7 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
             </PopoverContent>
           </Popover>
         </div>
-
-        {/* Filtro Promoção - Changed to Select component */}
-        <div className="space-y-1 flex-shrink-0">
-          <Label htmlFor="property-promotion-select" className="text-xs font-semibold text-white text-center w-full">Promoção</Label>
-          <Select
-            onValueChange={handlePromotionChange} // Reusing and adapting the handler
-            value={activeFilters.hasPromotion === true ? 'true' : 'all'}
-            name="property-promotion-select"
-            aria-label="Filtrar por promoção"
-          >
-            <SelectTrigger className="w-full bg-transparent text-white font-semibold border-white/70 hover:border-white focus:ring-white/50 min-w-[150px]">
-              <SelectValue placeholder="Promoção" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todas</SelectItem>
-              <SelectItem value="true">Em Promoção</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <FilterPopover label="Promoção" value={activeFilters.hasPromotion?.toString()} options={promotionOptions} onValueChange={(v) => handleFilterChange('hasPromotion', v)} placeholder="Todas" />
       </div>
     </div>
   );

@@ -1161,8 +1161,8 @@ export default function AllProperties() {
     return (
         <div id="all-properties" className="w-full py-12 md:py-16 -mt-8 md:-mt-16 bg-white overflow-hidden relative">
             <div className="max-w-[1600px] mx-auto px-4">
-                <div className="flex justify-between items-center mb-6">
-                    <div className="flex flex-col">
+                <div className="flex flex-col items-center mb-6">
+                    <div className="flex flex-col items-center text-center">
                         <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-gray-900">
                             Confira todos os imóveis da Yallah
                         </h2>
@@ -1170,25 +1170,23 @@ export default function AllProperties() {
                             Nossa coleção completa de propriedades premium em localizações estratégicas com excelente custo-benefício
                         </p>
                     </div>
-                    {/* <Link href="/imoveis" className="hidden md:flex items-center text-[#8BADA4] hover:text-[#6d8a84] font-medium">
-                        Ver catálogo completo <ArrowRight className="ml-2 w-5 h-5" />
-                    </Link> */}
-                    {/* The filter placeholder was here, it will be removed from here */}
                 </div>
+            </div>
 
-                {/* Centered Filter Section - New Position */}
-                <div id="property-filters-container" className="my-8 flex justify-center px-4"> {/* Added px-4 for padding on small screens */}
-                    {/* Apply floating pill styles here */}
-                    <div className="w-full max-w-fit bg-[#8BADA4] rounded-full shadow-xl py-2 px-6 md:py-3 md:px-8"> {/* Changed padding */}
-                        <PropertyFilters
-                            properties={allProperties}
-                            activeFilters={activeFilters}
-                            setActiveFilters={setActiveFilters}
-                            onFilterChange={applyFilters}
-                        />
-                    </div>
+            {/* Centered Filter Section - New Position */}
+            <div id="property-filters-container" className="my-8">
+                {/* Apply full-width bar styles here */}
+                <div className="w-full bg-stone-50 border-y border-stone-200 shadow-sm py-6 px-4 md:py-8 md:px-6">
+                    <PropertyFilters
+                        properties={allProperties}
+                        activeFilters={activeFilters}
+                        setActiveFilters={setActiveFilters}
+                        onFilterChange={applyFilters}
+                    />
                 </div>
+            </div>
 
+            <div className="max-w-[1600px] mx-auto px-4">
                 {/* Container dos slides com controles de navegação */}
                 <div className="relative">
                     {/* Botão Anterior */}
