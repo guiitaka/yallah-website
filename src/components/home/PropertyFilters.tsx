@@ -5,13 +5,13 @@ import { PropertyCard } from './AllProperties'; // Assuming PropertyCard is expo
 
 // Import directly from the ui directory that's in the same directory
 import { Button } from "./ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
 // For other components, continue to use the original imports
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { Slider } from "../../components/ui/slider";
 import { Checkbox } from "../../components/ui/checkbox";
 import { Label } from "../../components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "../../components/ui/popover";
 import { formatCurrency } from '@/utils/format';
 
 // TODO: Import ShadCN components as needed (e.g., Select, Slider, Checkbox, etc.)
