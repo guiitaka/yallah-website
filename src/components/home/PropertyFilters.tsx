@@ -30,6 +30,7 @@ interface PropertyFiltersProps {
   activeFilters: any; // Replace 'any' with a specific filter type later
   setActiveFilters: React.Dispatch<React.SetStateAction<any>>; // Replace 'any'
   onFilterChange: (filters: any) => void; // Callback to apply filters // Replace 'any'
+  onClearFilters?: () => void;
 }
 
 const FilterPopover: React.FC<{
@@ -96,6 +97,7 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
   activeFilters,
   setActiveFilters,
   onFilterChange,
+  onClearFilters,
 }) => {
   const [minPrice, maxPrice] = useMemo(() => {
     if (!properties || properties.length === 0) return [0, 1000]; // Default range
@@ -118,21 +120,36 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
     return options;
   };
 
-  const createNumericOptions = (keys: (number | undefined)[], singular: string, plural: string) => {
-    const uniqueKeys = Array.from(new Set(keys.filter(k => typeof k === 'number' && k > 0))) as number[];
-    const options = uniqueKeys.sort((a, b) => a - b).map(key => ({ value: key.toString(), label: `${key}` }));
+  const createGroupedNumericOptions = (keys: (number | undefined)[]) => {
+    const uniqueKeys = Array.from(new Set(keys.filter((k): k is number => typeof k === 'number' && k > 0)));
+    const options: { value: string; label: string }[] = [];
+    const threshold = 5;
+
+    uniqueKeys.forEach(key => {
+      if (key < threshold) {
+        options.push({ value: key.toString(), label: key.toString() });
+      }
+    });
+
+    if (uniqueKeys.some(key => key >= threshold)) {
+      options.push({ value: threshold.toString(), label: `${threshold}+` });
+    }
+
+    options.sort((a, b) => parseInt(a.value, 10) - parseInt(b.value, 10));
+
     options.unshift({ value: 'all', label: `Todos` });
+
     return options;
-  }
+  };
 
   const availableTypes = createOptions(properties.map(p => p.type));
   availableTypes[0].label = "Todos os Tipos";
   const availableCategories = createOptions(properties.map(p => p.category));
   availableCategories[0].label = "Todas as Categorias";
-  const availableRoomCounts = createNumericOptions(properties.map(p => p.rooms), 'quarto', 'quartos');
-  const availableBathroomCounts = createNumericOptions(properties.map(p => p.bathrooms), 'banheiro', 'banheiros');
-  const availableBedCounts = createNumericOptions(properties.map(p => p.beds), 'cama', 'camas');
-  const availableGuestCounts = createNumericOptions(properties.map(p => p.guests), 'hóspede', 'hóspedes');
+  const availableRoomCounts = createGroupedNumericOptions(properties.map(p => p.rooms));
+  const availableBathroomCounts = createGroupedNumericOptions(properties.map(p => p.bathrooms));
+  const availableBedCounts = createGroupedNumericOptions(properties.map(p => p.beds));
+  const availableGuestCounts = createGroupedNumericOptions(properties.map(p => p.guests));
 
   const ratingOptions = [
     { value: 'all', label: "Todas" },
@@ -180,6 +197,8 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
     onFilterChange(newFilters);
   };
 
+  const areFiltersActive = Object.values(activeFilters).some(v => v !== undefined);
+
   return (
     <div className="w-full">
       <div className="flex flex-wrap items-center justify-around gap-x-4 gap-y-4">
@@ -219,6 +238,15 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
           </Popover>
         </div>
         <FilterPopover label="Promoção" value={activeFilters.hasPromotion?.toString()} options={promotionOptions} onValueChange={(v) => handleFilterChange('hasPromotion', v)} placeholder="Todas" />
+        {areFiltersActive && onClearFilters && (
+          <Button
+            variant="ghost"
+            onClick={onClearFilters}
+            className="text-sm font-semibold text-red-500 hover:bg-red-50"
+          >
+            Limpar Filtros
+          </Button>
+        )}
       </div>
     </div>
   );

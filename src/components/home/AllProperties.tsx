@@ -867,6 +867,7 @@ export default function AllProperties() {
     // Initialize filteredProperties and update when allProperties or activeFilters changes
     useEffect(() => {
         let propertiesToFilter = [...allProperties];
+        const numericFilterThreshold = 5;
 
         // Apply type filter
         if (activeFilters.type) {
@@ -880,17 +881,29 @@ export default function AllProperties() {
 
         // Apply rooms filter
         if (typeof activeFilters.rooms === 'number') {
-            propertiesToFilter = propertiesToFilter.filter(p => p.rooms === activeFilters.rooms);
+            if (activeFilters.rooms === numericFilterThreshold) {
+                propertiesToFilter = propertiesToFilter.filter(p => p.rooms !== undefined && p.rooms >= numericFilterThreshold);
+            } else {
+                propertiesToFilter = propertiesToFilter.filter(p => p.rooms === activeFilters.rooms);
+            }
         }
 
         // Apply bathrooms filter
         if (typeof activeFilters.bathrooms === 'number') {
-            propertiesToFilter = propertiesToFilter.filter(p => p.bathrooms === activeFilters.bathrooms);
+            if (activeFilters.bathrooms === numericFilterThreshold) {
+                propertiesToFilter = propertiesToFilter.filter(p => p.bathrooms !== undefined && p.bathrooms >= numericFilterThreshold);
+            } else {
+                propertiesToFilter = propertiesToFilter.filter(p => p.bathrooms === activeFilters.bathrooms);
+            }
         }
 
         // Apply beds filter
         if (typeof activeFilters.beds === 'number') {
-            propertiesToFilter = propertiesToFilter.filter(p => p.beds === activeFilters.beds);
+            if (activeFilters.beds === numericFilterThreshold) {
+                propertiesToFilter = propertiesToFilter.filter(p => p.beds !== undefined && p.beds >= numericFilterThreshold);
+            } else {
+                propertiesToFilter = propertiesToFilter.filter(p => p.beds === activeFilters.beds);
+            }
         }
 
         // Apply guests filter
@@ -932,6 +945,10 @@ export default function AllProperties() {
         console.log("Updating activeFilters: ", newFilters);
         setActiveFilters(newFilters);
         // The actual filtering logic is now in the useEffect that watches activeFilters
+    };
+
+    const handleClearFilters = () => {
+        setActiveFilters({});
     };
 
     // Calculate total slides based on filtered properties
@@ -1147,17 +1164,6 @@ export default function AllProperties() {
         );
     }
 
-    // Handle empty state (now checks filteredProperties)
-    if (filteredProperties.length === 0 && !loading) { // Check loading to prevent flash of 'No properties'
-        return (
-            <div className="container mx-auto py-16">
-                <div className="text-center">
-                    <p className="text-gray-500">Nenhum imóvel encontrado com os filtros selecionados.</p>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div id="all-properties" className="w-full py-12 md:py-16 -mt-8 md:-mt-16 bg-white overflow-hidden relative">
             <div className="max-w-[1600px] mx-auto px-4">
@@ -1182,6 +1188,7 @@ export default function AllProperties() {
                         activeFilters={activeFilters}
                         setActiveFilters={setActiveFilters}
                         onFilterChange={applyFilters}
+                        onClearFilters={handleClearFilters}
                     />
                 </div>
             </div>
@@ -1189,215 +1196,221 @@ export default function AllProperties() {
             <div className="max-w-[1600px] mx-auto px-4">
                 {/* Container dos slides com controles de navegação */}
                 <div className="relative">
-                    {/* Botão Anterior */}
-                    <button
-                        onClick={prevSlide}
-                        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 z-10 w-12 h-12 rounded-full bg-[#8BADA4] shadow-lg flex items-center justify-center hover:bg-[#7A9D94] transition-colors"
-                        aria-label="Slide anterior"
-                    >
-                        <CaretLeft className="w-6 h-6 text-white" />
-                    </button>
+                    {filteredProperties.length > 0 ? (
+                        <>
+                            {/* Botão Anterior */}
+                            <button
+                                onClick={prevSlide}
+                                className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 z-10 w-12 h-12 rounded-full bg-[#8BADA4] shadow-lg flex items-center justify-center hover:bg-[#7A9D94] transition-colors"
+                                aria-label="Slide anterior"
+                            >
+                                <CaretLeft className="w-6 h-6 text-white" />
+                            </button>
 
-                    {/* Container dos cards com transição suave */}
-                    <div className="overflow-hidden">
-                        <div
-                            className="transition-transform duration-300 ease-in-out"
-                            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-                        >
-                            <div className="flex">
-                                {Array.from({ length: totalSlides }).map((_, slideIndex) => (
-                                    <div key={`slide-${slideIndex}`} className="w-full flex-none">
-                                        <div className="grid grid-rows-2 gap-6">
-                                            <div className="grid grid-cols-4 gap-4">
-                                                {filteredProperties
-                                                    .slice(slideIndex * itemsPerPage, slideIndex * itemsPerPage + 4)
-                                                    .map((property) => (
-                                                        <div
-                                                            key={property.id}
-                                                            className={`group relative rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1
+                            {/* Container dos cards com transição suave */}
+                            <div className="overflow-hidden">
+                                <div
+                                    className="transition-transform duration-300 ease-in-out"
+                                    style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                                >
+                                    <div className="flex">
+                                        {Array.from({ length: totalSlides }).map((_, slideIndex) => (
+                                            <div key={`slide-${slideIndex}`} className="w-full flex-none">
+                                                <div className="grid grid-rows-2 gap-6">
+                                                    <div className="grid grid-cols-4 gap-4">
+                                                        {filteredProperties
+                                                            .slice(slideIndex * itemsPerPage, slideIndex * itemsPerPage + 4)
+                                                            .map((property) => (
+                                                                <div
+                                                                    key={property.id}
+                                                                    className={`group relative rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1
                                                               ${expandedCard === property.id ? 'opacity-0 pointer-events-none' : 'z-10'}`}
-                                                            onClick={() => expandCard(property.id)}
-                                                            style={{ borderRadius: '1.5rem' }}
-                                                        >
-                                                            <div className="relative aspect-[4/3] rounded-3xl overflow-hidden">
-                                                                <Image
-                                                                    src={getValidImage((property as any).images, property.image)}
-                                                                    alt={property.title}
-                                                                    fill
-                                                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                                                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                                                                />
+                                                                    onClick={() => expandCard(property.id)}
+                                                                    style={{ borderRadius: '1.5rem' }}
+                                                                >
+                                                                    <div className="relative aspect-[4/3] rounded-3xl overflow-hidden">
+                                                                        <Image
+                                                                            src={getValidImage((property as any).images, property.image)}
+                                                                            alt={property.title}
+                                                                            fill
+                                                                            className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                                                            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                                                                        />
 
-                                                                {/* Overlay com gradiente */}
-                                                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                                                                        {/* Overlay com gradiente */}
+                                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
-                                                                {/* Botão de favoritos */}
-                                                                <div className="absolute top-4 right-4 z-10">
-                                                                    <FavoriteButton propertyId={property.id} />
-                                                                </div>
+                                                                        {/* Botão de favoritos */}
+                                                                        <div className="absolute top-4 right-4 z-10">
+                                                                            <FavoriteButton propertyId={property.id} />
+                                                                        </div>
 
-                                                                {/* Badge com preço */}
-                                                                <div className="absolute top-4 left-4 bg-white/90 px-3 py-1.5 rounded-full shadow-md text-sm font-medium text-black">
-                                                                    {formatCurrency(property.pricePerNight)}/noite
-                                                                </div>
+                                                                        {/* Badge com preço */}
+                                                                        <div className="absolute top-4 left-4 bg-white/90 px-3 py-1.5 rounded-full shadow-md text-sm font-medium text-black">
+                                                                            {formatCurrency(property.pricePerNight)}/noite
+                                                                        </div>
 
-                                                                {/* Conteúdo do card */}
-                                                                <div className="absolute bottom-0 left-0 w-full p-4">
-                                                                    {/* Localização */}
-                                                                    <div className="text-white/80 text-sm mb-1">{property.location}</div>
+                                                                        {/* Conteúdo do card */}
+                                                                        <div className="absolute bottom-0 left-0 w-full p-4">
+                                                                            {/* Localização */}
+                                                                            <div className="text-white/80 text-sm mb-1">{property.location}</div>
 
-                                                                    {/* Título */}
-                                                                    <h3 className="text-base md:text-lg text-white font-bold mb-1 line-clamp-2">
-                                                                        {property.title}
-                                                                    </h3>
+                                                                            {/* Título */}
+                                                                            <h3 className="text-base md:text-lg text-white font-bold mb-1 line-clamp-2">
+                                                                                {property.title}
+                                                                            </h3>
 
-                                                                    {/* Características */}
-                                                                    <div className="flex gap-4 items-center text-white/80 mt-2">
-                                                                        {property.features ? (
-                                                                            <div className="flex items-center w-full">
-                                                                                <p className="text-white/80 text-sm">
-                                                                                    {property.features}
-                                                                                </p>
+                                                                            {/* Características */}
+                                                                            <div className="flex gap-4 items-center text-white/80 mt-2">
+                                                                                {property.features ? (
+                                                                                    <div className="flex items-center w-full">
+                                                                                        <p className="text-white/80 text-sm">
+                                                                                            {property.features}
+                                                                                        </p>
+                                                                                    </div>
+                                                                                ) : (
+                                                                                    <span className="text-sm">Acomodações disponíveis mediante consulta</span>
+                                                                                )}
                                                                             </div>
-                                                                        ) : (
-                                                                            <span className="text-sm">Acomodações disponíveis mediante consulta</span>
-                                                                        )}
-                                                                    </div>
 
-                                                                    {/* Avaliações */}
-                                                                    <div className="flex items-center mb-2">
-                                                                        <Star className="w-4 h-4 text-yellow-400 mr-1" weight="fill" />
-                                                                        <span className="text-white text-sm font-medium">
-                                                                            {typeof property.rating === 'object' && property.rating !== null
-                                                                                ? property.rating.value
-                                                                                : property.rating} <span className="text-white/70">({property.rating.count})</span>
-                                                                        </span>
-                                                                    </div>
+                                                                            {/* Avaliações */}
+                                                                            <div className="flex items-center mb-2">
+                                                                                <Star className="w-4 h-4 text-yellow-400 mr-1" weight="fill" />
+                                                                                <span className="text-white text-sm font-medium">
+                                                                                    {typeof property.rating === 'object' && property.rating !== null
+                                                                                        ? property.rating.value
+                                                                                        : property.rating} <span className="text-white/70">({property.rating.count})</span>
+                                                                                </span>
+                                                                            </div>
 
-                                                                    {/* Botão de ação */}
-                                                                    <div className="mt-6">
-                                                                        <button
-                                                                            onClick={(e) => { e.stopPropagation(); expandCard(property.id); }}
-                                                                            className="w-full justify-center text-sm font-medium bg-white text-gray-800 py-2 px-4 rounded-full hover:bg-gray-100 transition-all duration-300 shadow-sm flex items-center"
-                                                                        >
-                                                                            Ver detalhes <ArrowRight size={16} className="ml-1" />
-                                                                        </button>
+                                                                            {/* Botão de ação */}
+                                                                            <div className="mt-6">
+                                                                                <button
+                                                                                    onClick={(e) => { e.stopPropagation(); expandCard(property.id); }}
+                                                                                    className="w-full justify-center text-sm font-medium bg-white text-gray-800 py-2 px-4 rounded-full hover:bg-gray-100 transition-all duration-300 shadow-sm flex items-center"
+                                                                                >
+                                                                                    Ver detalhes <ArrowRight size={16} className="ml-1" />
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                            </div>
-                                            <div className="grid grid-cols-4 gap-4">
-                                                {filteredProperties
-                                                    .slice(slideIndex * itemsPerPage + 4, slideIndex * itemsPerPage + 8)
-                                                    .map((property) => (
-                                                        <div
-                                                            key={property.id}
-                                                            className={`group relative rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1
+                                                            ))}
+                                                    </div>
+                                                    <div className="grid grid-cols-4 gap-4">
+                                                        {filteredProperties
+                                                            .slice(slideIndex * itemsPerPage + 4, slideIndex * itemsPerPage + 8)
+                                                            .map((property) => (
+                                                                <div
+                                                                    key={property.id}
+                                                                    className={`group relative rounded-3xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 transform hover:-translate-y-1
                                                                   ${expandedCard === property.id ? 'opacity-0 pointer-events-none' : 'z-10'}`}
-                                                            onClick={() => expandCard(property.id)}
-                                                            style={{ borderRadius: '1.5rem' }}
-                                                        >
-                                                            <div className="relative aspect-[4/3] rounded-3xl overflow-hidden">
-                                                                <Image
-                                                                    src={getValidImage((property as any).images, property.image)}
-                                                                    alt={property.title}
-                                                                    fill
-                                                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                                                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
-                                                                />
+                                                                    onClick={() => expandCard(property.id)}
+                                                                    style={{ borderRadius: '1.5rem' }}
+                                                                >
+                                                                    <div className="relative aspect-[4/3] rounded-3xl overflow-hidden">
+                                                                        <Image
+                                                                            src={getValidImage((property as any).images, property.image)}
+                                                                            alt={property.title}
+                                                                            fill
+                                                                            className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                                                            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 20vw"
+                                                                        />
 
-                                                                {/* Overlay com gradiente */}
-                                                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+                                                                        {/* Overlay com gradiente */}
+                                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
 
-                                                                {/* Botão de favoritos */}
-                                                                <div className="absolute top-4 right-4 z-10">
-                                                                    <FavoriteButton propertyId={property.id} />
-                                                                </div>
+                                                                        {/* Botão de favoritos */}
+                                                                        <div className="absolute top-4 right-4 z-10">
+                                                                            <FavoriteButton propertyId={property.id} />
+                                                                        </div>
 
-                                                                {/* Badge com preço */}
-                                                                <div className="absolute top-4 left-4 bg-white/90 px-3 py-1.5 rounded-full shadow-md text-sm font-medium text-black">
-                                                                    {formatCurrency(property.pricePerNight)}/noite
-                                                                </div>
+                                                                        {/* Badge com preço */}
+                                                                        <div className="absolute top-4 left-4 bg-white/90 px-3 py-1.5 rounded-full shadow-md text-sm font-medium text-black">
+                                                                            {formatCurrency(property.pricePerNight)}/noite
+                                                                        </div>
 
-                                                                {/* Conteúdo do card */}
-                                                                <div className="absolute bottom-0 left-0 w-full p-4">
-                                                                    {/* Localização */}
-                                                                    <div className="text-white/80 text-sm mb-1">{property.location}</div>
+                                                                        {/* Conteúdo do card */}
+                                                                        <div className="absolute bottom-0 left-0 w-full p-4">
+                                                                            {/* Localização */}
+                                                                            <div className="text-white/80 text-sm mb-1">{property.location}</div>
 
-                                                                    {/* Título */}
-                                                                    <h3 className="text-base md:text-lg text-white font-bold mb-1 line-clamp-2">
-                                                                        {property.title}
-                                                                    </h3>
+                                                                            {/* Título */}
+                                                                            <h3 className="text-base md:text-lg text-white font-bold mb-1 line-clamp-2">
+                                                                                {property.title}
+                                                                            </h3>
 
-                                                                    {/* Características */}
-                                                                    <div className="flex gap-4 items-center text-white/80 mt-2">
-                                                                        {property.features ? (
-                                                                            <div className="flex items-center w-full">
-                                                                                <p className="text-white/80 text-sm">
-                                                                                    {property.features}
-                                                                                </p>
+                                                                            {/* Características */}
+                                                                            <div className="flex gap-4 items-center text-white/80 mt-2">
+                                                                                {property.features ? (
+                                                                                    <div className="flex items-center w-full">
+                                                                                        <p className="text-white/80 text-sm">
+                                                                                            {property.features}
+                                                                                        </p>
+                                                                                    </div>
+                                                                                ) : (
+                                                                                    <span className="text-sm">Acomodações disponíveis mediante consulta</span>
+                                                                                )}
                                                                             </div>
-                                                                        ) : (
-                                                                            <span className="text-sm">Acomodações disponíveis mediante consulta</span>
-                                                                        )}
-                                                                    </div>
 
-                                                                    {/* Avaliações */}
-                                                                    <div className="flex items-center mb-2">
-                                                                        <Star className="w-4 h-4 text-yellow-400 mr-1" weight="fill" />
-                                                                        <span className="text-white text-sm font-medium">
-                                                                            {typeof property.rating === 'object' && property.rating !== null
-                                                                                ? property.rating.value
-                                                                                : property.rating} <span className="text-white/70">({property.rating.count})</span>
-                                                                        </span>
-                                                                    </div>
+                                                                            {/* Avaliações */}
+                                                                            <div className="flex items-center mb-2">
+                                                                                <Star className="w-4 h-4 text-yellow-400 mr-1" weight="fill" />
+                                                                                <span className="text-white text-sm font-medium">
+                                                                                    {typeof property.rating === 'object' && property.rating !== null
+                                                                                        ? property.rating.value
+                                                                                        : property.rating} <span className="text-white/70">({property.rating.count})</span>
+                                                                                </span>
+                                                                            </div>
 
-                                                                    {/* Botão de ação */}
-                                                                    <div className="mt-6">
-                                                                        <button
-                                                                            onClick={(e) => { e.stopPropagation(); expandCard(property.id); }}
-                                                                            className="w-full justify-center text-sm font-medium bg-white text-gray-800 py-2 px-4 rounded-full hover:bg-gray-100 transition-all duration-300 shadow-sm flex items-center"
-                                                                        >
-                                                                            Ver detalhes <ArrowRight size={16} className="ml-1" />
-                                                                        </button>
+                                                                            {/* Botão de ação */}
+                                                                            <div className="mt-6">
+                                                                                <button
+                                                                                    onClick={(e) => { e.stopPropagation(); expandCard(property.id); }}
+                                                                                    className="w-full justify-center text-sm font-medium bg-white text-gray-800 py-2 px-4 rounded-full hover:bg-gray-100 transition-all duration-300 shadow-sm flex items-center"
+                                                                                >
+                                                                                    Ver detalhes <ArrowRight size={16} className="ml-1" />
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        </div>
-                                                    ))}
+                                                            ))}
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
+                                        ))}
                                     </div>
+                                </div>
+                            </div>
+
+                            {/* Botão Próximo */}
+                            <button
+                                onClick={nextSlide}
+                                className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 z-10 w-12 h-12 rounded-full bg-[#8BADA4] shadow-lg flex items-center justify-center hover:bg-[#7A9D94] transition-colors"
+                                aria-label="Próximo slide"
+                            >
+                                <CaretRight className="w-6 h-6 text-white" />
+                            </button>
+
+                            {/* Dots de navegação */}
+                            <div className="flex justify-center items-center gap-2 mt-6">
+                                {Array.from({ length: totalSlides }).map((_, index) => ( // Should use the new totalSlides
+                                    <button
+                                        key={index}
+                                        onClick={() => goToSlide(index)}
+                                        className={`w-2 h-2 rounded-full transition-all duration-300 ${currentSlide === index
+                                            ? 'bg-[#8BADA4] w-4'
+                                            : 'bg-gray-300 hover:bg-gray-400'
+                                            }`}
+                                        aria-label={`Ir para slide ${index + 1}`}
+                                    />
                                 ))}
                             </div>
-                        </div>
-                    </div>
-
-                    {/* Botão Próximo */}
-                    <button
-                        onClick={nextSlide}
-                        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 z-10 w-12 h-12 rounded-full bg-[#8BADA4] shadow-lg flex items-center justify-center hover:bg-[#7A9D94] transition-colors"
-                        aria-label="Próximo slide"
-                    >
-                        <CaretRight className="w-6 h-6 text-white" />
-                    </button>
-
-                    {/* Dots de navegação */}
-                    <div className="flex justify-center items-center gap-2 mt-6">
-                        {Array.from({ length: totalSlides }).map((_, index) => ( // Should use the new totalSlides
-                            <button
-                                key={index}
-                                onClick={() => goToSlide(index)}
-                                className={`w-2 h-2 rounded-full transition-all duration-300 ${currentSlide === index
-                                    ? 'bg-[#8BADA4] w-4'
-                                    : 'bg-gray-300 hover:bg-gray-400'
-                                    }`}
-                                aria-label={`Ir para slide ${index + 1}`}
-                            />
-                        ))}
-                    </div>
+                        </>
+                    ) : (
+                        <p className="text-center text-gray-500 py-10">Nenhum imóvel encontrado com os filtros selecionados.</p>
+                    )}
                 </div>
 
                 {/* Botão móvel */}
