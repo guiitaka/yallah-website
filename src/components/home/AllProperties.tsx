@@ -1165,10 +1165,10 @@ export default function AllProperties() {
     }
 
     return (
-        <div id="imoveis" className="w-full bg-white py-16 scroll-mt-[80px]">
+        <div id="all-properties" className="w-full bg-white pt-16 scroll-mt-[80px]">
             <div className="max-w-[1400px] mx-auto px-4">
                 <div className="text-center mb-12">
-                    <h2 className="text-4xl md:text-5xl font-semibold text-gray-800 mb-3">
+                    <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
                         Confira todos os imóveis da Yallah
                     </h2>
                     <p className="text-gray-600 max-w-2xl">
