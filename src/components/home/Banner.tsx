@@ -83,9 +83,11 @@ export default function Banner({ userType }: BannerProps) {
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <button className="bg-white/10 backdrop-blur-lg border border-white/20 text-white font-semibold py-3 px-8 rounded-full hover:bg-white/20 transition-colors shadow-lg w-full sm:w-auto">
-                  Conheça nossa História
-                </button>
+                <Link href="/owner#about-us">
+                  <button className="bg-white/10 backdrop-blur-lg border border-white/20 text-white font-semibold py-3 px-8 rounded-full hover:bg-white/20 transition-colors shadow-lg w-full sm:w-auto">
+                    Conheça nossa História
+                  </button>
+                </Link>
                 <button className="bg-[#8BADA4] text-white font-semibold py-3 px-8 rounded-full hover:bg-[#7A9C94] transition-colors shadow-lg w-full sm:w-auto">
                   Explorar Imóveis
                 </button>
