@@ -1165,17 +1165,15 @@ export default function AllProperties() {
     }
 
     return (
-        <div id="all-properties" className="w-full py-12 md:py-16 -mt-8 md:-mt-16 bg-white overflow-hidden relative">
-            <div className="max-w-[1600px] mx-auto px-4">
-                <div className="flex flex-col items-center mb-6">
-                    <div className="flex flex-col items-center text-center">
-                        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-gray-900">
-                            Confira todos os imóveis da Yallah
-                        </h2>
-                        <p className="text-gray-600 max-w-2xl">
-                            Nossa coleção completa de propriedades premium em localizações estratégicas com excelente custo-benefício
-                        </p>
-                    </div>
+        <div id="imoveis" className="w-full bg-white py-16 scroll-mt-[80px]">
+            <div className="max-w-[1400px] mx-auto px-4">
+                <div className="text-center mb-12">
+                    <h2 className="text-4xl md:text-5xl font-semibold text-gray-800 mb-3">
+                        Confira todos os imóveis da Yallah
+                    </h2>
+                    <p className="text-gray-600 max-w-2xl">
+                        Nossa coleção completa de propriedades premium em localizações estratégicas com excelente custo-benefício
+                    </p>
                 </div>
             </div>
 

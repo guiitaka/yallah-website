@@ -6,6 +6,7 @@ import FAQ from '@/components/home/FAQ'
 import Footer from '@/components/layout/Footer'
 import AboutSection from '@/components/home/AboutSection'
 import MapPresenceSection from '@/components/home/MapPresenceSection'
+import AllProperties from '@/components/home/AllProperties'
 import type { Metadata, Viewport } from 'next'
 
 export const metadata: Metadata = {
@@ -31,6 +32,7 @@ export default function OwnerPage() {
         <div className="relative">
           <Promotions />
         </div>
+        <AllProperties />
 
         <AboutSection />
         <MapPresenceSection />

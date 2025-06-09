@@ -88,9 +88,11 @@ export default function Banner({ userType }: BannerProps) {
                     Conheça nossa História
                   </button>
                 </Link>
-                <button className="bg-[#8BADA4] text-white font-semibold py-3 px-8 rounded-full hover:bg-[#7A9C94] transition-colors shadow-lg w-full sm:w-auto">
-                  Explorar Imóveis
-                </button>
+                <Link href="/owner#imoveis">
+                  <button className="bg-[#8BADA4] text-white font-semibold py-3 px-8 rounded-full hover:bg-[#7A9C94] transition-colors shadow-lg w-full sm:w-auto">
+                    Explorar Imóveis
+                  </button>
+                </Link>
               </div>
             </main>
           </div>
