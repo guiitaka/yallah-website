@@ -45,7 +45,7 @@ const AnimatedNumber = ({ value, suffix = '', decimals = 0 }: AnimatedNumberProp
 
 export default function AboutSection() {
     return (
-        <div id="about-us" className="w-full bg-white pt-16">
+        <div id="about-us" className="w-full bg-white pt-16 scroll-mt-[80px]">
             <div className="max-w-7xl mx-auto px-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
                     {/* Left Content */}
