@@ -32,7 +32,7 @@ export default function InstitutionalHero() {
     }, []);
 
     return (
-        <div id="institutional-hero" className="w-full py-12 md:py-16 lg:py-24 relative overflow-hidden">
+        <div id="institutional-hero" className="w-full py-12 md:py-16 lg:py-24 relative overflow-hidden mt-16">
             {/* Background Image */}
             <div className="absolute inset-0 w-full h-full z-0">
                 <Image
