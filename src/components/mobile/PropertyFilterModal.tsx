@@ -73,6 +73,11 @@ export default function PropertyFilterModal() {
     const handleApplyFilters = () => {
         setActiveFilters(tempFilters);
         toggleFilterModal();
+        // Scroll to the top of the page smoothly
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     };
 
     const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
