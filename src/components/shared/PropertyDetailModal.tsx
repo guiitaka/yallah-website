@@ -7,7 +7,7 @@ import {
     CaretLeft, CaretRight, Buildings, MapPin, Lock, Waves, CookingPot,
     WifiHigh, Desktop, Television, Dog, House, Lightning, Fire, Calendar as CalendarIcon, CaretDown,
     Clock, X, Snowflake, Users, Bed, ArrowRight, Star, Heart, CheckCircle,
-    Shield, Calendar, Bathtub, Car
+    Shield, Calendar, Bathtub, Car, ImageSquare
 } from '@phosphor-icons/react'; // Ensure all necessary icons are here
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -310,7 +310,7 @@ export default function PropertyDetailModal({ isOpen, onClose, property }: Prope
                 <div className="flex-1 overflow-y-auto">
                     {/* Image Grid */}
                     <div className="grid grid-cols-2 grid-rows-2 md:grid-cols-4 md:grid-rows-2 gap-2 p-2 h-[400px] md:h-auto md:max-h-[50vh]">
-                        {/* Main Image */}
+                        {/* Image 1 (Main on desktop) */}
                         <div
                             className="col-span-1 row-span-1 md:col-span-2 md:row-span-2 rounded-xl overflow-hidden cursor-pointer relative group"
                             onClick={() => openFullGalleryModal(0)}
@@ -325,8 +325,11 @@ export default function PropertyDetailModal({ isOpen, onClose, property }: Prope
                             <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
                         </div>
 
-                        {/* Second Image */}
-                        <div className="col-span-1 row-span-1 rounded-xl overflow-hidden cursor-pointer relative group" onClick={() => openFullGalleryModal(1)}>
+                        {/* Image 2 */}
+                        <div
+                            className="col-span-1 row-span-1 rounded-xl overflow-hidden cursor-pointer relative group"
+                            onClick={() => openFullGalleryModal(1)}
+                        >
                             <Image
                                 src={property.images?.[1] || '/placeholder.jpg'}
                                 alt={`${property.title} - imagem 2`}
@@ -336,8 +339,11 @@ export default function PropertyDetailModal({ isOpen, onClose, property }: Prope
                             <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
                         </div>
 
-                        {/* Third Image */}
-                        <div className="col-span-1 row-span-1 rounded-xl overflow-hidden cursor-pointer relative group" onClick={() => openFullGalleryModal(2)}>
+                        {/* Image 3 */}
+                        <div
+                            className="col-span-1 row-span-1 rounded-xl overflow-hidden cursor-pointer relative group"
+                            onClick={() => openFullGalleryModal(2)}
+                        >
                             <Image
                                 src={property.images?.[2] || '/placeholder.jpg'}
                                 alt={`${property.title} - imagem 3`}
@@ -347,16 +353,40 @@ export default function PropertyDetailModal({ isOpen, onClose, property }: Prope
                             <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
                         </div>
 
-                        {/* Map */}
-                        {center && (
-                            <div className="hidden md:block rounded-xl overflow-hidden relative group">
-                                <MapComponent
-                                    center={center}
-                                    zoom={14}
-                                    showMarker={true}
+                        {/* Image 4 (mobile) or Map (desktop) */}
+                        <div className="col-span-1 row-span-1 rounded-xl overflow-hidden relative group">
+                            {/* Mobile View: 4th Image */}
+                            <div className="block md:hidden h-full w-full cursor-pointer" onClick={() => openFullGalleryModal(3)}>
+                                <Image
+                                    src={property.images?.[3] || '/placeholder.jpg'}
+                                    alt={`${property.title} - imagem 4`}
+                                    fill
+                                    className="object-cover transition-transform duration-300 group-hover:scale-105"
                                 />
+                                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
                             </div>
-                        )}
+
+                            {/* Desktop View: Map or 4th Image */}
+                            <div className="hidden md:block h-full w-full">
+                                {center ? (
+                                    <MapComponent
+                                        center={center}
+                                        zoom={14}
+                                        showMarker={true}
+                                    />
+                                ) : (
+                                    <div className="h-full w-full cursor-pointer" onClick={() => openFullGalleryModal(3)}>
+                                        <Image
+                                            src={property.images?.[3] || '/placeholder.jpg'}
+                                            alt={`${property.title} - imagem 4`}
+                                            fill
+                                            className="object-cover transition-transform duration-300 group-hover:scale-105"
+                                        />
+                                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
                     {/* Main Content Body */}
@@ -407,17 +437,34 @@ export default function PropertyDetailModal({ isOpen, onClose, property }: Prope
                                     )}
                                     {activeTab === 'fotos' && (
                                         <div>
-                                            <h3 className="text-xl font-semibold mb-4 text-gray-800">Fotos do Imóvel</h3>
-                                            {displayImages.length > 0 ? (
-                                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                                                    {displayImages.map((img, idx) => (
-                                                        <div key={`full-gallery-thumb-${idx}`} className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group" onClick={() => { setCurrentGalleryIndex(idx); openFullGalleryModal(idx); }}>
-                                                            <Image src={img} alt={`${property.title} - Foto ${idx + 1}`} layout="fill" objectFit="cover" className="group-hover:scale-105 transition-transform" />
-                                                            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-opacity"></div>
-                                                        </div>
-                                                    ))}
+                                            <h3 className="text-2xl font-semibold mb-4 text-gray-800">Fotos do Imóvel</h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                {/* Main Image */}
+                                                <div className="col-span-1 row-span-2 rounded-xl overflow-hidden cursor-pointer relative group aspect-[4/3]" onClick={() => openFullGalleryModal(0)}>
+                                                    <Image src={property.images?.[0] || '/placeholder.jpg'} alt="Foto 1 do imóvel" fill className="object-cover transition-transform duration-300 group-hover:scale-105" />
+                                                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
                                                 </div>
-                                            ) : <p className="text-gray-600">Nenhuma foto adicional disponível.</p>}
+
+                                                <div className="col-span-1 grid grid-rows-2 gap-4">
+                                                    {/* Second Image */}
+                                                    <div className="rounded-xl overflow-hidden cursor-pointer relative group aspect-[4/3]" onClick={() => openFullGalleryModal(1)}>
+                                                        <Image src={property.images?.[1] || '/placeholder.jpg'} alt="Foto 2 do imóvel" fill className="object-cover transition-transform duration-300 group-hover:scale-105" />
+                                                        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
+                                                    </div>
+
+                                                    {/* "View All" Button */}
+                                                    <button
+                                                        onClick={() => openFullGalleryModal(0)}
+                                                        className="bg-gray-100 hover:bg-gray-200 rounded-xl flex flex-col items-center justify-center text-center p-4 transition-colors aspect-[4/3]"
+                                                    >
+                                                        <ImageSquare size={32} className="text-[#8BADA4] mb-2" />
+                                                        <span className="font-semibold text-gray-800">Ver todas as fotos</span>
+                                                        {property.images && property.images.length > 0 && (
+                                                            <span className="text-sm text-gray-600 mt-1">{property.images.length} fotos disponíveis</span>
+                                                        )}
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
                                     {activeTab === 'oferecemos' && (

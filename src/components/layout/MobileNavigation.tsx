@@ -65,7 +65,7 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
         toggleFilterModal();
       }
     },
-    { href: "http://localhost:3000/mobile/owner", icon: Buildings, label: "Proprietários" },
+    { href: "https://www.yallah.com.br/mobile/owner", icon: Buildings, label: "Proprietários" },
     { href: "https://agent.jotform.com/0197336e623672dd8656ec15d26e4d3ec9f7", icon: Headset, label: "Contato" },
   ];
 

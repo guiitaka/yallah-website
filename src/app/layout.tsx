@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Montserrat, Playfair_Display } from 'next/font/google'
 import '@/app/globals.css'
+import 'mapbox-gl/dist/mapbox-gl.css';
 import BodyWrapper from '@/components/layout/BodyWrapper'
 import ChatbotScript from '@components/layout/ChatbotScript'
 import { FilterProvider } from "@/context/FilterContext"
