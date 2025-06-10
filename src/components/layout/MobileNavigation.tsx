@@ -17,13 +17,24 @@ import {
   Train,
   Desktop,
   Mountains,
-  Wrench
+  Wrench,
+  Heart,
+  User,
+  Funnel
 } from '@phosphor-icons/react'
 import { useState } from 'react'
+import { useFilter } from '@/context/FilterContext'
 
 type MobileNavigationProps = {
   userType: 'owner' | 'tenant'
 }
+
+type NavLink = {
+  href: string;
+  icon: React.ElementType;
+  label: string;
+  action?: (e: React.MouseEvent) => void;
+};
 
 const categories = [
   { name: 'Apartamentos', icon: Buildings },
@@ -41,6 +52,32 @@ const categories = [
 export default function MobileNavigation({ userType }: MobileNavigationProps) {
   const router = useRouter()
   const [isCategoryOpen, setIsCategoryOpen] = useState(false)
+  const { toggleFilterModal } = useFilter();
+
+  const tenantLinks: NavLink[] = [
+    { href: "/mobile/tenant", icon: House, label: "Início" },
+    {
+      href: "#",
+      icon: Funnel,
+      label: "Filtros",
+      action: (e) => {
+        e.preventDefault();
+        toggleFilterModal();
+      }
+    },
+    { href: "#", icon: Heart, label: "Favoritos" },
+    { href: "#", icon: User, label: "Login" },
+  ];
+
+  const ownerLinks: NavLink[] = [
+    { href: "/mobile/owner", icon: House, label: "A Yallah" },
+    { href: "/mobile/owner/como-funciona", icon: Info, label: "Como Funciona" },
+    { href: "/mobile/owner/nosso-metodo", icon: Lightbulb, label: "Nosso Método" },
+    { href: "/mobile/owner/servicos", icon: Wrench, label: "Serviços" },
+    { href: "/mobile/owner/fale-conosco", icon: Headset, label: "Contato" },
+  ];
+
+  const links: NavLink[] = userType === 'owner' ? ownerLinks : tenantLinks;
 
   return (
     <>
@@ -70,46 +107,22 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
       {/* Menu de navegação mobile */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 md:hidden z-[20]">
         <div className="container mx-auto px-4">
-          <div className="flex items-start justify-between pt-2 h-[80px] mb-[env(safe-area-inset-bottom,24px)]">
-            <Link
-              href="/mobile/owner"
-              className="flex flex-col items-center gap-1"
-            >
-              <House weight="light" className="w-6 h-6 text-gray-600" />
-              <span className="text-[10px] text-gray-600">A Yallah</span>
-            </Link>
-
-            <Link
-              href="/mobile/owner/como-funciona"
-              className="flex flex-col items-center gap-1"
-            >
-              <Info weight="light" className="w-6 h-6 text-gray-600" />
-              <span className="text-[10px] text-gray-600">Como Funciona</span>
-            </Link>
-
-            <Link
-              href="/mobile/owner/nosso-metodo"
-              className="flex flex-col items-center gap-1"
-            >
-              <Lightbulb weight="light" className="w-6 h-6 text-gray-600" />
-              <span className="text-[10px] text-gray-600">Nosso Método</span>
-            </Link>
-
-            <Link
-              href="/mobile/owner/servicos"
-              className="flex flex-col items-center gap-1"
-            >
-              <Wrench weight="light" className="w-6 h-6 text-gray-600" />
-              <span className="text-[10px] text-gray-600">Serviços</span>
-            </Link>
-
-            <Link
-              href="/mobile/owner/fale-conosco"
-              className="flex flex-col items-center gap-1"
-            >
-              <Headset weight="light" className="w-6 h-6 text-gray-600" />
-              <span className="text-[10px] text-gray-600">Contato</span>
-            </Link>
+          <div className="flex items-center justify-around pt-2 h-[80px] mb-[env(safe-area-inset-bottom,24px)]">
+            {links.map(({ href, icon: Icon, label, action }) => (
+              <Link
+                key={label}
+                href={href}
+                className="flex flex-col items-center justify-center gap-1 w-1/4"
+                onClick={(e) => {
+                  if (action) {
+                    action(e);
+                  }
+                }}
+              >
+                <Icon weight="light" className="w-6 h-6 text-gray-600" />
+                <span className="text-[10px] text-gray-600">{label}</span>
+              </Link>
+            ))}
           </div>
         </div>
       </div>

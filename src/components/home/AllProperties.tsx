@@ -1171,7 +1171,7 @@ export default function AllProperties() {
                     <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
                         Confira todos os imóveis da Yallah
                     </h2>
-                    <p className="text-gray-600 max-w-2xl">
+                    <p className="text-gray-600 max-w-2xl mx-auto">
                         Nossa coleção completa de propriedades premium em localizações estratégicas com excelente custo-benefício
                     </p>
                 </div>

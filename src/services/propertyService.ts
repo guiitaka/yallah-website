@@ -124,11 +124,12 @@ export const deleteProperty = async (id: string): Promise<void> => {
 };
 
 // Busca todas as propriedades
-export const fetchProperties = async (): Promise<Property[]> => {
+export const fetchProperties = async (limit: number = 100): Promise<Property[]> => {
     const { data, error } = await supabase
         .from('properties')
         .select('*, what_you_should_know_sections, what_you_should_know_rich_text, points_of_interest')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(limit);
     if (error) throw error;
 
     // DEBUG: Log raw data from Supabase
@@ -150,20 +151,68 @@ export const fetchFilteredProperties = async (
     filters: Record<string, any>,
     sortBy: string = 'created_at',
     sortDirection: 'asc' | 'desc' = 'desc',
-    limitCount: number = 20
+    limitCount: number = 100
 ): Promise<Property[]> => {
     let query = supabase.from('properties').select('*, what_you_should_know_sections, what_you_should_know_rich_text, points_of_interest');
-    Object.entries(filters).forEach(([key, value]) => {
+
+    const processFilters = { ...filters };
+
+    // Handle price range
+    if (processFilters.minPrice !== undefined) {
+        query = query.gte('price', processFilters.minPrice);
+        delete processFilters.minPrice;
+    }
+    if (processFilters.maxPrice !== undefined) {
+        query = query.lte('price', processFilters.maxPrice);
+        delete processFilters.maxPrice;
+    }
+
+    // Handle 'hasPromotion' by mapping to the 'featured' column
+    if (processFilters.hasPromotion === true) {
+        query = query.eq('featured', true);
+        delete processFilters.hasPromotion;
+    }
+
+    // Handle 'minRating' by mapping to the 'rating' column
+    if (processFilters.minRating !== undefined) {
+        query = query.gte('rating', processFilters.minRating);
+        delete processFilters.minRating;
+    }
+
+    // Handle "or more" numeric filters
+    const gteFilters: Record<string, number> = {
+        bedrooms: 5,
+        bathrooms: 5,
+        beds: 5,
+        guests: 8,
+    };
+
+    Object.keys(gteFilters).forEach(key => {
+        const threshold = gteFilters[key];
+        if (processFilters[key] !== undefined && processFilters[key] >= threshold) {
+            query = query.gte(key, processFilters[key]);
+            delete processFilters[key];
+        }
+    });
+
+    // Process all remaining filters with .eq()
+    Object.entries(processFilters).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
             query = query.eq(key, value);
         }
     });
+
     query = query.order(sortBy, { ascending: sortDirection === 'asc' });
     if (limitCount > 0) {
         query = query.limit(limitCount);
     }
+
     const { data, error } = await query;
-    if (error) throw error;
+    if (error) {
+        console.error("Error fetching filtered properties:", error);
+        throw error;
+    }
+
     return data.map(item => toCamelCase(item)) as Property[];
 };
 

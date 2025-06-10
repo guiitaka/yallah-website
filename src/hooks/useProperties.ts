@@ -22,7 +22,7 @@ export const useProperties = (options: UsePropertiesOptions = {}) => {
 
     const {
         filters = {},
-        sortBy = 'updatedAt',
+        sortBy = 'updated_at',
         sortDirection = 'desc',
         limit = 100
     } = options;
@@ -46,7 +46,7 @@ export const useProperties = (options: UsePropertiesOptions = {}) => {
                             limit
                         );
                     } else {
-                        propertiesData = await fetchProperties();
+                        propertiesData = await fetchProperties(limit);
                     }
 
                     if (isMounted) {
