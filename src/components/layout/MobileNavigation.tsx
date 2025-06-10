@@ -65,8 +65,8 @@ export default function MobileNavigation({ userType }: MobileNavigationProps) {
         toggleFilterModal();
       }
     },
-    { href: "#", icon: Heart, label: "Favoritos" },
-    { href: "#", icon: User, label: "Login" },
+    { href: "http://localhost:3000/mobile/owner", icon: Buildings, label: "Proprietários" },
+    { href: "https://agent.jotform.com/0197336e623672dd8656ec15d26e4d3ec9f7", icon: Headset, label: "Contato" },
   ];
 
   const ownerLinks: NavLink[] = [

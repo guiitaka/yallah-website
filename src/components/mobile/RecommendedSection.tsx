@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import Image from 'next/image'
 import { ArrowRight, Buildings, Calendar, GraduationCap, TreePalm, Baby } from '@phosphor-icons/react'
 
@@ -45,9 +45,51 @@ const categories: LifestyleCategory[] = [
 ]
 
 export default function RecommendedSection() {
+    const scrollContainerRef = useRef<HTMLDivElement>(null)
+    const [isHovered, setIsHovered] = useState(false)
+    const animationFrameRef = useRef<number | null>(null)
+
+    // Duplicar categorias para um loop infinito e suave
+    const extendedCategories = [...categories, ...categories];
+
+    useEffect(() => {
+        const scrollContainer = scrollContainerRef.current;
+        if (!scrollContainer) return;
+
+        const scroll = () => {
+            if (!isHovered && scrollContainer) {
+                // Ajuste o valor para controlar a velocidade da rolagem
+                scrollContainer.scrollLeft += 0.5;
+
+                // Se a rolagem passar da metade (o fim dos itens originais), reseta para o início
+                if (scrollContainer.scrollLeft >= scrollContainer.scrollWidth / 2) {
+                    scrollContainer.scrollLeft = 0;
+                }
+                animationFrameRef.current = requestAnimationFrame(scroll);
+            }
+        };
+
+        const startScrolling = () => {
+            if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+            animationFrameRef.current = requestAnimationFrame(scroll);
+        };
+
+        const stopScrolling = () => {
+            if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
+        };
+
+        if (!isHovered) {
+            startScrolling();
+        } else {
+            stopScrolling();
+        }
+
+        return () => stopScrolling();
+    }, [isHovered]);
+
     return (
-        <section className="px-4 py-8 bg-white">
-            <div className="mb-6 text-center">
+        <section className="py-8 bg-white overflow-x-hidden">
+            <div className="mb-6 text-center px-4">
                 <div className="inline-block mb-3 px-4 py-1 bg-[#8BADA4]/10 rounded-full">
                     <span className="text-[#8BADA4] font-medium text-sm">Escolhas Sob Medida</span>
                 </div>
@@ -59,11 +101,17 @@ export default function RecommendedSection() {
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {categories.map((category, index) => (
+            {/* Horizontal Scrollable Container */}
+            <div
+                ref={scrollContainerRef}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                className="flex overflow-x-auto space-x-4 pb-4 -mx-4 px-4 scrollbar-hide"
+            >
+                {extendedCategories.map((category, index) => (
                     <div
-                        key={index}
-                        className="group relative rounded-2xl overflow-hidden shadow-lg transform transition-all duration-300 hover:-translate-y-1"
+                        key={`${category.title}-${index}`} // Chave única para itens duplicados
+                        className="group relative rounded-2xl overflow-hidden shadow-lg transform transition-all duration-300 hover:-translate-y-1 flex-shrink-0 w-[80vw] max-w-xs"
                     >
                         <div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
                             <Image

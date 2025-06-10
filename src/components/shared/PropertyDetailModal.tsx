@@ -209,9 +209,9 @@ export default function PropertyDetailModal({ isOpen, onClose, property }: Prope
         // setTimeout(() => setDateRange([null, null]), 5000); // Optionally clear dates
     };
 
-    const openFullGalleryModal = () => {
+    const openFullGalleryModal = (index: number) => {
         if (property?.images && property.images.length > 0) {
-            setCurrentGalleryIndex(0); // Start from the first image
+            setCurrentGalleryIndex(index);
             setShowFullGallery(true);
         }
     };
@@ -276,69 +276,92 @@ export default function PropertyDetailModal({ isOpen, onClose, property }: Prope
     const totalServiceFee = property.serviceFee || 0;
     const totalAmount = subtotal - discountAmount + totalServiceFee;
 
+    const getCenterCoordinates = (): [number, number] | undefined => {
+        if (!property?.coordinates) return undefined;
+        if (Array.isArray(property.coordinates) && typeof property.coordinates[0] === 'number' && typeof property.coordinates[1] === 'number') {
+            return [property.coordinates[0], property.coordinates[1]];
+        }
+        if (typeof property.coordinates === 'object' && 'lat' in property.coordinates && 'lng' in property.coordinates) {
+            const coords = property.coordinates as { lat: number; lng: number };
+            return [coords.lng, coords.lat];
+        }
+        return undefined;
+    };
+
+    const center = getCenterCoordinates();
 
     // JSX for the modal - This should be the exact structure from AllProperties.tsx's modal
     // This is a simplified representation and needs to be replaced with the full JSX from AllProperties.tsx
     return (
-        <>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-0 md:p-4">
             <div
-                className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4 md:p-8 animate-fade-in"
-                onClick={onClose} // Close if backdrop is clicked
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="property-detail-title"
+                ref={modalContentRef}
+                className="bg-white w-full h-full max-w-none md:max-w-4xl lg:max-w-6xl rounded-none md:rounded-2xl shadow-2xl flex flex-col relative overflow-hidden"
             >
-                <div
-                    ref={modalContentRef}
-                    className="bg-white rounded-3xl max-w-6xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl animate-scale-in rounded-scroll-container"
-                    onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+                {/* Close button */}
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 z-30 p-2 bg-white/80 rounded-full hover:bg-white transition-all shadow-md"
                 >
-                    {/* Close Button */}
-                    <button
-                        className="absolute top-4 right-4 p-2 rounded-full bg-white shadow-md hover:shadow-lg hover:bg-gray-100 transition-all z-[60]"
-                        onClick={onClose}
-                        aria-label="Fechar"
-                    >
-                        <X weight="bold" className="w-5 h-5 stroke-gray-600" />
-                    </button>
+                    <X className="w-5 h-5 text-gray-700" />
+                </button>
 
-                    {/* Image Gallery Section (simplified, use AllProperties version) */}
-                    <div className="grid grid-cols-12 gap-2 p-2 max-h-[40vh] md:max-h-[50vh] overflow-hidden">
-                        <div className="col-span-6 relative h-[200px] md:h-[calc(50vh-1rem)] rounded-l-xl overflow-hidden cursor-pointer group" onClick={() => { setCurrentGalleryIndex(0); openFullGalleryModal(); }}>
-                            <Image src={mainImage} alt={property.title} layout="fill" objectFit="cover" className="group-hover:scale-105 transition-transform" />
-                            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-opacity"></div>
+                {/* Content area that scrolls */}
+                <div className="flex-1 overflow-y-auto">
+                    {/* Image Grid */}
+                    <div className="grid grid-cols-2 grid-rows-2 md:grid-cols-4 md:grid-rows-2 gap-2 p-2 h-[400px] md:h-auto md:max-h-[50vh]">
+                        {/* Main Image */}
+                        <div
+                            className="col-span-1 row-span-1 md:col-span-2 md:row-span-2 rounded-xl overflow-hidden cursor-pointer relative group"
+                            onClick={() => openFullGalleryModal(0)}
+                        >
+                            <Image
+                                src={property.images?.[0] || '/placeholder.jpg'}
+                                alt={property.title}
+                                fill
+                                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                                priority
+                            />
+                            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
                         </div>
-                        <div className="col-span-6 grid grid-rows-2 gap-2">
-                            {displayImages.slice(1, 3).map((img, idx) => (
-                                <div key={`gallery-thumb-${idx + 1}`} className="relative h-[calc(25vh-1rem-0.25rem)] md:h-[calc(25vh-0.75rem)] rounded-tr-xl overflow-hidden cursor-pointer group" onClick={() => { setCurrentGalleryIndex(idx + 1); openFullGalleryModal(); }}>
-                                    <Image src={img} alt={`${property.title} - ${idx + 2}`} layout="fill" objectFit="cover" className="group-hover:scale-105 transition-transform" />
-                                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-opacity"></div>
-                                </div>
-                            ))}
-                            {/* Last image or map preview - simplified, use AllProperties logic */}
-                            <div className="relative h-[calc(25vh-1rem-0.25rem)] md:h-[calc(25vh-0.75rem)] rounded-br-xl overflow-hidden cursor-pointer group" onClick={() => { if (displayImages.length > 3) { setCurrentGalleryIndex(3); openFullGalleryModal(); } else { setActiveTab('localizacao'); modalContentRef.current?.scrollTo({ top: modalContentRef.current.scrollHeight, behavior: 'smooth' }); } }}>
-                                {displayImages.length > 3 ? (
-                                    <>
-                                        <Image src={displayImages[3]} alt={`${property.title} - 4`} layout="fill" objectFit="cover" className="group-hover:scale-105 transition-transform" />
-                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white text-lg font-semibold group-hover:bg-black/30 transition-colors">
-                                            +{displayImages.length - 3} mais
-                                        </div>
-                                    </>
-                                ) : property.coordinates ? (
-                                    <>
-                                        <MapComponent center={(typeof property.coordinates === 'object' && 'lat' in property.coordinates) ? [property.coordinates.lng, property.coordinates.lat] : property.coordinates as [number, number]} zoom={15} showMarker={true} showControls={false} useCustomMarker={true} />
-                                        <div className="absolute inset-0 bg-black/20 flex items-center justify-center text-white text-lg font-semibold opacity-0 group-hover:opacity-100 transition-opacity">Ver Mapa</div>
-                                    </>
-                                ) : (
-                                    <div className="w-full h-full bg-gray-200 flex items-center justify-center"><MapPin size={48} className="text-gray-400" /></div>
-                                )}
+
+                        {/* Second Image */}
+                        <div className="col-span-1 row-span-1 rounded-xl overflow-hidden cursor-pointer relative group" onClick={() => openFullGalleryModal(1)}>
+                            <Image
+                                src={property.images?.[1] || '/placeholder.jpg'}
+                                alt={`${property.title} - imagem 2`}
+                                fill
+                                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                            />
+                            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
+                        </div>
+
+                        {/* Third Image */}
+                        <div className="col-span-1 row-span-1 rounded-xl overflow-hidden cursor-pointer relative group" onClick={() => openFullGalleryModal(2)}>
+                            <Image
+                                src={property.images?.[2] || '/placeholder.jpg'}
+                                alt={`${property.title} - imagem 3`}
+                                fill
+                                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                            />
+                            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
+                        </div>
+
+                        {/* Map */}
+                        {center && (
+                            <div className="hidden md:block rounded-xl overflow-hidden relative group">
+                                <MapComponent
+                                    center={center}
+                                    zoom={14}
+                                    showMarker={true}
+                                />
                             </div>
-                        </div>
+                        )}
                     </div>
 
-                    {/* Main Content Area */}
-                    <div className="p-6">
-                        <div className="grid grid-cols-12 gap-6">
+                    {/* Main Content Body */}
+                    <div className="p-4 md:p-8">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             {/* Left Column */}
                             <div className="col-span-12 md:col-span-7">
                                 {/* Header */}
@@ -388,7 +411,7 @@ export default function PropertyDetailModal({ isOpen, onClose, property }: Prope
                                             {displayImages.length > 0 ? (
                                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                                                     {displayImages.map((img, idx) => (
-                                                        <div key={`full-gallery-thumb-${idx}`} className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group" onClick={() => { setCurrentGalleryIndex(idx); openFullGalleryModal(); }}>
+                                                        <div key={`full-gallery-thumb-${idx}`} className="relative aspect-square rounded-lg overflow-hidden cursor-pointer group" onClick={() => { setCurrentGalleryIndex(idx); openFullGalleryModal(idx); }}>
                                                             <Image src={img} alt={`${property.title} - Foto ${idx + 1}`} layout="fill" objectFit="cover" className="group-hover:scale-105 transition-transform" />
                                                             <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-opacity"></div>
                                                         </div>
@@ -437,7 +460,7 @@ export default function PropertyDetailModal({ isOpen, onClose, property }: Prope
                                             {property.location && <p className="text-sm text-gray-600 mb-3">{formatLocationForPublic(property.location)}</p>}
                                             {property.coordinates ? (
                                                 <div className="h-80 md:h-96 rounded-xl overflow-hidden shadow-md">
-                                                    <MapComponent center={(typeof property.coordinates === 'object' && 'lat' in property.coordinates) ? [property.coordinates.lng, property.coordinates.lat] : property.coordinates as [number, number]} zoom={15} showMarker={true} useCustomMarker={true} />
+                                                    <MapComponent center={(typeof property.coordinates === 'object' && 'lat' in property.coordinates) ? [property.coordinates.lng, property.coordinates.lat] : property.coordinates as [number, number]} zoom={15} showMarker={true} />
                                                 </div>
                                             ) : <p className="text-gray-600">Mapa não disponível.</p>}
                                             {property.pointsOfInterest && property.pointsOfInterest.length > 0 && (
@@ -595,7 +618,7 @@ export default function PropertyDetailModal({ isOpen, onClose, property }: Prope
             .animate-slide-in-left { animation: slide-in-left 0.3s ease-in-out forwards; }
             .animate-slide-in-right { animation: slide-in-right 0.3s ease-in-out forwards; }
         `}</style>
-        </>
+        </div>
     );
 }
 
@@ -649,4 +672,3 @@ export default function PropertyDetailModal({ isOpen, onClose, property }: Prope
 // CheckCircle - YES
 // All used icons seem to be in the import list.
 
- 

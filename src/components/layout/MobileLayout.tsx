@@ -21,7 +21,7 @@ export default function MobileLayout({ children }: MobileLayoutProps) {
 
   return (
     <FilterProvider>
-      <div className="flex flex-col min-h-screen bg-white">
+      <div className="flex flex-col min-h-screen bg-white overflow-x-hidden">
         <Header userType={userType} />
         <main className="flex-1 pt-24 pb-20">
           {children}
