@@ -18,35 +18,35 @@ const categories: LifestyleCategory[] = [
     title: 'Business Ready',
     subtitle: 'Estadias para executivos',
     description: 'Imóveis equipados com espaço de trabalho, internet de alta velocidade e localização estratégica para reuniões de negócios.',
-    icon: <Buildings className="w-6 h-6" weight="fill" />
+    icon: <Buildings className="w-6 h-6 text-white recommended-card-icon" weight="fill" />
   },
   {
     image: '/recomendado2.jpg',
     title: 'Vida Universitária',
     subtitle: 'Ideal para estudantes',
     description: 'Apartamentos próximos a universidades, com mobília completa, áreas de estudo e preços acessíveis.',
-    icon: <GraduationCap className="w-6 h-6" weight="fill" />
+    icon: <GraduationCap className="w-6 h-6 text-white recommended-card-icon" weight="fill" />
   },
   {
     image: '/recomendado3.jpg',
     title: 'Espaço para Eventos',
     subtitle: 'Celebre momentos especiais',
     description: 'Propriedades com amplas áreas sociais, cozinhas equipadas e capacidade para receber seus convidados com conforto.',
-    icon: <Calendar className="w-6 h-6" weight="fill" />
+    icon: <Calendar className="w-6 h-6 text-white recommended-card-icon" weight="fill" />
   },
   {
     image: '/recomendado4.jpg',
     title: 'Refúgio & Relaxamento',
     subtitle: 'Escape da rotina',
     description: 'Casas e chalés em meio à natureza, perfeitos para desconectar, relaxar e renovar as energias longe da cidade.',
-    icon: <TreePalm className="w-6 h-6" weight="fill" />
+    icon: <TreePalm className="w-6 h-6 text-white recommended-card-icon" weight="fill" />
   },
   {
     image: '/recomendado1.jpg', // Reusing image as placeholder - you might want to replace with a dedicated image
     title: 'Estadia Familiar',
     subtitle: 'Perfeito para famílias',
     description: 'Casas espaçosas com múltiplos quartos, áreas de lazer seguras para crianças e localizações próximas a parques e atrações familiares.',
-    icon: <Baby className="w-6 h-6" weight="fill" />
+    icon: <Baby className="w-6 h-6 text-white recommended-card-icon" weight="fill" />
   }
 ]
 

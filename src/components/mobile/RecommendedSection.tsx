@@ -16,31 +16,31 @@ const categories: LifestyleCategory[] = [
         image: '/recomendado1.jpg',
         title: 'Business Ready',
         subtitle: 'Estadias para executivos',
-        icon: <Buildings className="w-5 h-5" weight="fill" />
+        icon: <Buildings className="w-5 h-5 text-white recommended-card-icon" weight="fill" />
     },
     {
         image: '/recomendado2.jpg',
         title: 'Vida Universitária',
         subtitle: 'Ideal para estudantes',
-        icon: <GraduationCap className="w-5 h-5" weight="fill" />
+        icon: <GraduationCap className="w-5 h-5 text-white recommended-card-icon" weight="fill" />
     },
     {
         image: '/recomendado3.jpg',
         title: 'Momentos Especiais',
         subtitle: 'Espaço para eventos',
-        icon: <Calendar className="w-5 h-5" weight="fill" />
+        icon: <Calendar className="w-5 h-5 text-white recommended-card-icon" weight="fill" />
     },
     {
         image: '/recomendado4.jpg',
         title: 'Refúgio & Relaxamento',
         subtitle: 'Escape da rotina',
-        icon: <TreePalm className="w-5 h-5" weight="fill" />
+        icon: <TreePalm className="w-5 h-5 text-white recommended-card-icon" weight="fill" />
     },
     {
         image: '/recomendado1.jpg',
         title: 'Estadia Familiar',
         subtitle: 'Perfeito para famílias',
-        icon: <Baby className="w-5 h-5" weight="fill" />
+        icon: <Baby className="w-5 h-5 text-white recommended-card-icon" weight="fill" />
     }
 ]
 
