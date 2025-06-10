@@ -468,17 +468,60 @@ export default function PropertyDetailModal({ isOpen, onClose, property }: Prope
                                         </div>
                                     )}
                                     {activeTab === 'oferecemos' && (
-                                        <div>
-                                            <h3 className="text-xl font-semibold mb-3 text-gray-800">O que este lugar oferece</h3>
-                                            {property.amenities && property.amenities.length > 0 ? (
-                                                <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 text-sm text-gray-700">
-                                                    {property.amenities.map(amenity => (
-                                                        <li key={amenity} className="flex items-center">
-                                                            {getAmenityIcon(amenity)} <span className="ml-2">{amenity}</span>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            ) : <p className="text-gray-600">Comodidades não especificadas.</p>}
+                                        <div className="py-8">
+                                            <h3 className="text-2xl font-semibold mb-6">O que este lugar oferece</h3>
+                                            {property?.amenities && property.amenities.length > 0 ? (
+                                                <>
+                                                    {/* Mobile View: Single Column List (Now Categorized) */}
+                                                    <div className="block md:hidden">
+                                                        {AMENITIES_BY_CATEGORY.map(({ category, items }) => {
+                                                            const availableAmenities = items.filter(amenity => property.amenities!.includes(amenity));
+                                                            if (availableAmenities.length === 0) {
+                                                                return null;
+                                                            }
+                                                            return (
+                                                                <div key={category} className="mb-6">
+                                                                    <h4 className="font-bold text-lg mb-3 text-gray-700">{category}</h4>
+                                                                    <ul className="space-y-3">
+                                                                        {availableAmenities.map(amenity => (
+                                                                            <li key={amenity} className="flex items-center gap-3">
+                                                                                {getAmenityIcon(amenity)}
+                                                                                <span className="text-gray-600">{amenity}</span>
+                                                                            </li>
+                                                                        ))}
+                                                                    </ul>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                    {/* Desktop View: Two Columns */}
+                                                    <div className="hidden md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-4">
+                                                        {AMENITIES_BY_CATEGORY.reduce((acc, { category, items }) => {
+                                                            const availableAmenities = items.filter(amenity => property.amenities!.includes(amenity));
+                                                            if (availableAmenities.length === 0) {
+                                                                return acc;
+                                                            }
+
+                                                            acc.push(
+                                                                <div key={category}>
+                                                                    <h4 className="font-bold text-lg mb-2">{category}</h4>
+                                                                    <ul className="space-y-2">
+                                                                        {availableAmenities.map(amenity => (
+                                                                            <li key={amenity} className="flex items-center gap-2">
+                                                                                {getAmenityIcon(amenity)}
+                                                                                <span className="text-gray-600">{amenity}</span>
+                                                                            </li>
+                                                                        ))}
+                                                                    </ul>
+                                                                </div>
+                                                            );
+                                                            return acc;
+                                                        }, [] as JSX.Element[])}
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <p className="text-gray-600">Nenhuma comodidade especificada para este imóvel.</p>
+                                            )}
                                         </div>
                                     )}
                                     {activeTab === 'saber' && (
