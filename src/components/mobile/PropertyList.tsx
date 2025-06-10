@@ -37,9 +37,9 @@ export default function PropertyList() {
             <PropertyFilterModal />
             <div className="p-4 bg-gray-50 min-h-screen">
                 <div className="grid grid-cols-1 gap-6">
-                    {loading && <div>Carregando imóveis...</div>}
-                    {error && <div>Ocorreu um erro ao carregar os imóveis.</div>}
-                    {!loading && !error && properties.map((property: Property) => (
+                    {loading && <div className="text-center text-gray-500 mt-8">Carregando imóveis...</div>}
+                    {error && <div className="text-center text-red-500 mt-8">Ocorreu um erro ao carregar os imóveis.</div>}
+                    {!loading && !error && properties.length > 0 && properties.map((property: Property) => (
                         <div
                             key={property.id}
                             className="bg-white rounded-3xl overflow-hidden shadow-lg group cursor-pointer flex flex-col"
@@ -80,6 +80,11 @@ export default function PropertyList() {
                             </div>
                         </div>
                     ))}
+                    {!loading && !error && properties.length === 0 && (
+                        <div className="text-center text-gray-500 mt-8">
+                            <p>Nenhum imóvel encontrado baseado nos filtros aplicados.</p>
+                        </div>
+                    )}
                 </div>
 
                 {selectedProperty && (
