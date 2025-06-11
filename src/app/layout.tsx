@@ -158,7 +158,7 @@ export default function RootLayout({
             {/* Add to Homescreen Script */}
             <script dangerouslySetInnerHTML={{
               __html: `
-                // Inicialização mais agressiva para garantir que o popup apareça
+                // Inicialização única do Add to Homescreen
                 function initAddToHomeScreen() {
                   // Check if browser is in private mode (which can break localStorage)
                   function checkPrivateMode() {
@@ -176,14 +176,6 @@ export default function RootLayout({
                   // Function to initialize the add-to-homescreen
                   function doInitialize() {
                     if (window.AddToHomeScreen) {
-                      // Remove any existing instances first
-                      if (document.querySelector('.adhs-container')) {
-                        const oldContainer = document.querySelector('.adhs-container');
-                        if (oldContainer && oldContainer.parentNode) {
-                          oldContainer.parentNode.removeChild(oldContainer);
-                        }
-                      }
-                      
                       window.AddToHomeScreenInstance = window.AddToHomeScreen({
                         appName: 'Yallah',
                         appNameDisplay: 'standalone',
@@ -202,7 +194,6 @@ export default function RootLayout({
                       
                       // Debug output
                       console.log('Add to Homescreen Debug:', {
-                        'Attempt Time': new Date().toISOString(),
                         'Is standalone?': window.AddToHomeScreenInstance.isStandAlone(),
                         'Is iOS?': window.AddToHomeScreenInstance.isBrowserIOSSafari(),
                         'Is iOS Chrome?': window.AddToHomeScreenInstance.isBrowserIOSChrome(),
@@ -210,8 +201,6 @@ export default function RootLayout({
                         'User Agent': navigator.userAgent,
                         'DeviceInfo': deviceInfo
                       });
-                    } else {
-                      console.log('AddToHomeScreen library not loaded yet');
                     }
                   }
 
@@ -219,23 +208,13 @@ export default function RootLayout({
                   checkPrivateMode().then(function(isPrivate) {
                     console.log('Browser is in private mode:', isPrivate);
                     
-                    // Try multiple times at different intervals
-                    setTimeout(doInitialize, 1000);  // Try after 1 second
-                    setTimeout(doInitialize, 2000);  // Try after 2 seconds
-                    setTimeout(doInitialize, 5000);  // Try after 5 seconds
+                    // Inicializar apenas uma vez
+                    doInitialize();
                   });
                 }
 
                 // Execute when DOM is ready
                 document.addEventListener('DOMContentLoaded', initAddToHomeScreen);
-                
-                // Also execute after window load for good measure
-                window.addEventListener('load', initAddToHomeScreen);
-                
-                // And try immediately if document is already interactive or complete
-                if (document.readyState === 'interactive' || document.readyState === 'complete') {
-                  initAddToHomeScreen();
-                }
               `
             }} />
           </BodyWrapper>
