@@ -73,14 +73,8 @@ export default function PropertyFilterModal() {
     const handleApplyFilters = () => {
         setActiveFilters(tempFilters);
         toggleFilterModal();
-
-        // Adiciona um pequeno delay para garantir que o modal fechou antes de rolar
-        setTimeout(() => {
-            const section = document.getElementById('imoveis-disponiveis');
-            if (section) {
-                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }, 100);
+        // Redirect to the discover section after applying filters
+        window.location.hash = "discover-section";
     };
 
     const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {

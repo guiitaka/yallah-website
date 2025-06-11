@@ -127,18 +127,13 @@ export default function InstitutionalHero() {
 
                         {/* CTA Buttons */}
                         <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
-                            <button
-                                onClick={() => {
-                                    const section = document.getElementById('imoveis-disponiveis');
-                                    if (section) {
-                                        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                    }
-                                }}
+                            <Link
+                                href="#discover-section"
                                 className="flex items-center justify-center gap-2 bg-[#8BADA4] text-white px-4 md:px-6 py-3 md:py-4 rounded-full hover:bg-[#7a9b94] transition-colors shadow-md text-sm md:text-base whitespace-nowrap"
                             >
                                 <House weight="bold" className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
                                 <span className="truncate">Encontrar imóvel perfeito</span>
-                            </button>
+                            </Link>
                             <Link
                                 href="/sobre"
                                 className="flex items-center justify-center gap-2 bg-white text-gray-800 px-4 md:px-6 py-3 md:py-4 rounded-full hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm text-sm md:text-base whitespace-nowrap"
