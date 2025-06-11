@@ -302,10 +302,11 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
                     <div className="space-y-6 flex flex-col h-[550px]">
                         <div className="flex-shrink-0">
                             <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Localização *</label>
-                            <div className="flex-grow h-full">
+                            <div className="flex-grow w-full relative">
                                 <MapboxSearch
-                                    initialValue={formData.location}
                                     onLocationSelect={handleLocationSelect}
+                                    initialValue={formData.location}
+                                    variant="light"
                                 />
                             </div>
                             {formData.coordinates && (
