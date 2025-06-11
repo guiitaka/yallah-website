@@ -42,8 +42,15 @@ export default function RootLayout({
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <link rel="manifest" href="/manifest.json" />
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/philfung/add-to-homescreen@3.3/dist/add-to-homescreen.min.css" />
+        <link rel="manifest" href="/manifest.json" crossOrigin="use-credentials" />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/philfung/add-to-homescreen@3.3/dist/add-to-homescreen.min.css"
+        />
+        <Script
+          src="https://cdn.jsdelivr.net/gh/philfung/add-to-homescreen@3.3/dist/add-to-homescreen.min.js"
+          strategy="beforeInteractive"
+        />
       </head>
       <body>
         <FilterProvider>
@@ -146,18 +153,20 @@ export default function RootLayout({
             `}} />
           </BodyWrapper>
         </FilterProvider>
-        <Script src="https://cdn.jsdelivr.net/gh/philfung/add-to-homescreen@3.3/dist/add-to-homescreen.min.js" strategy="lazyOnload" />
         <script dangerouslySetInnerHTML={{
           __html: `
             document.addEventListener('DOMContentLoaded', function () {
               if (window.AddToHomeScreen) {
                 window.AddToHomeScreenInstance = window.AddToHomeScreen({
                   appName: 'Yallah',
+                  appNameDisplay: 'standalone',
                   appIconUrl: 'apple-touch-icon.png',
                   assetUrl: 'https://cdn.jsdelivr.net/gh/philfung/add-to-homescreen@3.3/dist/assets/img/',
+                  allowClose: true,
+                  showArrow: true,
                   maxModalDisplayCount: 2
                 });
-                window.AddToHomeScreenInstance.show();
+                window.AddToHomeScreenInstance.show('pt');
               }
             });
           `
