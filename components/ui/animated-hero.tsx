@@ -74,7 +74,7 @@ function Hero() {
                                 Fale Conosco <PhoneCall className="w-5 h-5 md:w-6 md:h-6" />
                             </Button>
                         </Link>
-                        <Link href="#discover-section">
+                        <Link href="/tenant#all-properties">
                             <Button size="lg" className="gap-4 px-8 sm:px-10 py-4 text-lg md:text-xl bg-[#8BADA4] hover:bg-[#7A9A8D] text-white">
                                 Explorar Agora <MoveRight className="w-5 h-5 md:w-6 md:h-6" />
                             </Button>

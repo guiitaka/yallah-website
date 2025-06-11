@@ -61,6 +61,7 @@ export interface Property {
         quietHours?: string;
     };
     pointsOfInterest?: string[];
+    propertyLink?: string;
 }
 
 // Dados de exemplo para as propriedades

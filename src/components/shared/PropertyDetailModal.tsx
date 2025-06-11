@@ -624,13 +624,24 @@ export default function PropertyDetailModal({ isOpen, onClose, property }: Prope
                                             <div className="flex justify-between font-bold text-lg pt-2 border-t mt-2"><span>Total</span><span>{formatCurrency(totalAmount)}</span></div>
                                         </div>
                                     )}
-                                    <button
-                                        onClick={handleAvailabilityConsultation}
-                                        disabled={!startDate || !endDate}
-                                        className="w-full bg-[#8BADA4] hover:bg-[#7A9A8D] text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                                    >
-                                        Consultar disponibilidade <ArrowRight size={18} className="ml-2" />
-                                    </button>
+                                    {property.propertyLink ? (
+                                        <a
+                                            href={property.propertyLink}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="w-full bg-[#8BADA4] hover:bg-[#7A9A8D] text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center"
+                                        >
+                                            Consultar disponibilidade <ArrowRight size={18} className="ml-2" />
+                                        </a>
+                                    ) : (
+                                        <button
+                                            onClick={handleAvailabilityConsultation}
+                                            disabled={!startDate || !endDate}
+                                            className="w-full bg-[#8BADA4] hover:bg-[#7A9A8D] text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                                        >
+                                            Consultar disponibilidade <ArrowRight size={18} className="ml-2" />
+                                        </button>
+                                    )}
                                     {consultationMessage && <p className={`text-xs text-center ${consultationMessage.startsWith('Obrigado') ? 'text-green-600' : 'text-red-600'}`}>{consultationMessage}</p>}
                                 </div>
                             </div>

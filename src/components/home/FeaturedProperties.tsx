@@ -65,6 +65,7 @@ interface PropertyCard { // Renamed from PropertyCardDisplayData
     cancellationPolicy?: string; // From Property
     sourceUrl?: Property['sourceUrl']; // From Property
     whatYouShouldKnowDynamic?: Property['whatYouShouldKnowDynamic']; // From Property
+    propertyLink?: string;
 }
 
 // Componente para o botão de favorito
@@ -228,6 +229,7 @@ export default function FeaturedProperties() {
                 cancellationPolicy: prop.cancellationPolicy,
                 sourceUrl: prop.sourceUrl,
                 whatYouShouldKnowDynamic: prop.whatYouShouldKnowDynamic,
+                propertyLink: prop.propertyLink,
             };
         });
     }, [featuredFirebaseProperties]);
@@ -434,6 +436,18 @@ export default function FeaturedProperties() {
 
         return 'Localização detalhada após reserva'; // Final fallback
     };
+
+    const totalAmount = useMemo(() => {
+        if (!selectedProperty) return 0;
+        const nights = calculateNights(checkInDate, checkOutDate);
+        if (nights <= 0) return 0;
+
+        const basePrice = selectedProperty.pricePerNight * nights;
+        const discount = selectedProperty.discountSettings ? calculateActualDiscount(basePrice, selectedProperty.discountSettings) : 0;
+        const serviceFee = selectedProperty.serviceFee || 0;
+
+        return basePrice - discount + serviceFee;
+    }, [selectedProperty, checkInDate, checkOutDate]);
 
     return (
         <>
@@ -802,23 +816,37 @@ export default function FeaturedProperties() {
                                                     <div className="flex justify-between font-bold text-lg pt-2 border-t mt-2">
                                                         <span>Total</span>
                                                         <span>
-                                                            {formatCurrency(
-                                                                (selectedProperty.pricePerNight * calculateNights(checkInDate, checkOutDate)) +
-                                                                (selectedProperty.serviceFee || 0) -
-                                                                (selectedProperty.discountSettings ? calculateActualDiscount(selectedProperty.pricePerNight * calculateNights(checkInDate, checkOutDate), selectedProperty.discountSettings) : 0)
-                                                            )}
+                                                            {totalAmount > 0 ? formatCurrency(totalAmount) : 'R$ 0,00'}
                                                         </span>
                                                     </div>
                                                 </div>
                                             )}
 
-                                            <button
-                                                onClick={() => handleAvailabilityConsultation(selectedProperty)}
-                                                disabled={!checkInDate || !checkOutDate}
-                                                className="w-full bg-[#8BADA4] hover:bg-[#7A9A8D] text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                                            >
-                                                Consultar disponibilidade <ArrowRight size={18} className="ml-2" />
-                                            </button>
+                                            {/* Botão de consulta */}
+                                            <div className="mt-6">
+                                                {selectedProperty.propertyLink ? (
+                                                    <a
+                                                        href={selectedProperty.propertyLink}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="w-full bg-[#8BADA4] hover:bg-opacity-90 text-white font-bold py-3 px-4 rounded-lg transition-colors flex items-center justify-center"
+                                                    >
+                                                        Consultar disponibilidade
+                                                        <ArrowRight size={18} className="ml-2" />
+                                                    </a>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => handleAvailabilityConsultation(selectedProperty)}
+                                                        disabled={!checkInDate || !checkOutDate}
+                                                        className="w-full bg-[#8BADA4] hover:bg-opacity-90 text-white font-bold py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                                                    >
+                                                        Consultar disponibilidade
+                                                        <ArrowRight size={18} className="ml-2" />
+                                                    </button>
+                                                )}
+                                            </div>
+
+                                            {/* Mensagem de consulta */}
                                             {consultationMessage && <p className="text-xs text-center text-gray-600">{consultationMessage}</p>}
                                         </div>
                                     </div>

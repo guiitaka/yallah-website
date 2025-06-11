@@ -217,6 +217,7 @@ interface FormData {
         quietHours?: string;
     };
     pointsOfInterest: string[]; // Adicionado para pontos de interesse
+    propertyLink?: string;
     // additionalFeatures?: string[]; // Optional additional features
 }
 
@@ -270,6 +271,7 @@ const initialFormData: FormData = {
     },
     whatYouShouldKnowDynamic: {},
     pointsOfInterest: [], // Adicionado para pontos de interesse
+    propertyLink: '',
     // additionalFeatures: [], // Optional additional features
 };
 
@@ -564,6 +566,7 @@ export default function PropertiesPage() {
         },
         whatYouShouldKnowDynamic: {},
         pointsOfInterest: [], // Adicionado para pontos de interesse
+        propertyLink: '',
         // additionalFeatures: [], // Optional additional features
     });
 
@@ -786,6 +789,7 @@ export default function PropertiesPage() {
                 quietHours: '22:00 - 08:00'
             },
             pointsOfInterest: [], // Adicionado para pontos de interesse
+            propertyLink: '',
             // additionalFeatures: [], // Optional additional features
         });
         setLocalImages([]);
@@ -880,6 +884,7 @@ export default function PropertiesPage() {
                 whatYouShouldKnowSections: processedWhatYouShouldKnowSections, // Use processed data
                 whatYouShouldKnowDynamic: formData.whatYouShouldKnowDynamic, // Keep as is, or enhance later
                 pointsOfInterest: formData.pointsOfInterest,
+                propertyLink: formData.propertyLink,
                 // additionalFeatures: formData.additionalFeatures,
                 // created_at and updated_at will be handled by Supabase
             };
@@ -976,6 +981,7 @@ export default function PropertiesPage() {
                 },
                 whatYouShouldKnowSections: processedWhatYouShouldKnowSections, // Use processed data
                 pointsOfInterest: formData.pointsOfInterest,
+                propertyLink: formData.propertyLink,
                 // additionalFeatures: formData.additionalFeatures,
                 // updated_at will be handled by Supabase
             };
@@ -1061,6 +1067,7 @@ export default function PropertiesPage() {
             whatYouShouldKnowSections: sectionsForFormData, // MODIFIED: Use sectionsForFormData
             whatYouShouldKnowDynamic: property.whatYouShouldKnowDynamic || initialFormData.whatYouShouldKnowDynamic, // This might need review if it's used for similar dynamic inputs
             pointsOfInterest: property.pointsOfInterest || [],
+            propertyLink: property.propertyLink || '',
             // additionalFeatures: property.additionalFeatures || [],
         });
         // console.log('DEBUG: formData.pointsOfInterest set to:', property.pointsOfInterest || []);
@@ -1501,6 +1508,7 @@ export default function PropertiesPage() {
             },
             whatYouShouldKnowDynamic: {},
             pointsOfInterest: importedData.pointsOfInterest || [], // Adicionado e mapeado de pointsOfInterest
+            propertyLink: importedData.propertyLink || '',
             // additionalFeatures: importedData.additionalFeatures || [], // Optional additional features
         });
 

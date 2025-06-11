@@ -120,6 +120,7 @@ export interface PropertyCard {
         cancellationPolicy: string[];
     };
     pointsOfInterest?: string[]; // Novo campo para pontos de interesse
+    propertyLink?: string;
 }
 
 // Static property data as fallback
@@ -687,6 +688,7 @@ const mapFirebaseToPropertyCard = (properties: any[]): PropertyCard[] => {
             pointsOfInterest: property.pointsOfInterest || [],
             serviceFee: property.serviceFee,
             discountSettings: property.discountSettings,
+            propertyLink: property.propertyLink,
         };
     });
 };
@@ -2058,10 +2060,23 @@ export default function AllProperties() {
                                                     </div>
                                                 )}
 
-                                                {/* Botão de consulta */}
-                                                <button className="w-full py-3 px-4 bg-[#8BADA4] hover:bg-[#7A9D94] text-white font-medium rounded-full transition-colors flex items-center justify-center gap-2 text-sm whitespace-nowrap" onClick={() => handleAvailabilityConsultation(property)}>
-                                                    Consultar disponibilidade <ArrowRight weight="bold" className="min-w-4 min-h-4" />
-                                                </button>
+                                                {property.propertyLink ? (
+                                                    <a
+                                                        href={property.propertyLink}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="w-full bg-[#8BADA4] hover:bg-[#7A9A8D] text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center mt-4"
+                                                    >
+                                                        Consultar disponibilidade <ArrowRight size={18} className="ml-2" />
+                                                    </a>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => handleAvailabilityConsultation(property)}
+                                                        className="w-full bg-[#8BADA4] hover:bg-[#7A9A8D] text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-300 flex items-center justify-center mt-4"
+                                                    >
+                                                        Consultar disponibilidade <ArrowRight size={18} className="ml-2" />
+                                                    </button>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

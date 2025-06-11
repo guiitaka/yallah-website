@@ -36,9 +36,9 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2 lg:col-span-1">
             <h3 className="text-lg mb-4 font-bold">Navegação</h3>
             <ul className="space-y-3">
-              <li><Link href="#" className="text-white/80 hover:text-white transition-colors">Serviços</Link></li>
-              <li><Link href="#" className="text-white/80 hover:text-white transition-colors">Imóveis</Link></li>
-              <li><Link href="#" className="text-white/80 hover:text-white transition-colors">Sobre</Link></li>
+              <li><Link href="/" className="text-white/80 hover:text-white transition-colors">Início</Link></li>
+              <li><Link href="/owner/servicos" className="text-white/80 hover:text-white transition-colors">Serviços</Link></li>
+              <li><Link href="/owner/como-funciona" className="text-white/80 hover:text-white transition-colors">Sobre</Link></li>
             </ul>
           </div>
 
@@ -46,10 +46,10 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2 lg:col-span-1">
             <h3 className="text-lg mb-4 font-bold">Ferramentas</h3>
             <ul className="space-y-3">
-              <li><Link href="#" className="text-white/80 hover:text-white transition-colors">Gestão de Imóveis</Link></li>
-              <li><Link href="#" className="text-white/80 hover:text-white transition-colors">Análise de Mercado</Link></li>
-              <li><Link href="#" className="text-white/80 hover:text-white transition-colors">Atendimento 24h</Link></li>
-              <li><Link href="#" className="text-white/80 hover:text-white transition-colors">Dashboard</Link></li>
+              <li><Link href="/tenant" className="text-white/80 hover:text-white transition-colors">Para locatários</Link></li>
+              <li><Link href="/owner" className="text-white/80 hover:text-white transition-colors">Para proprietários</Link></li>
+              <li><Link href="/owner/nosso-metodo" className="text-white/80 hover:text-white transition-colors">Nosso Método</Link></li>
+              <li><Link href="/owner/fale-conosco" className="text-white/80 hover:text-white transition-colors">Contato</Link></li>
             </ul>
           </div>
 

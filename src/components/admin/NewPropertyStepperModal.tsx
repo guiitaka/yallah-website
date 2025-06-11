@@ -64,6 +64,7 @@ interface FormData {
         quietHours?: string;
     };
     pointsOfInterest: string[]; // Novo campo para pontos de interesse
+    propertyLink?: string; // Link para consulta de disponibilidade
 }
 
 interface NewPropertyStepperModalProps {
@@ -189,6 +190,18 @@ const NewPropertyStepperModal: React.FC<NewPropertyStepperModalProps> = ({
                                 placeholder="Ex: Apartamento moderno com vista para o mar"
                                 className="w-full"
                                 required
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="propertyLink" className="block text-sm font-medium text-gray-700 mb-1">Link do Imóvel</label>
+                            <Input
+                                id="propertyLink"
+                                name="propertyLink"
+                                type="url"
+                                value={formData.propertyLink || ''}
+                                onChange={handleChange}
+                                placeholder="https://yallah.com.br/imovel/exemplo"
+                                className="w-full"
                             />
                         </div>
                         <div>
