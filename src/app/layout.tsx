@@ -152,26 +152,61 @@ export default function RootLayout({
                 });
               });
             `}} />
+
+            {/* Add to Homescreen Script */}
+            <script dangerouslySetInnerHTML={{
+              __html: `
+                document.addEventListener('DOMContentLoaded', function () {
+                  // Check if browser is in private mode (which can break localStorage)
+                  function checkPrivateMode() {
+                    return new Promise(function(resolve) {
+                      try {
+                        localStorage.setItem('__private_mode_test', '1');
+                        localStorage.removeItem('__private_mode_test');
+                        resolve(false); // Not private mode
+                      } catch (e) {
+                        resolve(true); // Private mode
+                      }
+                    });
+                  }
+
+                  // Check private mode first
+                  checkPrivateMode().then(function(isPrivate) {
+                    console.log('Browser is in private mode:', isPrivate);
+                    
+                    if (window.AddToHomeScreen) {
+                      window.AddToHomeScreenInstance = window.AddToHomeScreen({
+                        appName: 'Yallah',
+                        appNameDisplay: 'standalone',
+                        appIconUrl: 'apple-touch-icon.png',
+                        assetUrl: 'https://cdn.jsdelivr.net/gh/philfung/add-to-homescreen@3.3/dist/assets/img/',
+                        allowClose: true,
+                        showArrow: true,
+                        maxModalDisplayCount: -1
+                      });
+                      
+                      // Clear any existing counter to ensure it always shows
+                      window.AddToHomeScreenInstance.clearModalDisplayCount();
+                      
+                      // Show the prompt
+                      var deviceInfo = window.AddToHomeScreenInstance.show('pt');
+                      
+                      // Debug output - this will be visible in the console
+                      console.log('Add to Homescreen Debug:', {
+                        'Is standalone?': window.AddToHomeScreenInstance.isStandAlone(),
+                        'Is iOS?': window.AddToHomeScreenInstance.isBrowserIOSSafari(),
+                        'Is iOS Chrome?': window.AddToHomeScreenInstance.isBrowserIOSChrome(),
+                        'Is Android Chrome?': window.AddToHomeScreenInstance.isBrowserAndroidChrome(),
+                        'User Agent': navigator.userAgent,
+                        'DeviceInfo': deviceInfo
+                      });
+                    }
+                  });
+                });
+              `
+            }} />
           </BodyWrapper>
         </FilterProvider>
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            document.addEventListener('DOMContentLoaded', function () {
-              if (window.AddToHomeScreen) {
-                window.AddToHomeScreenInstance = window.AddToHomeScreen({
-                  appName: 'Yallah',
-                  appNameDisplay: 'standalone',
-                  appIconUrl: 'apple-touch-icon.png',
-                  assetUrl: 'https://cdn.jsdelivr.net/gh/philfung/add-to-homescreen@3.3/dist/assets/img/',
-                  allowClose: true,
-                  showArrow: true,
-                  maxModalDisplayCount: 2
-                });
-                window.AddToHomeScreenInstance.show('pt');
-              }
-            });
-          `
-        }} />
       </body>
     </html>
   )
