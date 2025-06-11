@@ -43,7 +43,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="manifest" href="/manifest.json" />
-        <link rel="stylesheet" href="/add-to-homescreen/add-to-homescreen.min.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/philfung/add-to-homescreen@3.3/dist/add-to-homescreen.min.css" />
       </head>
       <body>
         <FilterProvider>
@@ -146,7 +146,7 @@ export default function RootLayout({
             `}} />
           </BodyWrapper>
         </FilterProvider>
-        <Script src="/add-to-homescreen/add-to-homescreen.min.js" strategy="lazyOnload" />
+        <Script src="https://cdn.jsdelivr.net/gh/philfung/add-to-homescreen@3.3/dist/add-to-homescreen.min.js" strategy="lazyOnload" />
         <script dangerouslySetInnerHTML={{
           __html: `
             document.addEventListener('DOMContentLoaded', function () {
@@ -154,7 +154,7 @@ export default function RootLayout({
                 window.AddToHomeScreenInstance = window.AddToHomeScreen({
                   appName: 'Yallah',
                   appIconUrl: 'apple-touch-icon.png',
-                  assetUrl: '/add-to-homescreen/assets/img/',
+                  assetUrl: 'https://cdn.jsdelivr.net/gh/philfung/add-to-homescreen@3.3/dist/assets/img/',
                   maxModalDisplayCount: 2
                 });
                 window.AddToHomeScreenInstance.show();
