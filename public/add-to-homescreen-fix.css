@@ -1,0 +1,30 @@
+/* Correção para garantir que o popup "add to homescreen" apareça acima de todos os elementos */
+.adhs-container {
+  z-index: 2147483647 !important; /* Valor máximo possível para z-index */
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+}
+
+.adhs-container .adhs-modal {
+  z-index: 2147483647 !important;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+.adhs-container .adhs-logo {
+  z-index: 2147483647 !important;
+}
+
+/* Garantir que o popup seja visível em dispositivos móveis */
+@media (max-width: 768px) {
+  .adhs-container,
+  .adhs-container .adhs-modal,
+  .adhs-container .adhs-logo {
+    z-index: 2147483647 !important;
+  }
+} 
