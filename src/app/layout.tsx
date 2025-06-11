@@ -158,8 +158,13 @@ export default function RootLayout({
             {/* Add to Homescreen Script */}
             <script dangerouslySetInnerHTML={{
               __html: `
-                // Inicialização única do Add to Homescreen
+                // Inicialização do Add to Homescreen
+                let hasInitialized = false; // Variável para controlar se já foi inicializado
+
                 function initAddToHomeScreen() {
+                  // Se já inicializou, não faça nada
+                  if (hasInitialized) return;
+                  
                   // Check if browser is in private mode (which can break localStorage)
                   function checkPrivateMode() {
                     return new Promise(function(resolve) {
@@ -175,46 +180,59 @@ export default function RootLayout({
 
                   // Function to initialize the add-to-homescreen
                   function doInitialize() {
-                    if (window.AddToHomeScreen) {
-                      window.AddToHomeScreenInstance = window.AddToHomeScreen({
-                        appName: 'Yallah',
-                        appNameDisplay: 'standalone',
-                        appIconUrl: 'apple-touch-icon.png',
-                        assetUrl: 'https://cdn.jsdelivr.net/gh/philfung/add-to-homescreen@3.3/dist/assets/img/',
-                        allowClose: true,
-                        showArrow: true,
-                        maxModalDisplayCount: -1
-                      });
-                      
-                      // Force clear any display count
-                      window.AddToHomeScreenInstance.clearModalDisplayCount();
-                      
-                      // Show the prompt
-                      var deviceInfo = window.AddToHomeScreenInstance.show('pt');
-                      
-                      // Debug output
-                      console.log('Add to Homescreen Debug:', {
-                        'Is standalone?': window.AddToHomeScreenInstance.isStandAlone(),
-                        'Is iOS?': window.AddToHomeScreenInstance.isBrowserIOSSafari(),
-                        'Is iOS Chrome?': window.AddToHomeScreenInstance.isBrowserIOSChrome(),
-                        'Is Android Chrome?': window.AddToHomeScreenInstance.isBrowserAndroidChrome(),
-                        'User Agent': navigator.userAgent,
-                        'DeviceInfo': deviceInfo
-                      });
+                    if (!window.AddToHomeScreen) {
+                      console.log('AddToHomeScreen library not loaded yet, trying in 1 second');
+                      setTimeout(doInitialize, 1000);
+                      return;
                     }
+                    
+                    if (hasInitialized) return; // Verificação dupla
+                    hasInitialized = true; // Marcar como inicializado
+                    
+                    window.AddToHomeScreenInstance = window.AddToHomeScreen({
+                      appName: 'Yallah',
+                      appNameDisplay: 'standalone',
+                      appIconUrl: 'apple-touch-icon.png',
+                      assetUrl: 'https://cdn.jsdelivr.net/gh/philfung/add-to-homescreen@3.3/dist/assets/img/',
+                      allowClose: true,
+                      showArrow: true,
+                      maxModalDisplayCount: -1
+                    });
+                    
+                    // Force clear any display count
+                    window.AddToHomeScreenInstance.clearModalDisplayCount();
+                    
+                    // Show the prompt
+                    var deviceInfo = window.AddToHomeScreenInstance.show('pt');
+                    
+                    // Debug output
+                    console.log('Add to Homescreen Debug:', {
+                      'Is standalone?': window.AddToHomeScreenInstance.isStandAlone(),
+                      'Is iOS?': window.AddToHomeScreenInstance.isBrowserIOSSafari(),
+                      'Is iOS Chrome?': window.AddToHomeScreenInstance.isBrowserIOSChrome(),
+                      'Is Android Chrome?': window.AddToHomeScreenInstance.isBrowserAndroidChrome(),
+                      'User Agent': navigator.userAgent,
+                      'DeviceInfo': deviceInfo
+                    });
                   }
 
                   // Check private mode first
                   checkPrivateMode().then(function(isPrivate) {
                     console.log('Browser is in private mode:', isPrivate);
                     
-                    // Inicializar apenas uma vez
+                    // Inicializar
                     doInitialize();
                   });
                 }
 
-                // Execute when DOM is ready
-                document.addEventListener('DOMContentLoaded', initAddToHomeScreen);
+                // Execute quando a página estiver completamente carregada
+                window.addEventListener('load', initAddToHomeScreen);
+                
+                // Execute também no DOMContentLoaded como backup
+                document.addEventListener('DOMContentLoaded', function() {
+                  // Espera um pouco para que outros scripts possam carregar primeiro
+                  setTimeout(initAddToHomeScreen, 1000);
+                });
               `
             }} />
           </BodyWrapper>
