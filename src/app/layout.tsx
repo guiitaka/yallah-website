@@ -5,6 +5,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import BodyWrapper from '@/components/layout/BodyWrapper'
 import ChatbotScript from '@components/layout/ChatbotScript'
 import { FilterProvider } from "@/context/FilterContext"
+import Script from 'next/script';
 
 const montserrat = Montserrat({ subsets: ['latin'] })
 const playfair = Playfair_Display({
@@ -41,6 +42,8 @@ export default function RootLayout({
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="stylesheet" href="/add-to-homescreen/add-to-homescreen.min.css" />
       </head>
       <body>
         <FilterProvider>
@@ -143,6 +146,22 @@ export default function RootLayout({
             `}} />
           </BodyWrapper>
         </FilterProvider>
+        <Script src="/add-to-homescreen/add-to-homescreen.min.js" strategy="lazyOnload" />
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            document.addEventListener('DOMContentLoaded', function () {
+              if (window.AddToHomeScreen) {
+                window.AddToHomeScreenInstance = window.AddToHomeScreen({
+                  appName: 'Yallah',
+                  appIconUrl: 'apple-touch-icon.png',
+                  assetUrl: '/add-to-homescreen/assets/img/',
+                  maxModalDisplayCount: 2
+                });
+                window.AddToHomeScreenInstance.show();
+              }
+            });
+          `
+        }} />
       </body>
     </html>
   )
