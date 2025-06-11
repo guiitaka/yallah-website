@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { deleteCookie } from 'cookies-next';
 import { useAuthContext } from '@/utils/AuthContext';
-import { Building, Inbox, MessageCircle, Bell, ChevronDown } from 'lucide-react';
+import { Building, Inbox, ChevronDown, LayoutDashboard } from 'lucide-react';
 
 export default function AdminHeader() {
     const { user, loading, signOut } = useAuthContext();
@@ -102,10 +102,10 @@ export default function AdminHeader() {
                                     Mensagens
                                 </Link>
                                 <Link
-                                    href="/admin/inbox/properties"
+                                    href="/admin/properties"
                                     className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-full hover:bg-opacity-80 transition-colors"
                                     style={{
-                                        backgroundColor: pathname === '/admin/inbox/properties' ? '#8BADA4' : 'transparent',
+                                        backgroundColor: pathname.startsWith('/admin/properties') ? '#8BADA4' : 'transparent',
                                         color: 'white'
                                     }}
                                 >
@@ -113,32 +113,20 @@ export default function AdminHeader() {
                                     Imóveis
                                 </Link>
                                 <Link
-                                    href="/admin/inbox/support"
+                                    href="/admin/dashboard"
                                     className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-full hover:bg-opacity-80 transition-colors"
                                     style={{
-                                        backgroundColor: pathname === '/admin/inbox/support' ? '#8BADA4' : 'transparent',
+                                        backgroundColor: pathname === '/admin/dashboard' ? '#8BADA4' : 'transparent',
                                         color: 'white'
                                     }}
                                 >
-                                    <MessageCircle className="mr-2 h-5 w-5" />
-                                    Suporte
+                                    <LayoutDashboard className="mr-2 h-5 w-5" />
+                                    Dashboard
                                 </Link>
                             </nav>
                         </div>
 
                         <div className="flex items-center ml-auto">
-                            <div className="mx-2">
-                                <button className="p-2 rounded-full bg-white/20 text-white hover:bg-white/30">
-                                    <MessageCircle className="h-5 w-5" />
-                                </button>
-                            </div>
-
-                            <div className="mx-2">
-                                <button className="p-2 rounded-full bg-white/20 text-white hover:bg-white/30">
-                                    <Bell className="h-5 w-5" />
-                                </button>
-                            </div>
-
                             <div className="ml-4 relative flex items-center profile-menu-container">
                                 <div className="flex items-center cursor-pointer" onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}>
                                     <Image

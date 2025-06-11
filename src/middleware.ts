@@ -39,9 +39,9 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/admin', request.url));
     }
 
-    // Se for exatamente /admin (página de login) e já tiver um token, redirecionar para o dashboard
+    // Se for exatamente /admin (página de login) e já tiver um token, redirecionar para o inbox
     if (request.nextUrl.pathname === '/admin' && request.cookies.get('admin_session')) {
-      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+      return NextResponse.redirect(new URL('/admin/inbox', request.url));
     }
   }
 

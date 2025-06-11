@@ -1750,28 +1750,13 @@ export default function PropertiesPage() {
                                         <h3 className="text-lg font-bold text-white truncate">{property.title}</h3>
                                         <div className="flex items-center mt-1 text-white/80">
                                             <MapPin className="h-4 w-4 mr-1" />
-                                            <p className="text-sm">{property.location}</p>
+                                            <p className="text-sm">{property.location.split(',').slice(0, 3).join(', ')}</p>
                                         </div>
-                                        <div className="flex items-center justify-between mt-4">
-                                            <div className="flex items-center text-white/80">
-                                                <DollarSign className="h-4 w-4" />
-                                                <span className="text-lg font-bold text-white">R$ {property.price}</span>
-                                                <span className="text-xs ml-1">/noite</span>
-                                            </div>
-                                            <div className="flex space-x-3">
-                                                <div className="flex items-center text-white/70">
-                                                    <BedDouble className="h-4 w-4 mr-1" />
-                                                    <span className="text-xs">{property.bedrooms}</span>
-                                                </div>
-                                                <div className="flex items-center text-white/70">
-                                                    <Bath className="h-4 w-4 mr-1" />
-                                                    <span className="text-xs">{property.bathrooms}</span>
-                                                </div>
-                                                <div className="flex items-center text-white/70">
-                                                    <Square className="h-4 w-4 mr-1" />
-                                                    <span className="text-xs">{property.area}m²</span>
-                                                </div>
-                                            </div>
+                                        <div className="mt-4">
+                                            <p className="text-xl font-bold text-white">
+                                                R$ {property.price}
+                                                <span className="text-sm font-normal text-white/80"> /noite</span>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
