@@ -1,54 +1,72 @@
 'use client'
 
-import { VerticalCutReveal } from "@/components/ui/vertical-cut-reveal"
+import React, { useRef, useEffect } from 'react';
+import { motion, useAnimation } from 'framer-motion';
+
+const textLines = [
+    { text: `ENCONTRE O SEU LUGAR 📍,`, className: "text-gray-800" },
+    { text: `SEM ESTRESSE 😊 E SEM`, className: "text-gray-800" },
+    { text: `COMPLICAÇÃO 👍.`, className: "text-teal-500" },
+];
+
+const lineVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: (i: number) => ({
+        y: 0,
+        opacity: 1,
+        transition: {
+            delay: i * 0.2,
+            duration: 0.5,
+            ease: "easeOut",
+        },
+    }),
+};
 
 export default function AnimatedTextSection() {
+    const controls = useAnimation();
+    const ref = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    controls.start("visible");
+                }
+            },
+            {
+                threshold: 0.1,
+            }
+        );
+
+        const currentRef = ref.current;
+        if (currentRef) {
+            observer.observe(currentRef);
+        }
+
+        return () => {
+            if (currentRef) {
+                observer.unobserve(currentRef);
+            }
+        };
+    }, [controls]);
+
     return (
-        <section id="discover-section" className="bg-white py-12 px-4">
-            <div className="w-full text-2xl sm:text-3xl md:text-4xl flex flex-col items-start justify-center font-bold text-gray-800 tracking-wide uppercase">
-                <VerticalCutReveal
-                    splitBy="characters"
-                    staggerDuration={0.025}
-                    staggerFrom="first"
-                    transition={{
-                        type: "spring",
-                        stiffness: 200,
-                        damping: 21,
-                    }}
-                    containerClassName="leading-tight"
-                >
-                    {`ENCONTRE O SEU LUGAR 📍,`}
-                </VerticalCutReveal>
-                <VerticalCutReveal
-                    splitBy="characters"
-                    staggerDuration={0.025}
-                    staggerFrom="last"
-                    reverse={true}
-                    transition={{
-                        type: "spring",
-                        stiffness: 200,
-                        damping: 21,
-                        delay: 0.5,
-                    }}
-                    containerClassName="leading-tight"
-                >
-                    {`SEM ESTRESSE 😌 E SEM`}
-                </VerticalCutReveal>
-                <VerticalCutReveal
-                    splitBy="characters"
-                    staggerDuration={0.025}
-                    staggerFrom="center"
-                    transition={{
-                        type: "spring",
-                        stiffness: 200,
-                        damping: 21,
-                        delay: 1.1,
-                    }}
-                    containerClassName="leading-tight text-[#8BADA4]"
-                >
-                    {`COMPLICAÇÃO 👍.`}
-                </VerticalCutReveal>
-            </div>
+        <section ref={ref} id="imoveis-disponiveis" className="bg-gray-50 py-12 px-4 text-left">
+            <h2 className="text-4xl font-bold">
+                {textLines.map((line, index) => (
+                    <motion.div
+                        key={index}
+                        className={line.className}
+                        custom={index}
+                        initial="hidden"
+                        animate={controls}
+                        variants={lineVariants}
+                        style={{ display: 'block' }} // Garante que cada linha seja um bloco
+                    >
+                        {line.text}
+                    </motion.div>
+                ))}
+            </h2>
         </section>
     )
 } 

@@ -73,11 +73,14 @@ export default function PropertyFilterModal() {
     const handleApplyFilters = () => {
         setActiveFilters(tempFilters);
         toggleFilterModal();
-        // Scroll to the top of the page smoothly
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
+
+        // Adiciona um pequeno delay para garantir que o modal fechou antes de rolar
+        setTimeout(() => {
+            const section = document.getElementById('imoveis-disponiveis');
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100);
     };
 
     const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
