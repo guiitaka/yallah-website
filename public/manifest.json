@@ -1,6 +1,6 @@
 {
-  "short_name": "Aardvark",
-  "name": "Aardvark: the app for aardvarks (add to homescreen test page)",
+  "short_name": "Yallah",
+  "name": "Yallah: Encontre o lugar perfeito para sua estadia",
   "display": "standalone",
   "id": "/?source=pwa",
   "start_url": "/?source=pwa",
