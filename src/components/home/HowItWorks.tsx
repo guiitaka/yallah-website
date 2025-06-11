@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, House, Buildings, Warehouse, HouseLine, Buildings as BuildingsIcon, Plus } from '@phosphor-icons/react';
+import { House, Building, Building2, Warehouse } from 'lucide-react';
 import MapboxSearch from '../MapboxSearch';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
@@ -140,8 +140,8 @@ const StepTwo: React.FC<{
         <div className="grid grid-cols-2 gap-4 mb-12">
             {[
                 { icon: House, label: 'Casa', value: 'casa' },
-                { icon: Buildings, label: 'Apartamento', value: 'apartamento' },
-                { icon: Buildings, label: 'Condomínio', value: 'condominio' },
+                { icon: Building, label: 'Apartamento', value: 'apartamento' },
+                { icon: Building2, label: 'Condomínio', value: 'condominio' },
                 { icon: Warehouse, label: 'Comercial', value: 'comercial' },
             ].map(({ icon: Icon, label, value }) => (
                 <button
@@ -1041,7 +1041,7 @@ export default function HowItWorks({ showCTA = true }: HowItWorksProps) {
                                 className="h-full"
                             >
                                 {currentStep === 3 ? (
-                                    <MapboxSearch onLocationSelect={handleLocationSelect} />
+                                    <MapboxSearch onLocationSelect={handleLocationSelect} initialValue={formData.endereco} variant="light" />
                                 ) : (
                                     <Image
                                         src={currentStep === 1

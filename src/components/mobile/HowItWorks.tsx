@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, House, Buildings, Warehouse, HouseLine, Buildings as BuildingsIcon, Plus, CaretLeft, CaretRight } from '@phosphor-icons/react';
+import { ArrowLeft, ArrowRight, House, Building, Building2, Warehouse } from 'lucide-react';
 import MapboxSearch from '../MapboxSearch';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
@@ -100,11 +100,11 @@ const StepTwo: React.FC<{
         </h3>
 
         {/* Property Type Grid */}
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-4">
             {[
                 { icon: House, label: 'Casa', value: 'casa' },
-                { icon: Buildings, label: 'Apartamento', value: 'apartamento' },
-                { icon: Buildings, label: 'Condomínio', value: 'condominio' },
+                { icon: Building, label: 'Apartamento', value: 'apartamento' },
+                { icon: Building2, label: 'Condomínio', value: 'condominio' },
                 { icon: Warehouse, label: 'Comercial', value: 'comercial' },
             ].map(({ icon: Icon, label, value }) => (
                 <button
@@ -194,6 +194,8 @@ const StepThree: React.FC<{
                 <div className="relative w-full h-[300px] rounded-xl overflow-hidden">
                     <MapboxSearch
                         onLocationSelect={onLocationSelect}
+                        initialValue={formData.endereco || ''}
+                        variant="light"
                     />
                 </div>
             </div>
@@ -737,8 +739,7 @@ export default function HowItWorks({ showCTA = true }: HowItWorksProps) {
                             onClick={prevStep}
                             className="flex items-center gap-2 text-white hover:text-white transition-colors px-6 py-2.5 rounded-full border border-white/20 backdrop-blur-sm bg-white/5"
                         >
-                            <CaretLeft weight="bold" className="w-5 h-5" />
-                            <span>Voltar</span>
+                            <ArrowLeft size={20} />
                         </button>
                     )}
                     {currentStep < 6 && (
@@ -747,8 +748,7 @@ export default function HowItWorks({ showCTA = true }: HowItWorksProps) {
                             className={`flex items-center gap-2 text-white transition-colors px-6 py-2.5 rounded-full border border-white/20 backdrop-blur-sm bg-white/5 hover:bg-white/10 ${currentStep === 1 ? 'w-full justify-center' : 'ml-auto'} disabled:opacity-50 disabled:cursor-not-allowed`}
                             disabled={!validateStep(currentStep)}
                         >
-                            <span>Continuar</span>
-                            <CaretRight weight="bold" className="w-5 h-5" />
+                            <ArrowRight size={20} />
                         </button>
                     )}
                 </div>

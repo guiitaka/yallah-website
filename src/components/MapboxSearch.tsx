@@ -8,6 +8,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 interface MapboxSearchProps {
     onLocationSelect: (location: { address: string; coordinates: [number, number] }) => void;
     initialValue?: string;
+    variant?: 'light' | 'dark';
 }
 
 // Componente wrapper que só renderiza no cliente
@@ -27,7 +28,7 @@ const ClientSideMapboxSearch: React.FC<MapboxSearchProps> = (props) => {
     return <MapboxSearch {...props} />;
 };
 
-const MapboxSearch: React.FC<MapboxSearchProps> = ({ onLocationSelect, initialValue = '' }) => {
+const MapboxSearch: React.FC<MapboxSearchProps> = ({ onLocationSelect, initialValue = '', variant = 'dark' }) => {
     const mapContainer = useRef<HTMLDivElement>(null);
     const map = useRef<mapboxgl.Map | null>(null);
     const marker = useRef<mapboxgl.Marker | null>(null);
@@ -230,12 +231,20 @@ const MapboxSearch: React.FC<MapboxSearchProps> = ({ onLocationSelect, initialVa
         );
     }
 
+    const inputClasses = variant === 'light'
+        ? "w-full pl-4 pr-12 py-3 bg-gray-100 border border-gray-300 text-black placeholder-gray-500 rounded-full focus:outline-none focus:ring-2 focus:ring-[#8BADA4] text-base transition-colors"
+        : "w-full pl-3 pr-12 py-3 bg-white/10 border border-white/20 text-white placeholder-white/60 rounded-full focus:outline-none focus:ring-0 focus:border-white/40 text-base transition-colors";
+
+    const iconClasses = variant === 'light'
+        ? "text-gray-500"
+        : "text-white/60";
+
     return (
         <div className="relative w-full flex flex-col h-full">
             <form onSubmit={handleAddressSubmit} className="relative mb-2 flex-shrink-0">
                 <input
                     placeholder="Digite o endereço do imóvel"
-                    className="w-full pl-3 pr-12 py-3 bg-white/10 border border-white/20 text-white placeholder-white/60 rounded-full focus:outline-none focus:ring-0 focus:border-white/40 text-base transition-colors"
+                    className={inputClasses}
                     value={addressInput}
                     onChange={handleManualAddressInput}
                     onFocus={() => {
@@ -245,7 +254,7 @@ const MapboxSearch: React.FC<MapboxSearchProps> = ({ onLocationSelect, initialVa
                     }}
                 />
                 <button type="submit" className="absolute right-0 top-0 bottom-0 px-4 flex items-center bg-transparent">
-                    <MagnifyingGlass size={22} className="text-white/60" />
+                    <MagnifyingGlass size={22} className={iconClasses} />
                 </button>
             </form>
 
