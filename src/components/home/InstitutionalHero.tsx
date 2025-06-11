@@ -135,7 +135,7 @@ export default function InstitutionalHero() {
                                 <span className="truncate">Encontrar imóvel perfeito</span>
                             </Link>
                             <Link
-                                href="/sobre"
+                                href="/owner#about-us"
                                 className="flex items-center justify-center gap-2 bg-white text-gray-800 px-4 md:px-6 py-3 md:py-4 rounded-full hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm text-sm md:text-base whitespace-nowrap"
                             >
                                 <span className="truncate">Conheça nossa história</span>
