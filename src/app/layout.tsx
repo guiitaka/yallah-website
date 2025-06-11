@@ -44,6 +44,9 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="manifest" href="/manifest.json" crossOrigin="use-credentials" />
+        <link rel="icon" href={`/favicon.ico?v=${new Date().getTime()}`} sizes="any" />
+        <link rel="icon" href={`/favicon-192.png?v=${new Date().getTime()}`} type="image/png" />
+        <link rel="apple-touch-icon" href={`/apple-touch-icon.png?v=${new Date().getTime()}`} />
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/philfung/add-to-homescreen@3.3/dist/add-to-homescreen.min.css"
@@ -165,6 +168,23 @@ export default function RootLayout({
                   // Se já inicializou, não faça nada
                   if (hasInitialized) return;
                   
+                  // Função para detectar se é um dispositivo móvel
+                  function isMobileDevice() {
+                    const userAgent = window.navigator.userAgent.toLowerCase();
+                    const mobileKeywords = [
+                      'iphone', 'ipad', 'android', 'phone', 'mobile',
+                      'webos', 'ipod', 'blackberry', 'windows phone'
+                    ];
+                    
+                    return mobileKeywords.some(keyword => userAgent.includes(keyword));
+                  }
+                  
+                  // Somente continua se for um dispositivo móvel
+                  if (!isMobileDevice()) {
+                    console.log('AddToHomeScreen: Não é um dispositivo móvel, não exibindo o popup');
+                    return;
+                  }
+                  
                   // Check if browser is in private mode (which can break localStorage)
                   function checkPrivateMode() {
                     return new Promise(function(resolve) {
@@ -192,7 +212,7 @@ export default function RootLayout({
                     window.AddToHomeScreenInstance = window.AddToHomeScreen({
                       appName: 'Yallah',
                       appNameDisplay: 'standalone',
-                      appIconUrl: 'apple-touch-icon.png',
+                      appIconUrl: 'apple-touch-icon.png?v=' + new Date().getTime(),
                       assetUrl: 'https://cdn.jsdelivr.net/gh/philfung/add-to-homescreen@3.3/dist/assets/img/',
                       allowClose: true,
                       showArrow: true,
@@ -230,7 +250,19 @@ export default function RootLayout({
                 
                 // Execute também no DOMContentLoaded como backup
                 document.addEventListener('DOMContentLoaded', function() {
-                  // Espera um pouco para que outros scripts possam carregar primeiro
+                  // Limpa dados de armazenamento relacionados ao add-to-homescreen
+                  try {
+                    localStorage.removeItem('add-to-homescreen-shown');
+                    localStorage.removeItem('add-to-homescreen-count');
+                    console.log('Dados de cache do add-to-homescreen limpos');
+                  } catch (e) {
+                    console.error('Erro ao limpar cache:', e);
+                  }
+                  
+                  // Inicializa imediatamente
+                  initAddToHomeScreen();
+                  
+                  // Tenta inicializar novamente após um curto delay para garantir
                   setTimeout(initAddToHomeScreen, 1000);
                 });
               `
