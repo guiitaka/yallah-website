@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, House, Buildings, Warehouse, HouseLine, Buildings as BuildingsIcon, Plus, CaretLeft, CaretRight } from '@phosphor-icons/react';
 import MapboxSearch from '../MapboxSearch';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
+import { supabase } from '@/utils/supabaseClient';
 
 interface HowItWorksProps {
     showCTA?: boolean;
@@ -14,6 +15,7 @@ interface HowItWorksProps {
 
 interface FormData {
     nome?: string;
+    email?: string;
     telefone?: string;
     tipoImovel?: string;
     valorEstimado?: number;
@@ -54,9 +56,19 @@ const StepOne: React.FC<{
                 <input
                     type="text"
                     placeholder="Nome"
-                    className="w-full px-6 py-4 bg-white/10 border border-white/20 text-white placeholder-white/60 rounded-full focus:outline-none focus:ring-0 focus:border-white/40 text-base transition-colors"
+                    className="w-full px-6 py-4 bg-white/10 border border-white/20 !text-white !placeholder-white/60 rounded-full focus:outline-none focus:ring-0 focus:border-white/40 text-base transition-colors"
                     onChange={(e) => onInputChange('nome', e.target.value)}
                     value={formData.nome || ''}
+                />
+            </div>
+            <div>
+                <input
+                    type="email"
+                    placeholder="E-mail"
+                    className="w-full px-6 py-4 bg-white/10 border border-white/20 !text-white !placeholder-white/60 rounded-full focus:outline-none focus:ring-0 focus:border-white/40 text-base transition-colors"
+                    onChange={(e) => onInputChange('email', e.target.value)}
+                    value={formData.email || ''}
+                    required
                 />
             </div>
             <div>
@@ -150,7 +162,7 @@ const StepThree: React.FC<{
                             type="text"
                             value={formatCurrency(formData.valorEstimado || 200000)}
                             onChange={handleValueChange}
-                            className="w-full text-3xl text-center bg-transparent text-white/80 focus:outline-none focus:ring-0 cursor-pointer"
+                            className="w-full text-3xl text-center bg-transparent !text-white/80 focus:outline-none focus:ring-0 cursor-pointer"
                         />
                         <div className="absolute -bottom-0.5 left-0 right-0 h-px bg-white/20 group-hover:bg-white/40 transition-colors" />
                     </div>
@@ -222,7 +234,7 @@ const StepFour: React.FC<{
                         inputMode="numeric"
                         value={formData.valorDiaria ? formatCurrency(String(formData.valorDiaria * 100)) : ''}
                         onChange={handleValueChange}
-                        className="w-full text-3xl px-3 py-2 bg-white/10 border border-white/20 text-white placeholder-white/60 rounded-xl focus:outline-none focus:ring-0 focus:border-white/40 text-center font-light"
+                        className="w-full text-3xl px-3 py-2 bg-white/10 border border-white/20 !text-white !placeholder-white/60 rounded-xl focus:outline-none focus:ring-0 focus:border-white/40 text-center font-light"
                         placeholder="0,00"
                     />
                 </div>
@@ -310,7 +322,7 @@ const StepSix: React.FC<{
     const handleSelect = (option: string) => {
         setAnimatingButton(option);
         onInputChange('mobilia', option);
-        setTimeout(onComplete, 500);
+        onComplete();
     };
 
     return (
@@ -471,6 +483,31 @@ const SuccessMessage: React.FC = () => {
     );
 };
 
+const ErrorMessage: React.FC<{ onRetry: () => void }> = ({ onRetry }) => (
+    <div className="w-full px-6 flex flex-col items-center justify-center text-center h-full">
+        <motion.div
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+            className="bg-red-500/20 p-6 rounded-full mb-6"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-red-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </motion.div>
+        <h3 className="text-2xl font-semibold text-white mb-2">Ops! Algo deu errado.</h3>
+        <p className="text-white/80 mb-6">
+            Não foi possível enviar sua solicitação. Por favor, tente novamente.
+        </p>
+        <button
+            onClick={onRetry}
+            className="bg-white/20 text-white font-semibold py-3 px-6 rounded-lg hover:bg-white/30 transition-colors"
+        >
+            Tentar Novamente
+        </button>
+    </div>
+);
+
 const platforms = [
     {
         id: 'airbnb',
@@ -496,6 +533,8 @@ export default function HowItWorks({ showCTA = true }: HowItWorksProps) {
         valorDiaria: 0,
         plataformas: []
     });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
     const handleInputChange = (field: string, value: any) => {
         setFormData(prev => ({ ...prev, [field]: value }));
@@ -509,16 +548,87 @@ export default function HowItWorks({ showCTA = true }: HowItWorksProps) {
         }));
     };
 
+    const validateStep = (step: number): boolean => {
+        switch (step) {
+            case 1:
+                return !!formData.nome && !!formData.email && !!formData.telefone && formData.telefone.length > 10;
+            case 2:
+                return !!formData.tipoImovel;
+            case 3:
+                return !!formData.valorEstimado && !!formData.endereco;
+            case 4:
+                return typeof formData.valorDiaria === 'number' && formData.valorDiaria >= 0;
+            case 5:
+                return !!formData.plataformas && formData.plataformas.length > 0;
+            case 6:
+                return !!formData.mobilia;
+            default:
+                return true; // Default to true for steps without validation
+        }
+    };
+
     const nextStep = () => {
-        setCurrentStep(prev => Math.min(prev + 1, 7));
+        if (validateStep(currentStep)) {
+            setCurrentStep(prev => Math.min(prev + 1, 7));
+        }
     };
 
     const prevStep = () => {
         setCurrentStep(prev => Math.max(prev - 1, 1));
     };
 
-    const handleComplete = () => {
+    const handleSubmit = async () => {
+        // A validação final acontece aqui, antes de enviar.
+        if (!validateStep(1) || !validateStep(2) || !validateStep(3) || !validateStep(4) || !validateStep(5) || !formData.mobilia) {
+            // Se algo estiver faltando (improvável devido à trava dos botões), não submete.
+            // Poderíamos adicionar uma mensagem de erro aqui se necessário.
+            console.error("Validação final falhou. Dados incompletos:", formData);
+            return;
+        }
+
+        setIsSubmitting(true);
+        setSubmitStatus('idle');
         setCurrentStep(7);
+
+        const [firstName, ...lastNameParts] = (formData.nome || "").split(" ");
+        const lastName = lastNameParts.join(" ");
+
+        const messageData = {
+            first_name: firstName,
+            last_name: lastName,
+            email: formData.email,
+            phone: formData.telefone,
+            category: 'Possíveis Clientes',
+            property_type: formData.tipoImovel,
+            property_address: formData.endereco,
+            property_value: formData.valorEstimado,
+            daily_rate: formData.valorDiaria,
+            current_platform: formData.plataformas?.join(', '),
+            furnishing_state: formData.mobilia,
+            message: `Novo lead de "Possíveis Clientes" (Mobile):
+            - Tipo de Imóvel: ${formData.tipoImovel}
+            - Endereço: ${formData.endereco}
+            - Valor Estimado: ${formData.valorEstimado}
+            - Diária Desejada: ${formData.valorDiaria}
+            - Plataformas: ${formData.plataformas?.join(', ')}
+            - Mobília: ${formData.mobilia}`
+        };
+
+        const { error } = await supabase.from('contact_messages').insert([messageData]);
+
+        if (error) {
+            console.error('Error submitting form:', error);
+            setSubmitStatus('error');
+        } else {
+            setSubmitStatus('success');
+        }
+        setIsSubmitting(false);
+    };
+
+    const handleComplete = () => {
+        // Agora o handleComplete chama diretamente o handleSubmit.
+        // A lógica de `setTimeout` foi removida para simplificar.
+        handleSubmit();
     };
 
     // Mapeamento das imagens de fundo para cada etapa
@@ -605,10 +715,16 @@ export default function HowItWorks({ showCTA = true }: HowItWorksProps) {
                             <StepSix
                                 formData={formData}
                                 onInputChange={handleInputChange}
-                                onComplete={() => setCurrentStep(7)}
+                                onComplete={handleComplete}
                             />
                         )}
-                        {currentStep === 7 && <SuccessMessage />}
+                        {currentStep === 7 && submitStatus === 'success' && <SuccessMessage />}
+                        {currentStep === 7 && submitStatus === 'error' && <ErrorMessage onRetry={handleSubmit} />}
+                        {currentStep === 7 && isSubmitting && (
+                            <div className="flex justify-center items-center h-full">
+                                <div className="w-16 h-16 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
+                            </div>
+                        )}
                     </motion.div>
                 </AnimatePresence>
             </div>
@@ -628,7 +744,8 @@ export default function HowItWorks({ showCTA = true }: HowItWorksProps) {
                     {currentStep < 6 && (
                         <button
                             onClick={nextStep}
-                            className={`flex items-center gap-2 text-white transition-colors px-6 py-2.5 rounded-full border border-white/20 backdrop-blur-sm bg-white/5 hover:bg-white/10 ${currentStep === 1 ? 'w-full justify-center' : 'ml-auto'}`}
+                            className={`flex items-center gap-2 text-white transition-colors px-6 py-2.5 rounded-full border border-white/20 backdrop-blur-sm bg-white/5 hover:bg-white/10 ${currentStep === 1 ? 'w-full justify-center' : 'ml-auto'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                            disabled={!validateStep(currentStep)}
                         >
                             <span>Continuar</span>
                             <CaretRight weight="bold" className="w-5 h-5" />

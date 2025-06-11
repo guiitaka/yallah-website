@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowRight, Check } from '@phosphor-icons/react';
+import { supabase } from '@/utils/supabaseClient';
 
 const ContactForm = () => {
     const [formData, setFormData] = useState({
-        name: '',
+        firstName: '',
+        lastName: '',
         email: '',
         phone: '',
-        subject: '',
         message: '',
         service: 'proprietario', // Default selected service
     });
@@ -68,9 +69,21 @@ const ContactForm = () => {
         setError('');
 
         try {
-            // Aqui seria a lógica de envio do formulário para o backend
-            // Por enquanto, vamos apenas simular um delay
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            // Prepara a mensagem para incluir o tipo de serviço/interesse
+            const messageWithService = `Interesse: ${formData.service}\n\n${formData.message}`;
+
+            const { error } = await supabase.from('contact_messages').insert({
+                first_name: formData.firstName,
+                last_name: formData.lastName,
+                email: formData.email,
+                phone: formData.phone,
+                message: messageWithService, // Mensagem atualizada
+                category: 'Contatos', // Categoria fixa para este formulário
+            });
+
+            if (error) {
+                throw error;
+            }
 
             // Sucesso
             setSubmitted(true);
@@ -79,15 +92,16 @@ const ContactForm = () => {
             setTimeout(() => {
                 setSubmitted(false);
                 setFormData({
-                    name: '',
+                    firstName: '',
+                    lastName: '',
                     email: '',
                     phone: '',
-                    subject: '',
                     message: '',
                     service: 'proprietario',
                 });
             }, 5000);
         } catch (err) {
+            console.error('Error submitting form:', err);
             setError('Ocorreu um erro ao enviar sua mensagem. Por favor, tente novamente.');
         } finally {
             setIsSubmitting(false);
@@ -121,8 +135,8 @@ const ContactForm = () => {
                         <form
                             onSubmit={handleSubmit}
                             className={`bg-white p-6 md:p-8 rounded-xl shadow-sm border transition-all duration-500 ${isHighlighted
-                                    ? 'border-[#8BADA4] shadow-lg shadow-[#8BADA4]/20 transform scale-[1.01]'
-                                    : 'border-gray-100'
+                                ? 'border-[#8BADA4] shadow-lg shadow-[#8BADA4]/20 transform scale-[1.01]'
+                                : 'border-gray-100'
                                 }`}
                         >
                             {error && (
@@ -217,14 +231,14 @@ const ContactForm = () => {
 
                                 {/* Nome */}
                                 <div>
-                                    <label htmlFor="name" className="block text-gray-700 font-medium mb-2">
-                                        Nome completo*
+                                    <label htmlFor="firstName" className="block text-gray-700 font-medium mb-2">
+                                        Nome*
                                     </label>
                                     <input
                                         type="text"
-                                        id="name"
-                                        name="name"
-                                        value={formData.name}
+                                        id="firstName"
+                                        name="firstName"
+                                        value={formData.firstName}
                                         onChange={handleChange}
                                         required
                                         className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#8BADA4] focus:ring focus:ring-[#8BADA4]/20 transition-colors outline-none"
@@ -232,8 +246,25 @@ const ContactForm = () => {
                                     />
                                 </div>
 
-                                {/* Email */}
+                                {/* Sobrenome */}
                                 <div>
+                                    <label htmlFor="lastName" className="block text-gray-700 font-medium mb-2">
+                                        Sobrenome*
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="lastName"
+                                        name="lastName"
+                                        value={formData.lastName}
+                                        onChange={handleChange}
+                                        required
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#8BADA4] focus:ring focus:ring-[#8BADA4]/20 transition-colors outline-none"
+                                        placeholder="Seu sobrenome"
+                                    />
+                                </div>
+
+                                {/* Email */}
+                                <div className="md:col-span-2">
                                     <label htmlFor="email" className="block text-gray-700 font-medium mb-2">
                                         Email*
                                     </label>
@@ -250,7 +281,7 @@ const ContactForm = () => {
                                 </div>
 
                                 {/* Telefone */}
-                                <div>
+                                <div className="md:col-span-2">
                                     <label htmlFor="phone" className="block text-gray-700 font-medium mb-2">
                                         Telefone
                                     </label>
@@ -261,58 +292,48 @@ const ContactForm = () => {
                                         value={formData.phone}
                                         onChange={handleChange}
                                         className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#8BADA4] focus:ring focus:ring-[#8BADA4]/20 transition-colors outline-none"
-                                        placeholder="(11) 99999-9999"
-                                    />
-                                </div>
-
-                                {/* Assunto */}
-                                <div>
-                                    <label htmlFor="subject" className="block text-gray-700 font-medium mb-2">
-                                        Assunto*
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="subject"
-                                        name="subject"
-                                        value={formData.subject}
-                                        onChange={handleChange}
-                                        required
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#8BADA4] focus:ring focus:ring-[#8BADA4]/20 transition-colors outline-none"
-                                        placeholder="Assunto da sua mensagem"
+                                        placeholder="(XX) XXXXX-XXXX"
                                     />
                                 </div>
 
                                 {/* Mensagem */}
                                 <div className="md:col-span-2">
                                     <label htmlFor="message" className="block text-gray-700 font-medium mb-2">
-                                        Mensagem*
+                                        Sua mensagem*
                                     </label>
                                     <textarea
                                         id="message"
                                         name="message"
+                                        rows={5}
                                         value={formData.message}
                                         onChange={handleChange}
                                         required
-                                        rows={6}
-                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#8BADA4] focus:ring focus:ring-[#8BADA4]/20 transition-colors outline-none resize-none"
-                                        placeholder="Digite sua mensagem aqui..."
+                                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-[#8BADA4] focus:ring focus:ring-[#8BADA4]/20 transition-colors outline-none"
+                                        placeholder="Descreva sua necessidade..."
                                     ></textarea>
                                 </div>
                             </div>
 
-                            <div className="flex justify-end">
+                            <div className="text-center">
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className={`
-                    inline-flex items-center gap-2 px-6 py-3.5 rounded-lg font-medium text-white
-                    ${isSubmitting
-                                            ? 'bg-[#8BADA4]/70 cursor-not-allowed'
-                                            : 'bg-[#8BADA4] hover:bg-[#7a9a94] transition-colors'}
-                  `}
+                                    className="w-full md:w-auto bg-[#8BADA4] text-white font-bold py-3 px-8 rounded-lg hover:bg-[#7A9A8D] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#8BADA4] transition-all duration-300 ease-in-out disabled:bg-gray-400 disabled:cursor-not-allowed group"
                                 >
-                                    {isSubmitting ? 'Enviando...' : 'Enviar mensagem'}
-                                    <ArrowRight size={20} weight="bold" />
+                                    {isSubmitting ? (
+                                        <div className="flex items-center justify-center">
+                                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            Enviando...
+                                        </div>
+                                    ) : (
+                                        <span className="flex items-center justify-center">
+                                            Enviar Mensagem
+                                            <ArrowRight size={20} weight="bold" className="ml-2 transform group-hover:translate-x-1 transition-transform" />
+                                        </span>
+                                    )}
                                 </button>
                             </div>
                         </form>

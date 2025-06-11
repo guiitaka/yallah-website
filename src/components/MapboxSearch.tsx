@@ -235,7 +235,7 @@ const MapboxSearch: React.FC<MapboxSearchProps> = ({ onLocationSelect, initialVa
             <form onSubmit={handleAddressSubmit} className="relative mb-2 flex-shrink-0">
                 <input
                     placeholder="Digite o endereço do imóvel"
-                    className="w-full pl-3 pr-12 py-2 bg-white text-gray-800 placeholder-gray-500 border border-[#8BADA4] rounded-md focus:outline-none focus:ring-2 focus:ring-[#8BADA4] text-base"
+                    className="w-full pl-3 pr-12 py-3 bg-white/10 border border-white/20 text-white placeholder-white/60 rounded-full focus:outline-none focus:ring-0 focus:border-white/40 text-base transition-colors"
                     value={addressInput}
                     onChange={handleManualAddressInput}
                     onFocus={() => {
@@ -244,8 +244,8 @@ const MapboxSearch: React.FC<MapboxSearchProps> = ({ onLocationSelect, initialVa
                         }
                     }}
                 />
-                <button type="submit" className="absolute right-0 top-0 bottom-0 px-3 flex items-center bg-[#8BADA4] rounded-r-md">
-                    <MagnifyingGlass size={20} color="white" />
+                <button type="submit" className="absolute right-0 top-0 bottom-0 px-4 flex items-center bg-transparent">
+                    <MagnifyingGlass size={22} className="text-white/60" />
                 </button>
             </form>
 

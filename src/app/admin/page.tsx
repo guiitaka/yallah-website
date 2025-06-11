@@ -28,7 +28,7 @@ export default function AdminLogin() {
                 sameSite: 'strict'
             });
 
-            router.push('/admin/dashboard');
+            router.push('/admin/inbox');
         } catch (error: any) {
             console.error('Erro ao fazer login:', error);
             setErrorMessage('Nome de usuário ou senha inválidos');

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { deleteCookie } from 'cookies-next';
 import { useAuthContext } from '@/utils/AuthContext';
-import { Building, Home, MessageCircle, Bell, ChevronDown } from 'lucide-react';
+import { Building, Inbox, MessageCircle, Bell, ChevronDown } from 'lucide-react';
 
 export default function AdminHeader() {
     const { user, loading, signOut } = useAuthContext();
@@ -83,7 +83,7 @@ export default function AdminHeader() {
                 <div className="bg-white/30 backdrop-blur-lg rounded-full shadow-lg py-3 px-6 border border-white/20">
                     <div className="flex items-center relative">
                         <div className="flex-shrink-0">
-                            <Link href="/admin/dashboard" className="flex items-center">
+                            <Link href="/admin/inbox" className="flex items-center">
                                 <span className="text-white text-3xl font-bold">Yallah</span>
                             </Link>
                         </div>
@@ -91,21 +91,21 @@ export default function AdminHeader() {
                         <div className="absolute left-1/2 transform -translate-x-1/2">
                             <nav className="hidden md:flex items-center rounded-full px-2 py-1">
                                 <Link
-                                    href="/admin/dashboard"
+                                    href="/admin/inbox"
                                     className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-full hover:bg-opacity-80 transition-colors"
                                     style={{
-                                        backgroundColor: pathname === '/admin/dashboard' ? '#8BADA4' : 'transparent',
+                                        backgroundColor: pathname === '/admin/inbox' ? '#8BADA4' : 'transparent',
                                         color: 'white'
                                     }}
                                 >
-                                    <Home className="mr-2 h-5 w-5" />
-                                    Home
+                                    <Inbox className="mr-2 h-5 w-5" />
+                                    Mensagens
                                 </Link>
                                 <Link
-                                    href="/admin/dashboard/properties"
+                                    href="/admin/inbox/properties"
                                     className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-full hover:bg-opacity-80 transition-colors"
                                     style={{
-                                        backgroundColor: pathname === '/admin/dashboard/properties' ? '#8BADA4' : 'transparent',
+                                        backgroundColor: pathname === '/admin/inbox/properties' ? '#8BADA4' : 'transparent',
                                         color: 'white'
                                     }}
                                 >
@@ -113,10 +113,10 @@ export default function AdminHeader() {
                                     Imóveis
                                 </Link>
                                 <Link
-                                    href="/admin/dashboard/support"
+                                    href="/admin/inbox/support"
                                     className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-full hover:bg-opacity-80 transition-colors"
                                     style={{
-                                        backgroundColor: pathname === '/admin/dashboard/support' ? '#8BADA4' : 'transparent',
+                                        backgroundColor: pathname === '/admin/inbox/support' ? '#8BADA4' : 'transparent',
                                         color: 'white'
                                     }}
                                 >

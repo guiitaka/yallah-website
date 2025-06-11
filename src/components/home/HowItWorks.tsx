@@ -7,6 +7,7 @@ import { ArrowRight, House, Buildings, Warehouse, HouseLine, Buildings as Buildi
 import MapboxSearch from '../MapboxSearch';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
+import { supabase } from '@/utils/supabaseClient';
 
 interface HowItWorksProps {
     showCTA?: boolean;
@@ -15,6 +16,7 @@ interface HowItWorksProps {
 // Tipos para os dados do formulário
 interface FormData {
     nome?: string;
+    email?: string;
     telefone?: string;
     tipoImovel?: string;
     valorEstimado?: number;
@@ -32,7 +34,7 @@ const StepOne: React.FC<{
 }> = ({ formData, onInputChange }) => (
     <div className="w-full max-w-[400px] mx-auto">
         {/* Logo */}
-        <div className="flex justify-center mb-16">
+        <div className="flex justify-center mb-12">
             <div className="relative w-[240px] h-[75px]">
                 <Image
                     src="/logo-yallah-nobg-footer.png"
@@ -45,12 +47,12 @@ const StepOne: React.FC<{
         </div>
 
         {/* Title */}
-        <h3 className="text-[32px] leading-tight font-normal text-center mb-16 text-white">
+        <h3 className="text-[32px] leading-tight font-normal text-center mb-12 text-white">
             Cadastre seu imóvel na Yallah
         </h3>
 
         {/* Form Fields */}
-        <div className="space-y-6">
+        <div className="space-y-4">
             <div>
                 <input
                     type="text"
@@ -58,6 +60,15 @@ const StepOne: React.FC<{
                     className="w-full px-6 py-4 bg-white/10 border border-white/20 text-white placeholder-white/60 rounded-full focus:outline-none focus:ring-0 focus:border-white/40 text-base transition-colors name-input-force-white-text"
                     onChange={(e) => onInputChange('nome', e.target.value)}
                     value={formData.nome || ''}
+                />
+            </div>
+            <div>
+                <input
+                    type="email"
+                    placeholder="E-mail"
+                    className="w-full px-6 py-4 bg-white/10 border border-white/20 text-white placeholder-white/60 rounded-full focus:outline-none focus:ring-0 focus:border-white/40 text-base transition-colors name-input-force-white-text"
+                    onChange={(e) => onInputChange('email', e.target.value)}
+                    value={formData.email || ''}
                 />
             </div>
             <div>
@@ -632,17 +643,70 @@ const SuccessMessage: React.FC = () => (
 export default function HowItWorks({ showCTA = true }: HowItWorksProps) {
     const [currentStep, setCurrentStep] = useState(1);
     const [showThankYou, setShowThankYou] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState<FormData>({
         valorEstimado: 200000,
         valorDiaria: 0,
         plataformas: []
     });
 
+    const validateStep = (step: number): boolean => {
+        switch (step) {
+            case 1:
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return !!formData.nome && !!formData.email && emailRegex.test(formData.email) && (formData.telefone?.length ?? 0) > 10;
+            case 2:
+                return !!formData.tipoImovel;
+            case 3:
+                return !!formData.endereco && !!formData.valorEstimado;
+            case 4:
+                return formData.valorDiaria !== undefined && formData.valorDiaria > 0;
+            case 5:
+                return formData.plataformas !== undefined && formData.plataformas.length > 0;
+            case 6:
+                return !!formData.mobilia;
+            default:
+                return false;
+        }
+    };
+
+    // Função para enviar os dados para o Supabase
+    const handleSubmit = async (finalFormData: FormData) => {
+        setIsSubmitting(true);
+        const submissionData = {
+            first_name: finalFormData.nome,
+            email: finalFormData.email,
+            phone: finalFormData.telefone,
+            category: 'Possíveis Clientes', // Categoria do formulário
+            property_type: finalFormData.tipoImovel,
+            property_address: finalFormData.endereco,
+            property_value: finalFormData.valorEstimado,
+            daily_rate: finalFormData.valorDiaria,
+            current_platform: finalFormData.plataformas?.join(', '), // Converte array para string
+            furnishing_state: finalFormData.mobilia,
+            // Outros campos podem ser deixados como nulos se não aplicável
+            // e.g., last_name, message, is_read não são deste formulário
+        };
+
+        const { error } = await supabase.from('contact_messages').insert([submissionData]);
+
+        if (error) {
+            console.error('Erro ao salvar no Supabase:', error);
+            // Opcional: Adicionar feedback de erro para o usuário
+        } else {
+            // Se o envio for bem-sucedido, mostra a mensagem de agradecimento
+            setShowThankYou(true);
+        }
+        setIsSubmitting(false);
+    };
+
     const handleInputChange = (field: string, value: string | number | string[]) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
-        // Se estiver no último step e uma opção for selecionada, mostra a mensagem de agradecimento
+        const updatedFormData = { ...formData, [field]: value };
+        setFormData(updatedFormData);
+
+        // Se estiver no último step e uma opção for selecionada, submete o formulário
         if (currentStep === 6 && field === 'mobilia') {
-            setTimeout(() => setShowThankYou(true), 300);
+            handleSubmit(updatedFormData);
         }
     };
 
@@ -817,7 +881,8 @@ export default function HowItWorks({ showCTA = true }: HowItWorksProps) {
                                         <div className="flex items-center justify-center gap-4 mt-6">
                                             <button
                                                 onClick={handleNext}
-                                                className="w-[400px] flex items-center justify-center bg-white text-[#8BADA4] rounded-full px-6 py-4 font-medium hover:bg-white/90 transition-colors text-base"
+                                                disabled={!validateStep(1)}
+                                                className="w-[400px] flex items-center justify-center bg-white text-[#8BADA4] rounded-full px-6 py-4 font-medium transition-colors text-base disabled:bg-white/50 disabled:cursor-not-allowed"
                                             >
                                                 Continuar
                                             </button>
@@ -843,7 +908,8 @@ export default function HowItWorks({ showCTA = true }: HowItWorksProps) {
                                             </button>
                                             <button
                                                 onClick={handleNext}
-                                                className="flex-1 px-6 py-4 bg-white text-[#8BADA4] rounded-full hover:bg-white/90 transition-colors"
+                                                disabled={!validateStep(2)}
+                                                className="flex-1 px-6 py-4 bg-white text-[#8BADA4] rounded-full hover:bg-white/90 transition-colors disabled:bg-white/50 disabled:cursor-not-allowed"
                                             >
                                                 Continuar
                                             </button>
@@ -870,7 +936,8 @@ export default function HowItWorks({ showCTA = true }: HowItWorksProps) {
                                             </button>
                                             <button
                                                 onClick={handleNext}
-                                                className="flex-1 px-6 py-4 bg-white text-[#8BADA4] rounded-full hover:bg-white/90 transition-colors"
+                                                disabled={!validateStep(3)}
+                                                className="flex-1 px-6 py-4 bg-white text-[#8BADA4] rounded-full hover:bg-white/90 transition-colors disabled:bg-white/50 disabled:cursor-not-allowed"
                                             >
                                                 Continuar
                                             </button>
@@ -896,7 +963,8 @@ export default function HowItWorks({ showCTA = true }: HowItWorksProps) {
                                             </button>
                                             <button
                                                 onClick={handleNext}
-                                                className="flex-1 px-6 py-4 bg-white text-[#8BADA4] rounded-full hover:bg-white/90 transition-colors"
+                                                disabled={!validateStep(4)}
+                                                className="flex-1 px-6 py-4 bg-white text-[#8BADA4] rounded-full hover:bg-white/90 transition-colors disabled:bg-white/50 disabled:cursor-not-allowed"
                                             >
                                                 Continuar
                                             </button>
@@ -922,7 +990,8 @@ export default function HowItWorks({ showCTA = true }: HowItWorksProps) {
                                             </button>
                                             <button
                                                 onClick={handleNext}
-                                                className="flex-1 px-6 py-4 bg-white text-[#8BADA4] rounded-full hover:bg-white/90 transition-colors"
+                                                disabled={!validateStep(5)}
+                                                className="flex-1 px-6 py-4 bg-white text-[#8BADA4] rounded-full hover:bg-white/90 transition-colors disabled:bg-white/50 disabled:cursor-not-allowed"
                                             >
                                                 Continuar
                                             </button>
@@ -948,7 +1017,8 @@ export default function HowItWorks({ showCTA = true }: HowItWorksProps) {
                                             </button>
                                             <button
                                                 onClick={handleNext}
-                                                className="flex-1 px-6 py-4 bg-white text-[#8BADA4] rounded-full hover:bg-white/90 transition-colors"
+                                                disabled={!validateStep(6)}
+                                                className="flex-1 px-6 py-4 bg-white text-[#8BADA4] rounded-full hover:bg-white/90 transition-colors disabled:bg-white/50 disabled:cursor-not-allowed"
                                             >
                                                 Continuar
                                             </button>
