@@ -84,7 +84,11 @@ export default function Footer() {
 
                 {/* Copyright e Links Legais */}
                 <div className="text-center text-xs opacity-60 mt-4 flex flex-col gap-4 pt-6 border-t border-white/10">
-                    <p>© {new Date().getFullYear()} Yallah. Todos os direitos reservados.</p>
+                    <div className="flex flex-wrap justify-center gap-2">
+                        <span>© {new Date().getFullYear()} Yallah.</span>
+                        <Link href="/mobile/politica-de-privacidade" className="underline text-white/80">Política de Privacidade</Link>
+                        <Link href="/mobile/termos-de-uso" className="underline text-white/80">Termos de Uso</Link>
+                    </div>
 
                     {/* Typewriter Section */}
                     <div className="text-center">
@@ -102,11 +106,6 @@ export default function Footer() {
                                 cursorChar="|"
                             />
                         </div>
-                    </div>
-
-                    <div className="flex justify-center gap-4">
-                        <Link href="/mobile/politica-de-privacidade" className="underline text-white/80">Política de Privacidade</Link>
-                        <Link href="/mobile/termos-de-uso" className="underline text-white/80">Termos de Uso</Link>
                     </div>
                 </div>
             </div>
