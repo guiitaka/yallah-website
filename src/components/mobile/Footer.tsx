@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { InstagramLogo, FacebookLogo, WhatsappLogo } from '@phosphor-icons/react';
+import { Typewriter } from '@/components/ui/typewriter';
 
 export default function Footer() {
     return (
@@ -79,6 +80,27 @@ export default function Footer() {
                     >
                         <WhatsappLogo size={28} weight="fill" />
                     </Link>
+                </div>
+
+                {/* Typewriter Section */}
+                <div className="text-center mb-6">
+                    <div className="text-sm">
+                        <span className="text-white/80">Encontre o lugar perfeito para </span>
+                        <Typewriter
+                            text={[
+                                "relaxar",
+                                "trabalhar",
+                                "se divertir",
+                                "viver momentos únicos",
+                                "criar memórias"
+                            ]}
+                            speed={70}
+                            className="text-[#95CEB3] font-semibold"
+                            waitTime={1500}
+                            deleteSpeed={40}
+                            cursorChar="|"
+                        />
+                    </div>
                 </div>
 
                 {/* Copyright e Links Legais */}

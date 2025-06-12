@@ -3,6 +3,7 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { Typewriter } from '@/components/ui/typewriter'
 
 export default function Footer() {
   return (
@@ -60,6 +61,27 @@ export default function Footer() {
               <li><a href="mailto:contato@yallah.com" className="text-white/80 hover:text-white transition-colors">contato@yallah.com</a></li>
               <li><a href="tel:+5511999999999" className="text-white/80 hover:text-white transition-colors">+55 (11) 99999-9999</a></li>
             </ul>
+          </div>
+        </div>
+
+        {/* Typewriter Section */}
+        <div className="flex justify-center mb-8 text-center">
+          <div className="text-xl">
+            <span className="text-white/80">Encontre o lugar perfeito para </span>
+            <Typewriter
+              text={[
+                "relaxar",
+                "trabalhar",
+                "se divertir",
+                "viver momentos únicos",
+                "criar memórias"
+              ]}
+              speed={70}
+              className="text-[#95CEB3] font-semibold"
+              waitTime={1500}
+              deleteSpeed={40}
+              cursorChar="|"
+            />
           </div>
         </div>
 
