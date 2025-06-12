@@ -81,9 +81,13 @@ export default function Footer() {
                     </Link>
                 </div>
 
-                {/* Copyright */}
-                <div className="text-center text-xs opacity-60">
+                {/* Copyright e Links Legais */}
+                <div className="text-center text-xs opacity-60 mt-4 flex flex-col gap-2">
                     <p>© {new Date().getFullYear()} Yallah. Todos os direitos reservados.</p>
+                    <div className="flex justify-center gap-4">
+                        <Link href="/mobile/politica-de-privacidade" className="underline text-white/80">Política de Privacidade</Link>
+                        <Link href="/mobile/termos-de-uso" className="underline text-white/80">Termos de Uso</Link>
+                    </div>
                 </div>
             </div>
         </footer>

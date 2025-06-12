@@ -67,10 +67,10 @@ export default function Footer() {
         <div className="flex flex-col sm:flex-row justify-between items-center text-center sm:text-left pt-8 border-t border-white/10 gap-4 sm:gap-0">
           <p className="text-white/60">Copyright © YALLAH {new Date().getFullYear()}</p>
           <div className="flex flex-col xs:flex-row gap-4 sm:gap-8 items-center">
-            <Link href="#" className="text-white/80 hover:text-white transition-colors">
+            <Link href="/politica-de-privacidade" className="text-white/80 hover:text-white transition-colors">
               Política de Privacidade
             </Link>
-            <Link href="#" className="text-white/80 hover:text-white transition-colors">
+            <Link href="/termos-de-uso" className="text-white/80 hover:text-white transition-colors">
               Termos de Uso
             </Link>
           </div>
