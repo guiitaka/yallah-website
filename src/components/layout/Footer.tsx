@@ -74,11 +74,11 @@ export default function Footer() {
               <span className="text-white/80">Desenvolvido por: </span>
               <Typewriter
                 text={[
-                  "TakaStudios®",
+                  "TakaStudios",
                   "NETCOM"
                 ]}
                 speed={70}
-                className="text-[#95CEB3] font-semibold"
+                className="text-white font-semibold"
                 waitTime={1500}
                 deleteSpeed={40}
                 cursorChar="|"
