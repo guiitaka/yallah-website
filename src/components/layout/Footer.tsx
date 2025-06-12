@@ -64,30 +64,31 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Typewriter Section */}
-        <div className="flex justify-center mb-8 text-center">
-          <div className="text-xl">
-            <span className="text-white/80">Encontre o lugar perfeito para </span>
-            <Typewriter
-              text={[
-                "relaxar",
-                "trabalhar",
-                "se divertir",
-                "viver momentos únicos",
-                "criar memórias"
-              ]}
-              speed={70}
-              className="text-[#95CEB3] font-semibold"
-              waitTime={1500}
-              deleteSpeed={40}
-              cursorChar="|"
-            />
-          </div>
-        </div>
-
         {/* Bottom Bar */}
         <div className="flex flex-col sm:flex-row justify-between items-center text-center sm:text-left pt-8 border-t border-white/10 gap-4 sm:gap-0">
           <p className="text-white/60">Copyright © YALLAH {new Date().getFullYear()}</p>
+
+          {/* Typewriter Section */}
+          <div className="flex justify-center items-center">
+            <div className="text-base">
+              <span className="text-white/80">Encontre o lugar perfeito para </span>
+              <Typewriter
+                text={[
+                  "relaxar",
+                  "trabalhar",
+                  "se divertir",
+                  "viver momentos únicos",
+                  "criar memórias"
+                ]}
+                speed={70}
+                className="text-[#95CEB3] font-semibold"
+                waitTime={1500}
+                deleteSpeed={40}
+                cursorChar="|"
+              />
+            </div>
+          </div>
+
           <div className="flex flex-col xs:flex-row gap-4 sm:gap-8 items-center">
             <Link href="/politica-de-privacidade" className="text-white/80 hover:text-white transition-colors">
               Política de Privacidade

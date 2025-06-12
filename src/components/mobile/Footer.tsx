@@ -82,30 +82,31 @@ export default function Footer() {
                     </Link>
                 </div>
 
-                {/* Typewriter Section */}
-                <div className="text-center mb-6">
-                    <div className="text-sm">
-                        <span className="text-white/80">Encontre o lugar perfeito para </span>
-                        <Typewriter
-                            text={[
-                                "relaxar",
-                                "trabalhar",
-                                "se divertir",
-                                "viver momentos únicos",
-                                "criar memórias"
-                            ]}
-                            speed={70}
-                            className="text-[#95CEB3] font-semibold"
-                            waitTime={1500}
-                            deleteSpeed={40}
-                            cursorChar="|"
-                        />
-                    </div>
-                </div>
-
                 {/* Copyright e Links Legais */}
-                <div className="text-center text-xs opacity-60 mt-4 flex flex-col gap-2">
+                <div className="text-center text-xs opacity-60 mt-4 flex flex-col gap-4 pt-6 border-t border-white/10">
                     <p>© {new Date().getFullYear()} Yallah. Todos os direitos reservados.</p>
+
+                    {/* Typewriter Section */}
+                    <div className="text-center">
+                        <div className="text-xs">
+                            <span className="text-white/80">Encontre o lugar perfeito para </span>
+                            <Typewriter
+                                text={[
+                                    "relaxar",
+                                    "trabalhar",
+                                    "se divertir",
+                                    "viver momentos únicos",
+                                    "criar memórias"
+                                ]}
+                                speed={70}
+                                className="text-[#95CEB3] font-semibold"
+                                waitTime={1500}
+                                deleteSpeed={40}
+                                cursorChar="|"
+                            />
+                        </div>
+                    </div>
+
                     <div className="flex justify-center gap-4">
                         <Link href="/mobile/politica-de-privacidade" className="underline text-white/80">Política de Privacidade</Link>
                         <Link href="/mobile/termos-de-uso" className="underline text-white/80">Termos de Uso</Link>
