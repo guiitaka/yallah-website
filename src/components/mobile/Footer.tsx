@@ -89,14 +89,11 @@ export default function Footer() {
                     {/* Typewriter Section */}
                     <div className="text-center">
                         <div className="text-xs">
-                            <span className="text-white/80">Encontre o lugar perfeito para </span>
+                            <span className="text-white/80">Desenvolvido por: </span>
                             <Typewriter
                                 text={[
-                                    "relaxar",
-                                    "trabalhar",
-                                    "se divertir",
-                                    "viver momentos únicos",
-                                    "criar memórias"
+                                    "TakaStudios®",
+                                    "NETCOM"
                                 ]}
                                 speed={70}
                                 className="text-[#95CEB3] font-semibold"
