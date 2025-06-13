@@ -1,7 +1,7 @@
 import React from 'react';
 import ContactSection from '@/components/contact/ContactSection';
 import ContactForm from '@/components/contact/ContactForm';
-import ClientLayout from '@/components/layout/ClientLayout';
+import MobileLayout from '@/components/layout/MobileLayout';
 import Footer from '@/components/mobile/Footer';
 
 export const metadata = {
@@ -11,12 +11,11 @@ export const metadata = {
 
 export default function ContactPageMobile() {
     return (
-        <ClientLayout>
+        <MobileLayout>
             {/* Main Content - Mobile optimized */}
             <div className="pt-16"></div>
             <ContactSection />
             <ContactForm />
-            <Footer />
-        </ClientLayout>
+        </MobileLayout>
     );
 } 
