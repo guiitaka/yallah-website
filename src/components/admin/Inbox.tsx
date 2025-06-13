@@ -303,7 +303,12 @@ const Inbox = () => {
                                         Detalhes do Imóvel
                                     </h4>
                                     <div className="space-y-3">
-                                        <p><strong>Endereço do imóvel:</strong> {selectedMessage.property_address || 'Não informado'}</p>
+                                        <div>
+                                            <strong>Endereço do imóvel:</strong>
+                                            {(selectedMessage.property_address || 'Não informado').split(',').map((part, index) => (
+                                                <span key={index} className="block">{part.trim()}</span>
+                                            ))}
+                                        </div>
                                         <p><strong>Tipo:</strong> {selectedMessage.property_type || 'Não informado'}</p>
                                         <p><strong>Valor Estimado:</strong> {formatCurrency(selectedMessage.property_value)}</p>
                                         <p><strong>Diária Desejada:</strong> {formatCurrency(selectedMessage.daily_rate)}</p>
