@@ -34,14 +34,8 @@ const categories = [
 ];
 
 const Inbox = () => {
-    // Log on every render to trace the property_address
     const [messages, setMessages] = useState<Message[]>([]);
     const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
-
-    if (selectedMessage) {
-        console.log(`Inbox Render -> Address: "${selectedMessage.property_address}"`, selectedMessage);
-    }
-
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [page, setPage] = useState(1);
@@ -89,12 +83,6 @@ const Inbox = () => {
         fetchMessages(1, activeCategory);
     }, [activeCategory]);
 
-    useEffect(() => {
-        if (selectedMessage) {
-            console.log(`RENDER - component updated. Address is: "${selectedMessage.property_address}"`);
-        }
-    }, [selectedMessage]);
-
     const handleLoadMore = () => {
         const nextPage = page + 1;
         setPage(nextPage);
@@ -102,7 +90,6 @@ const Inbox = () => {
     };
 
     const handleSelectMessage = async (message: Message) => {
-        console.log(`CLICK - Selected message. Address is: "${message.property_address}"`);
         setSelectedMessage(message);
         if (!message.is_read) {
             const { error } = await supabase
@@ -113,7 +100,6 @@ const Inbox = () => {
             if (error) {
                 console.error('Error updating message status:', error);
             } else {
-                console.log(`DB_UPDATE - Marking message as read: ${message.id}`);
                 setMessages(prevMessages =>
                     prevMessages.map(m =>
                         m.id === message.id ? { ...m, is_read: true } : m
@@ -303,12 +289,7 @@ const Inbox = () => {
                                         Detalhes do Imóvel
                                     </h4>
                                     <div className="space-y-3">
-                                        <div>
-                                            <strong>Endereço do imóvel:</strong>
-                                            {(selectedMessage.property_address || 'Não informado').split(',').map((part, index) => (
-                                                <span key={index} className="block">{part.trim()}</span>
-                                            ))}
-                                        </div>
+                                        <p><strong>Endereço do imóvel:</strong> {selectedMessage.property_address || 'Não informado'}</p>
                                         <p><strong>Tipo:</strong> {selectedMessage.property_type || 'Não informado'}</p>
                                         <p><strong>Valor Estimado:</strong> {formatCurrency(selectedMessage.property_value)}</p>
                                         <p><strong>Diária Desejada:</strong> {formatCurrency(selectedMessage.daily_rate)}</p>
