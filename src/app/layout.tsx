@@ -44,9 +44,8 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="manifest" href="/manifest.json" crossOrigin="use-credentials" />
-        <link rel="icon" href={`/favicon.ico?v=${new Date().getTime()}`} sizes="any" />
-        <link rel="icon" href={`/favicon-192.png?v=${new Date().getTime()}`} type="image/png" />
-        <link rel="apple-touch-icon" href={`/apple-touch-icon.png?v=${new Date().getTime()}`} />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/philfung/add-to-homescreen@3.3/dist/add-to-homescreen.min.css"
