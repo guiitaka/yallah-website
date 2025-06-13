@@ -20,8 +20,8 @@ export type Message = {
     category: string | null;
     property_type: string | null;
     property_address: string | null;
-    property_value: number | null;
-    daily_rate: number | null;
+    property_value: string | null;
+    daily_rate: string | null;
     current_platform: string | null;
     furnishing_state: string | null;
 };
@@ -100,11 +100,7 @@ const Inbox = () => {
             if (error) {
                 console.error('Error updating message status:', error);
             } else {
-                setMessages(prevMessages =>
-                    prevMessages.map(m =>
-                        m.id === message.id ? { ...m, is_read: true } : m
-                    )
-                );
+                setMessages(messages.map(m => m.id === message.id ? { ...m, is_read: true } : m));
             }
         }
     };
@@ -149,9 +145,10 @@ const Inbox = () => {
     };
 
     // Helper para formatar moeda
-    const formatCurrency = (value: number | null) => {
+    const formatCurrency = (value: string | null) => {
         if (value === null || typeof value === 'undefined') return 'N/A';
-        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+        const numericValue = parseFloat(value);
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(numericValue);
     };
 
     if (loading && page === 1) {
@@ -204,7 +201,7 @@ const Inbox = () => {
                                         <p className={`font-bold ${!msg.is_read ? 'text-gray-900' : 'text-gray-600'}`}>{`${msg.first_name} ${msg.last_name || ''}`}</p>
                                         {!msg.is_read && <span className="w-2.5 h-2.5 bg-blue-500 rounded-full flex-shrink-0 mt-1.5 ml-2"></span>}
                                     </div>
-                                    <p className="text-sm text-gray-500 truncate mt-1">{msg.message || 'Novo Lead'}</p>
+                                    <p className="text-sm text-gray-500 truncate mt-1">{msg.message || msg.property_address || 'Novo Lead'}</p>
                                     <div className="flex justify-between items-center mt-2">
                                         <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-200 text-gray-700">{msg.category || 'Geral'}</span>
                                         <p className="text-xs text-right text-gray-400">
@@ -288,13 +285,82 @@ const Inbox = () => {
                                         <MapPin size={16} />
                                         Detalhes do Imóvel
                                     </h4>
-                                    <div className="space-y-3">
-                                        <p><strong>Endereço do imóvel:</strong> {selectedMessage.property_address || 'Não informado'}</p>
-                                        <p><strong>Tipo:</strong> {selectedMessage.property_type || 'Não informado'}</p>
-                                        <p><strong>Valor Estimado:</strong> {formatCurrency(selectedMessage.property_value)}</p>
-                                        <p><strong>Diária Desejada:</strong> {formatCurrency(selectedMessage.daily_rate)}</p>
-                                        <p><strong>Plataformas Atuais:</strong> {selectedMessage.current_platform || 'Nenhuma'}</p>
-                                        <p><strong>Mobília:</strong> {selectedMessage.furnishing_state || 'Não informado'}</p>
+                                    <div className="space-y-4">
+                                        {/* TIPO */}
+                                        <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-400">
+                                            <div className="space-y-2">
+                                                <div className="text-base font-bold text-gray-800">
+                                                    TIPO:
+                                                </div>
+                                                <div className="text-gray-900 font-medium text-base bg-white p-2 rounded border">
+                                                    {selectedMessage.property_type || 'Não informado'}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* ENDEREÇO */}
+                                        <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-400">
+                                            <div className="space-y-2">
+                                                <div className="text-base font-bold text-blue-800">
+                                                    ENDEREÇO:
+                                                </div>
+                                                <div className="text-gray-900 font-medium text-base bg-white p-3 rounded border">
+                                                    {selectedMessage.property_address}
+                                                </div>
+                                                {/* DEBUG TEMPORÁRIO */}
+                                                <div className="text-base p-2 rounded">
+                                                    "{selectedMessage.property_address || 'VAZIO'}" | {selectedMessage.property_address ? 'Endereço preenchido no formulário' : 'Endereço NÃO preenchido no formulário'}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* VALOR ESTIMADO */}
+                                        <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-400">
+                                            <div className="space-y-2">
+                                                <div className="text-base font-bold text-green-800">
+                                                    VALOR ESTIMADO:
+                                                </div>
+                                                <div className="text-gray-900 font-medium text-base bg-white p-2 rounded border">
+                                                    {formatCurrency(selectedMessage.property_value)}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* DIÁRIA DESEJADA */}
+                                        <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400">
+                                            <div className="space-y-2">
+                                                <div className="text-base font-bold text-yellow-800">
+                                                    DIÁRIA DESEJADA:
+                                                </div>
+                                                <div className="text-gray-900 font-medium text-base bg-white p-2 rounded border">
+                                                    {formatCurrency(selectedMessage.daily_rate)}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* PLATAFORMAS ATUAIS */}
+                                        <div className="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-400">
+                                            <div className="space-y-2">
+                                                <div className="text-base font-bold text-purple-800">
+                                                    PLATAFORMAS ATUAIS:
+                                                </div>
+                                                <div className="text-gray-900 font-medium text-base bg-white p-2 rounded border">
+                                                    {selectedMessage.current_platform || 'Nenhuma'}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* MOBÍLIA */}
+                                        <div className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-400">
+                                            <div className="space-y-2">
+                                                <div className="text-base font-bold text-orange-800">
+                                                    MOBÍLIA:
+                                                </div>
+                                                <div className="text-gray-900 font-medium text-base bg-white p-2 rounded border">
+                                                    {selectedMessage.furnishing_state || 'Não informado'}
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             )}
