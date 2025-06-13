@@ -200,7 +200,7 @@ const Inbox = () => {
                                         <p className={`font-bold ${!msg.is_read ? 'text-gray-900' : 'text-gray-600'}`}>{`${msg.first_name} ${msg.last_name || ''}`}</p>
                                         {!msg.is_read && <span className="w-2.5 h-2.5 bg-blue-500 rounded-full flex-shrink-0 mt-1.5 ml-2"></span>}
                                     </div>
-                                    <p className="text-sm text-gray-500 truncate mt-1">{msg.message || msg.property_address || 'Novo Lead'}</p>
+                                    <p className="text-sm text-gray-500 truncate mt-1">{msg.message || 'Novo Lead'}</p>
                                     <div className="flex justify-between items-center mt-2">
                                         <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-200 text-gray-700">{msg.category || 'Geral'}</span>
                                         <p className="text-xs text-right text-gray-400">
@@ -285,8 +285,13 @@ const Inbox = () => {
                                         Detalhes do Imóvel
                                     </h4>
                                     <div className="space-y-3">
+                                        <div>
+                                            <strong>Endereço do imóvel:</strong>
+                                            {(selectedMessage.property_address || 'Não informado').split(',').map((part, index) => (
+                                                <span key={index} className="block">{part.trim()}</span>
+                                            ))}
+                                        </div>
                                         <p><strong>Tipo:</strong> {selectedMessage.property_type || 'Não informado'}</p>
-                                        <p><strong>Endereço:</strong> {selectedMessage.property_address || 'Não informado'}</p>
                                         <p><strong>Valor Estimado:</strong> {formatCurrency(selectedMessage.property_value)}</p>
                                         <p><strong>Diária Desejada:</strong> {formatCurrency(selectedMessage.daily_rate)}</p>
                                         <p><strong>Plataformas Atuais:</strong> {selectedMessage.current_platform || 'Nenhuma'}</p>
