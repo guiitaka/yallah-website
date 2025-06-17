@@ -23,37 +23,40 @@ export default function Footer() {
                 </div>
 
                 {/* Links */}
-                <div className="grid grid-cols-2 gap-6 mb-8">
+                <div className="grid grid-cols-2 gap-x-6 gap-y-8 mb-8">
                     <div className="space-y-3">
                         <h3 className="font-bold text-sm mb-4">Navegação</h3>
-                        <Link href="/mobile/a-yallah" className="block text-sm opacity-80">
-                            A Yallah
+                        <Link href="/mobile" className="block text-sm opacity-80">
+                            Início
                         </Link>
-                        <Link href="/mobile/como-funciona" className="block text-sm opacity-80">
+                        <Link href="/mobile/owner/servicos" className="block text-sm opacity-80">
+                            Serviços
+                        </Link>
+                        <Link href="/mobile/owner/como-funciona" className="block text-sm opacity-80">
                             Como Funciona
                         </Link>
-                        <Link href="/mobile/metodo" className="block text-sm opacity-80">
-                            Método
+                        <Link href="/mobile/owner/nosso-metodo" className="block text-sm opacity-80">
+                            Nosso Método
                         </Link>
-                        <Link href="/mobile/contato" className="block text-sm opacity-80">
+                    </div>
+
+                    <div className="space-y-3">
+                        <h3 className="font-bold text-sm mb-4">Ferramentas</h3>
+                        <Link href="/mobile/tenant" className="block text-sm opacity-80">
+                            Para locatários
+                        </Link>
+                        <Link href="/mobile/owner" className="block text-sm opacity-80">
+                            Para proprietários
+                        </Link>
+                        <Link href="/mobile/owner/fale-conosco" className="block text-sm opacity-80">
                             Contato
                         </Link>
                     </div>
 
                     <div className="space-y-3">
-                        <h3 className="font-bold text-sm mb-4">Categorias</h3>
-                        <Link href="/mobile/tenant/apartamentos" className="block text-sm opacity-80">
-                            Apartamentos
-                        </Link>
-                        <Link href="/mobile/tenant/chales" className="block text-sm opacity-80">
-                            Chalés
-                        </Link>
-                        <Link href="/mobile/tenant/pousadas" className="block text-sm opacity-80">
-                            Pousadas
-                        </Link>
-                        <Link href="/mobile/tenant/studios" className="block text-sm opacity-80">
-                            Studios
-                        </Link>
+                        <h3 className="font-bold text-sm mb-4">Contato</h3>
+                        <a href="mailto:contato@yallah.com" className="block text-sm opacity-80">contato@yallah.com</a>
+                        <a href="tel:+5511999999999" className="block text-sm opacity-80">+55 (11) 99999-9999</a>
                     </div>
                 </div>
 

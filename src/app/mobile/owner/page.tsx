@@ -8,6 +8,7 @@ import ContactForm from '@/components/home/ContactForm';
 import FAQ from '@/components/home/FAQ';
 import AboutSection from '@/components/mobile/AboutSection';
 import MapPresenceSection from '@/components/mobile/MapPresenceSection';
+import Footer from '@/components/mobile/Footer';
 import { Buildings, ShieldCheck, Money, ChartLineUp } from '@phosphor-icons/react';
 
 const GITHUB_VIDEO_BASE_URL = 'https://user-images.githubusercontent.com/YOUR_USER_ID/YOUR_REPO'
@@ -163,6 +164,7 @@ export default function MobileOwnerPage() {
 
         <ContactForm />
         <FAQ />
+        <Footer />
       </div>
     </MobileLayout>
   );

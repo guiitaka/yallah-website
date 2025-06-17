@@ -39,7 +39,9 @@ export default function Footer() {
             <ul className="space-y-3">
               <li><Link href="/" className="text-white/80 hover:text-white transition-colors">Início</Link></li>
               <li><Link href="/owner/servicos" className="text-white/80 hover:text-white transition-colors">Serviços</Link></li>
-              <li><Link href="/owner/como-funciona" className="text-white/80 hover:text-white transition-colors">Sobre</Link></li>
+              <li><Link href="/owner/como-funciona" className="text-white/80 hover:text-white transition-colors">Como Funciona</Link></li>
+              <li><Link href="/owner/nosso-metodo" className="text-white/80 hover:text-white transition-colors">Nosso Método</Link></li>
+              <li><Link href="/owner/fale-conosco" className="text-white/80 hover:text-white transition-colors">Sobre</Link></li>
             </ul>
           </div>
 
@@ -49,7 +51,6 @@ export default function Footer() {
             <ul className="space-y-3">
               <li><Link href="/tenant" className="text-white/80 hover:text-white transition-colors">Para locatários</Link></li>
               <li><Link href="/owner" className="text-white/80 hover:text-white transition-colors">Para proprietários</Link></li>
-              <li><Link href="/owner/nosso-metodo" className="text-white/80 hover:text-white transition-colors">Nosso Método</Link></li>
               <li><Link href="/owner/fale-conosco" className="text-white/80 hover:text-white transition-colors">Contato</Link></li>
             </ul>
           </div>

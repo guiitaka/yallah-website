@@ -1,5 +1,8 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: false
 ---
+# Do not start new localhost servers
+
+When running the application, do not start a new `localhost` server if one is already running. Check the terminal history for evidence of a running server before starting a new one.
